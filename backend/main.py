@@ -5,6 +5,16 @@ from typing import Optional
 from datetime import date, datetime
 import json
 import redis
+import logging
+from dotenv import load_dotenv
+from kiwi_client import KiwiFlightClient
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Flight Discovery API", version="2.0.0")
 
@@ -23,6 +33,10 @@ try:
     redis_client.ping()
 except Exception:
     redis_client = None
+
+# Initialize Kiwi client
+kiwi_client = KiwiFlightClient()
+logger.info(f"Kiwi API available: {kiwi_client.is_available()}")
 
 # Airport definitions
 AIRPORTS = {
@@ -207,10 +221,14 @@ def add_tax_and_info(flight: dict) -> dict:
     f = flight.copy()
     dest = AIRPORTS.get(f["destination"], {})
     orig = AIRPORTS.get(f["origin"], {})
-    tax_amount = round(f["price"] * 0.15)
-    total_price = f["price"] + tax_amount
-    f["tax_amount"] = tax_amount
-    f["total_price"] = total_price
+    
+    # Handle tax calculation (Amadeus flights already have total_price)
+    if "total_price" not in f or f.get("source") != "amadeus":
+        tax_amount = round(f["price"] * 0.15)
+        total_price = f["price"] + tax_amount
+        f["tax_amount"] = tax_amount
+        f["total_price"] = total_price
+    
     f["city"] = dest.get("city", f["destination"])
     f["country"] = dest.get("country", "")
     f["region"] = dest.get("region", "Other")
@@ -224,7 +242,7 @@ def add_tax_and_info(flight: dict) -> dict:
     else:
         f["duration"] = f"{hours}h"
     
-    f["historical_price"] = round(f["price"] * 1.4)
+    f["historical_price"] = round(f.get("price", f.get("total_price", 0)) * 1.4)
     f["booking_url"] = generate_booking_url(
         f["origin"], f["destination"], f["date"],
         orig.get("city", f["origin"]), dest.get("city", f["destination"])
@@ -411,22 +429,57 @@ async def search_flights(
     if redis_client:
         cached = redis_client.get(cache_key)
         if cached:
+            logger.info(f"Returning cached results for {cache_key}")
             return json.loads(cached.decode("utf-8"))
 
-    filtered = [
-        f for f in mock_flights
-        if f["origin"] == origin
-        and (month is None or f["date"].startswith(month))
-        and (destination is None or f["destination"] == destination.upper() or
-             destination.lower() in f["city"].lower())
-    ]
+    # Try Kiwi API first
+    api_flights = []
+    if kiwi_client.is_available():
+        try:
+            logger.info(f"Searching Kiwi API: origin={origin}, month={month}, dest={destination}")
+            if month:
+                api_flights = kiwi_client.search_by_month(
+                    origin=origin,
+                    month=month,
+                    destination=destination,
+                    max_results=100
+                )
+            else:
+                # Single search without month
+                api_flights = kiwi_client.search_flights(
+                    origin=origin,
+                    destination=destination,
+                    max_results=100
+                )
+            
+            # Enrich API flights with airport metadata
+            api_flights = [add_tax_and_info(f) for f in api_flights]
+            logger.info(f"Retrieved {len(api_flights)} flights from Kiwi API")
+            
+        except Exception as e:
+            logger.error(f"Kiwi API error: {e} - falling back to mock data")
 
-    ranked = rank_flights(filtered)
+    # Fallback to mock data if no API results
+    if not api_flights:
+        logger.info("Using mock data (Kiwi unavailable or returned no results)")
+        filtered = [
+            f for f in mock_flights
+            if f["origin"] == origin
+            and (month is None or f["date"].startswith(month))
+            and (destination is None or f["destination"] == destination.upper() or
+                 destination.lower() in f["city"].lower())
+        ]
+        api_flights = filtered
+
+    # Apply value scoring algorithm
+    ranked = rank_flights(api_flights)
     flights = enrich_flights_with_deals(ranked)
 
+    # Cache results
     if redis_client:
         redis_client.set(cache_key, json.dumps(flights), ex=24 * 3600)
 
+    logger.info(f"Returning {len(flights)} flights to frontend")
     return flights
 
 
