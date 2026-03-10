@@ -15,6 +15,8 @@ interface DestinationCardProps {
   date: string;
   airline: string;
   duration: string;
+  durationHours?: number;
+  stops?: number;
   safetyScore: number;
   dealScore: number;
   dealClassification: string;
@@ -56,6 +58,8 @@ export default function DestinationCard({
   date,
   airline,
   duration,
+  durationHours,
+  stops = 0,
   safetyScore,
   dealScore,
   dealClassification,
@@ -84,6 +88,28 @@ export default function DestinationCard({
     dealBadgeClass = "bg-green-600 text-white";
   }
 
+  // Format stops display
+  let stopsText = "";
+  if (stops === 0) {
+    stopsText = "Nonstop";
+  } else if (stops === 1) {
+    stopsText = "1 stop";
+  } else {
+    stopsText = `${stops} stops`;
+  }
+
+  // Value score color coding
+  let valueScoreClass = "";
+  if (valueScore >= 80) {
+    valueScoreClass = "bg-green-500 text-white";
+  } else if (valueScore >= 60) {
+    valueScoreClass = "bg-blue-500 text-white";
+  } else if (valueScore >= 40) {
+    valueScoreClass = "bg-amber-500 text-white";
+  } else {
+    valueScoreClass = "bg-gray-400 text-white";
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -104,9 +130,19 @@ export default function DestinationCard({
             {dealBadgeText}
           </span>
         )}
+        {/* Nonstop badge */}
+        {stops === 0 && (
+          <span className="absolute top-3 left-3 mt-8 bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
+            ✈️ Nonstop
+          </span>
+        )}
         {/* Airport code pill */}
         <span className="absolute top-3 right-3 bg-black/40 text-white text-xs font-mono font-bold px-2.5 py-1 rounded-full">
           {destination}
+        </span>
+        {/* Value score badge */}
+        <span className={`absolute top-3 right-3 mt-8 text-xs font-bold px-2.5 py-1 rounded-full shadow ${valueScoreClass}`}>
+          Value: {Math.round(valueScore)}
         </span>
         {/* City name overlay */}
         <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-black/60 to-transparent">
@@ -148,13 +184,13 @@ export default function DestinationCard({
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-base">⏱️</span>
-            <span>{duration}</span>
+            <span className="font-medium">{duration}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className={`text-base ${dealScore >= 70 ? "text-green-600" : dealScore >= 50 ? "text-amber-500" : "text-gray-400"}`}>
-              {dealScore >= 70 ? "💚" : dealScore >= 50 ? "🟡" : "⚪"}
+            <span className={`text-base ${stops === 0 ? "text-green-600" : stops === 1 ? "text-amber-500" : "text-gray-400"}`}>
+              {stops === 0 ? "🟢" : stops === 1 ? "🟡" : "🔴"}
             </span>
-            <span>Score {Math.round(dealScore)}/100</span>
+            <span className="font-medium">{stopsText}</span>
           </div>
         </div>
 

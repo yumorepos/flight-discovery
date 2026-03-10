@@ -130,75 +130,76 @@ def get_duration(origin: str, destination: str) -> str:
     else:
         return "10h 00m"
 
-# Mock flight data - 55 flights across March-August 2026
+# Mock flight data - 58 flights across March-August 2026
+# Duration in hours (float), stops: 0 (nonstop), 1, or 2+
 _raw_flights = [
     # YUL -> Various (March)
-    {"id": 1, "origin": "YUL", "destination": "JFK", "price": 189, "date": "2026-03-15", "airline": "Air Canada"},
-    {"id": 2, "origin": "YUL", "destination": "LAX", "price": 329, "date": "2026-03-20", "airline": "United"},
-    {"id": 3, "origin": "YUL", "destination": "CDG", "price": 419, "date": "2026-03-22", "airline": "Air Canada"},
-    {"id": 4, "origin": "YUL", "destination": "LHR", "price": 389, "date": "2026-03-18", "airline": "British Airways"},
-    {"id": 5, "origin": "YUL", "destination": "NRT", "price": 749, "date": "2026-03-25", "airline": "Air Canada"},
-    {"id": 6, "origin": "YUL", "destination": "AKL", "price": 1099, "date": "2026-03-28", "airline": "Air New Zealand"},
-    {"id": 7, "origin": "YUL", "destination": "JNB", "price": 879, "date": "2026-03-22", "airline": "South African Airways"},
-    {"id": 8, "origin": "YUL", "destination": "CUN", "price": 299, "date": "2026-03-19", "airline": "WestJet"},
-    {"id": 9, "origin": "YUL", "destination": "BCN", "price": 459, "date": "2026-03-30", "airline": "Iberia"},
-    {"id": 10, "origin": "YUL", "destination": "DXB", "price": 599, "date": "2026-03-16", "airline": "Emirates"},
+    {"id": 1, "origin": "YUL", "destination": "JFK", "price": 189, "date": "2026-03-15", "airline": "Air Canada", "duration_hours": 1.5, "stops": 0},
+    {"id": 2, "origin": "YUL", "destination": "LAX", "price": 329, "date": "2026-03-20", "airline": "United", "duration_hours": 5.75, "stops": 0},
+    {"id": 3, "origin": "YUL", "destination": "CDG", "price": 419, "date": "2026-03-22", "airline": "Air Canada", "duration_hours": 7.33, "stops": 0},
+    {"id": 4, "origin": "YUL", "destination": "LHR", "price": 389, "date": "2026-03-18", "airline": "British Airways", "duration_hours": 7.0, "stops": 0},
+    {"id": 5, "origin": "YUL", "destination": "NRT", "price": 749, "date": "2026-03-25", "airline": "Air Canada", "duration_hours": 13.5, "stops": 0},
+    {"id": 6, "origin": "YUL", "destination": "AKL", "price": 1099, "date": "2026-03-28", "airline": "Air New Zealand", "duration_hours": 21.0, "stops": 1},
+    {"id": 7, "origin": "YUL", "destination": "JNB", "price": 879, "date": "2026-03-22", "airline": "South African Airways", "duration_hours": 16.0, "stops": 1},
+    {"id": 8, "origin": "YUL", "destination": "CUN", "price": 299, "date": "2026-03-19", "airline": "WestJet", "duration_hours": 4.5, "stops": 0},
+    {"id": 9, "origin": "YUL", "destination": "BCN", "price": 459, "date": "2026-03-30", "airline": "Iberia", "duration_hours": 8.33, "stops": 1},
+    {"id": 10, "origin": "YUL", "destination": "DXB", "price": 599, "date": "2026-03-16", "airline": "Emirates", "duration_hours": 11.5, "stops": 1},
     # YUL -> Various (April)
-    {"id": 11, "origin": "YUL", "destination": "JFK", "price": 209, "date": "2026-04-10", "airline": "WestJet"},
-    {"id": 12, "origin": "YUL", "destination": "LAX", "price": 349, "date": "2026-04-18", "airline": "Air Canada"},
-    {"id": 13, "origin": "YUL", "destination": "CDG", "price": 439, "date": "2026-04-22", "airline": "Air France"},
-    {"id": 14, "origin": "YUL", "destination": "FCO", "price": 469, "date": "2026-04-14", "airline": "Air Canada"},
-    {"id": 15, "origin": "YUL", "destination": "SIN", "price": 899, "date": "2026-04-20", "airline": "Singapore Airlines"},
-    {"id": 16, "origin": "YUL", "destination": "AKL", "price": 1149, "date": "2026-04-25", "airline": "Air New Zealand"},
-    {"id": 17, "origin": "YUL", "destination": "GRU", "price": 649, "date": "2026-04-12", "airline": "LATAM"},
-    {"id": 18, "origin": "YUL", "destination": "FRA", "price": 399, "date": "2026-04-08", "airline": "Lufthansa"},
-    {"id": 19, "origin": "YUL", "destination": "MIA", "price": 249, "date": "2026-04-05", "airline": "Air Canada"},
-    {"id": 20, "origin": "YUL", "destination": "BKK", "price": 819, "date": "2026-04-28", "airline": "Thai Airways"},
+    {"id": 11, "origin": "YUL", "destination": "JFK", "price": 209, "date": "2026-04-10", "airline": "WestJet", "duration_hours": 1.5, "stops": 0},
+    {"id": 12, "origin": "YUL", "destination": "LAX", "price": 349, "date": "2026-04-18", "airline": "Air Canada", "duration_hours": 5.75, "stops": 0},
+    {"id": 13, "origin": "YUL", "destination": "CDG", "price": 439, "date": "2026-04-22", "airline": "Air France", "duration_hours": 7.33, "stops": 0},
+    {"id": 14, "origin": "YUL", "destination": "FCO", "price": 469, "date": "2026-04-14", "airline": "Air Canada", "duration_hours": 8.5, "stops": 1},
+    {"id": 15, "origin": "YUL", "destination": "SIN", "price": 899, "date": "2026-04-20", "airline": "Singapore Airlines", "duration_hours": 16.0, "stops": 1},
+    {"id": 16, "origin": "YUL", "destination": "AKL", "price": 1149, "date": "2026-04-25", "airline": "Air New Zealand", "duration_hours": 21.0, "stops": 1},
+    {"id": 17, "origin": "YUL", "destination": "GRU", "price": 649, "date": "2026-04-12", "airline": "LATAM", "duration_hours": 9.5, "stops": 0},
+    {"id": 18, "origin": "YUL", "destination": "FRA", "price": 399, "date": "2026-04-08", "airline": "Lufthansa", "duration_hours": 7.75, "stops": 0},
+    {"id": 19, "origin": "YUL", "destination": "MIA", "price": 249, "date": "2026-04-05", "airline": "Air Canada", "duration_hours": 3.25, "stops": 0},
+    {"id": 20, "origin": "YUL", "destination": "BKK", "price": 819, "date": "2026-04-28", "airline": "Thai Airways", "duration_hours": 16.75, "stops": 1},
     # YUL -> Various (May)
-    {"id": 21, "origin": "YUL", "destination": "AMS", "price": 429, "date": "2026-05-05", "airline": "KLM"},
-    {"id": 22, "origin": "YUL", "destination": "MAD", "price": 479, "date": "2026-05-12", "airline": "Iberia"},
-    {"id": 23, "origin": "YUL", "destination": "ICN", "price": 769, "date": "2026-05-18", "airline": "Korean Air"},
-    {"id": 24, "origin": "YUL", "destination": "ZRH", "price": 449, "date": "2026-05-22", "airline": "Swiss International"},
-    {"id": 25, "origin": "YUL", "destination": "DEL", "price": 699, "date": "2026-05-08", "airline": "Air India"},
-    {"id": 26, "origin": "YUL", "destination": "HNL", "price": 559, "date": "2026-05-15", "airline": "Air Canada"},
-    {"id": 27, "origin": "YUL", "destination": "EZE", "price": 749, "date": "2026-05-25", "airline": "Aerolíneas Argentinas"},
+    {"id": 21, "origin": "YUL", "destination": "AMS", "price": 429, "date": "2026-05-05", "airline": "KLM", "duration_hours": 7.5, "stops": 0},
+    {"id": 22, "origin": "YUL", "destination": "MAD", "price": 479, "date": "2026-05-12", "airline": "Iberia", "duration_hours": 8.17, "stops": 1},
+    {"id": 23, "origin": "YUL", "destination": "ICN", "price": 769, "date": "2026-05-18", "airline": "Korean Air", "duration_hours": 13.75, "stops": 0},
+    {"id": 24, "origin": "YUL", "destination": "ZRH", "price": 449, "date": "2026-05-22", "airline": "Swiss International", "duration_hours": 7.92, "stops": 0},
+    {"id": 25, "origin": "YUL", "destination": "DEL", "price": 699, "date": "2026-05-08", "airline": "Air India", "duration_hours": 13.0, "stops": 1},
+    {"id": 26, "origin": "YUL", "destination": "HNL", "price": 559, "date": "2026-05-15", "airline": "Air Canada", "duration_hours": 10.5, "stops": 1},
+    {"id": 27, "origin": "YUL", "destination": "EZE", "price": 749, "date": "2026-05-25", "airline": "Aerolíneas Argentinas", "duration_hours": 11.0, "stops": 1},
     # YUL -> Various (June)
-    {"id": 28, "origin": "YUL", "destination": "LHR", "price": 419, "date": "2026-06-10", "airline": "Air Canada"},
-    {"id": 29, "origin": "YUL", "destination": "NRT", "price": 799, "date": "2026-06-20", "airline": "Air Canada"},
-    {"id": 30, "origin": "YUL", "destination": "JFK", "price": 179, "date": "2026-06-05", "airline": "Air Canada"},
-    {"id": 31, "origin": "YUL", "destination": "SYD", "price": 1289, "date": "2026-06-15", "airline": "Qantas"},
-    {"id": 32, "origin": "YUL", "destination": "KUL", "price": 859, "date": "2026-06-22", "airline": "Malaysia Airlines"},
-    {"id": 33, "origin": "YUL", "destination": "HKG", "price": 829, "date": "2026-06-28", "airline": "Cathay Pacific"},
+    {"id": 28, "origin": "YUL", "destination": "LHR", "price": 419, "date": "2026-06-10", "airline": "Air Canada", "duration_hours": 7.0, "stops": 0},
+    {"id": 29, "origin": "YUL", "destination": "NRT", "price": 799, "date": "2026-06-20", "airline": "Air Canada", "duration_hours": 13.5, "stops": 0},
+    {"id": 30, "origin": "YUL", "destination": "JFK", "price": 179, "date": "2026-06-05", "airline": "Air Canada", "duration_hours": 1.5, "stops": 0},
+    {"id": 31, "origin": "YUL", "destination": "SYD", "price": 1289, "date": "2026-06-15", "airline": "Qantas", "duration_hours": 20.5, "stops": 1},
+    {"id": 32, "origin": "YUL", "destination": "KUL", "price": 859, "date": "2026-06-22", "airline": "Malaysia Airlines", "duration_hours": 17.5, "stops": 1},
+    {"id": 33, "origin": "YUL", "destination": "HKG", "price": 829, "date": "2026-06-28", "airline": "Cathay Pacific", "duration_hours": 14.5, "stops": 1},
     # YUL -> Various (July-August)
-    {"id": 34, "origin": "YUL", "destination": "BCN", "price": 499, "date": "2026-07-10", "airline": "Air Transat"},
-    {"id": 35, "origin": "YUL", "destination": "CDG", "price": 479, "date": "2026-07-18", "airline": "Air France"},
-    {"id": 36, "origin": "YUL", "destination": "LAX", "price": 369, "date": "2026-07-25", "airline": "WestJet"},
-    {"id": 37, "origin": "YUL", "destination": "CUN", "price": 319, "date": "2026-08-05", "airline": "WestJet"},
-    {"id": 38, "origin": "YUL", "destination": "LHR", "price": 449, "date": "2026-08-12", "airline": "British Airways"},
+    {"id": 34, "origin": "YUL", "destination": "BCN", "price": 499, "date": "2026-07-10", "airline": "Air Transat", "duration_hours": 8.33, "stops": 0},
+    {"id": 35, "origin": "YUL", "destination": "CDG", "price": 479, "date": "2026-07-18", "airline": "Air France", "duration_hours": 7.33, "stops": 0},
+    {"id": 36, "origin": "YUL", "destination": "LAX", "price": 369, "date": "2026-07-25", "airline": "WestJet", "duration_hours": 5.75, "stops": 0},
+    {"id": 37, "origin": "YUL", "destination": "CUN", "price": 319, "date": "2026-08-05", "airline": "WestJet", "duration_hours": 4.5, "stops": 0},
+    {"id": 38, "origin": "YUL", "destination": "LHR", "price": 449, "date": "2026-08-12", "airline": "British Airways", "duration_hours": 7.0, "stops": 0},
     # YYZ -> Various
-    {"id": 39, "origin": "YYZ", "destination": "LHR", "price": 399, "date": "2026-03-14", "airline": "Air Canada"},
-    {"id": 40, "origin": "YYZ", "destination": "CDG", "price": 449, "date": "2026-04-16", "airline": "Air France"},
-    {"id": 41, "origin": "YYZ", "destination": "NRT", "price": 779, "date": "2026-04-22", "airline": "Japan Airlines"},
-    {"id": 42, "origin": "YYZ", "destination": "SIN", "price": 919, "date": "2026-05-18", "airline": "Singapore Airlines"},
-    {"id": 43, "origin": "YYZ", "destination": "DXB", "price": 619, "date": "2026-06-10", "airline": "Emirates"},
-    {"id": 44, "origin": "YYZ", "destination": "GRU", "price": 699, "date": "2026-07-14", "airline": "LATAM"},
+    {"id": 39, "origin": "YYZ", "destination": "LHR", "price": 399, "date": "2026-03-14", "airline": "Air Canada", "duration_hours": 7.5, "stops": 0},
+    {"id": 40, "origin": "YYZ", "destination": "CDG", "price": 449, "date": "2026-04-16", "airline": "Air France", "duration_hours": 7.75, "stops": 0},
+    {"id": 41, "origin": "YYZ", "destination": "NRT", "price": 779, "date": "2026-04-22", "airline": "Japan Airlines", "duration_hours": 13.25, "stops": 0},
+    {"id": 42, "origin": "YYZ", "destination": "SIN", "price": 919, "date": "2026-05-18", "airline": "Singapore Airlines", "duration_hours": 16.5, "stops": 1},
+    {"id": 43, "origin": "YYZ", "destination": "DXB", "price": 619, "date": "2026-06-10", "airline": "Emirates", "duration_hours": 12.5, "stops": 1},
+    {"id": 44, "origin": "YYZ", "destination": "GRU", "price": 699, "date": "2026-07-14", "airline": "LATAM", "duration_hours": 10.0, "stops": 0},
     # JFK -> Various
-    {"id": 45, "origin": "JFK", "destination": "LHR", "price": 369, "date": "2026-03-18", "airline": "American Airlines"},
-    {"id": 46, "origin": "JFK", "destination": "CDG", "price": 389, "date": "2026-04-14", "airline": "Delta"},
-    {"id": 47, "origin": "JFK", "destination": "NRT", "price": 679, "date": "2026-05-20", "airline": "JAL"},
-    {"id": 48, "origin": "JFK", "destination": "LAX", "price": 199, "date": "2026-03-22", "airline": "JetBlue"},
-    {"id": 49, "origin": "JFK", "destination": "FRA", "price": 349, "date": "2026-06-05", "airline": "Lufthansa"},
-    {"id": 50, "origin": "JFK", "destination": "DXB", "price": 549, "date": "2026-07-10", "airline": "Emirates"},
+    {"id": 45, "origin": "JFK", "destination": "LHR", "price": 369, "date": "2026-03-18", "airline": "American Airlines", "duration_hours": 7.0, "stops": 0},
+    {"id": 46, "origin": "JFK", "destination": "CDG", "price": 389, "date": "2026-04-14", "airline": "Delta", "duration_hours": 7.5, "stops": 0},
+    {"id": 47, "origin": "JFK", "destination": "NRT", "price": 679, "date": "2026-05-20", "airline": "JAL", "duration_hours": 14.0, "stops": 0},
+    {"id": 48, "origin": "JFK", "destination": "LAX", "price": 199, "date": "2026-03-22", "airline": "JetBlue", "duration_hours": 6.0, "stops": 0},
+    {"id": 49, "origin": "JFK", "destination": "FRA", "price": 349, "date": "2026-06-05", "airline": "Lufthansa", "duration_hours": 8.0, "stops": 0},
+    {"id": 50, "origin": "JFK", "destination": "DXB", "price": 549, "date": "2026-07-10", "airline": "Emirates", "duration_hours": 12.5, "stops": 0},
     # LAX -> Various
-    {"id": 51, "origin": "LAX", "destination": "NRT", "price": 629, "date": "2026-03-20", "airline": "ANA"},
-    {"id": 52, "origin": "LAX", "destination": "SYD", "price": 899, "date": "2026-04-18", "airline": "Qantas"},
-    {"id": 53, "origin": "LAX", "destination": "LHR", "price": 549, "date": "2026-05-15", "airline": "Virgin Atlantic"},
-    {"id": 54, "origin": "LAX", "destination": "EZE", "price": 779, "date": "2026-06-22", "airline": "LATAM"},
-    {"id": 55, "origin": "LAX", "destination": "CDG", "price": 499, "date": "2026-07-08", "airline": "Air France"},
+    {"id": 51, "origin": "LAX", "destination": "NRT", "price": 629, "date": "2026-03-20", "airline": "ANA", "duration_hours": 11.5, "stops": 0},
+    {"id": 52, "origin": "LAX", "destination": "SYD", "price": 899, "date": "2026-04-18", "airline": "Qantas", "duration_hours": 15.0, "stops": 0},
+    {"id": 53, "origin": "LAX", "destination": "LHR", "price": 549, "date": "2026-05-15", "airline": "Virgin Atlantic", "duration_hours": 10.5, "stops": 0},
+    {"id": 54, "origin": "LAX", "destination": "EZE", "price": 779, "date": "2026-06-22", "airline": "LATAM", "duration_hours": 13.0, "stops": 1},
+    {"id": 55, "origin": "LAX", "destination": "CDG", "price": 499, "date": "2026-07-08", "airline": "Air France", "duration_hours": 11.0, "stops": 0},
     # LHR -> Various
-    {"id": 56, "origin": "LHR", "destination": "DXB", "price": 489, "date": "2026-03-12", "airline": "Emirates"},
-    {"id": 57, "origin": "LHR", "destination": "SIN", "price": 529, "date": "2026-04-25", "airline": "Singapore Airlines"},
-    {"id": 58, "origin": "LHR", "destination": "NRT", "price": 579, "date": "2026-05-18", "airline": "British Airways"},
+    {"id": 56, "origin": "LHR", "destination": "DXB", "price": 489, "date": "2026-03-12", "airline": "Emirates", "duration_hours": 7.0, "stops": 0},
+    {"id": 57, "origin": "LHR", "destination": "SIN", "price": 529, "date": "2026-04-25", "airline": "Singapore Airlines", "duration_hours": 12.75, "stops": 0},
+    {"id": 58, "origin": "LHR", "destination": "NRT", "price": 579, "date": "2026-05-18", "airline": "British Airways", "duration_hours": 11.5, "stops": 0},
 ]
 
 def add_tax_and_info(flight: dict) -> dict:
@@ -214,7 +215,15 @@ def add_tax_and_info(flight: dict) -> dict:
     f["country"] = dest.get("country", "")
     f["region"] = dest.get("region", "Other")
     f["destination_emoji"] = dest.get("emoji", "✈️")
-    f["duration"] = get_duration(f["origin"], f["destination"])
+    
+    # Convert duration_hours to display format (e.g., "7h 30m")
+    hours = int(f.get("duration_hours", 0))
+    minutes = int((f.get("duration_hours", 0) - hours) * 60)
+    if minutes > 0:
+        f["duration"] = f"{hours}h {minutes}m"
+    else:
+        f["duration"] = f"{hours}h"
+    
     f["historical_price"] = round(f["price"] * 1.4)
     f["booking_url"] = generate_booking_url(
         f["origin"], f["destination"], f["date"],
@@ -251,16 +260,68 @@ def date_proximity_score(flight_date_str: str) -> float:
         return 50
 
 
+def normalize_score(value: float, min_val: float, max_val: float, reverse: bool = False) -> float:
+    """Normalize a value to 0-100 scale. If reverse=True, lower values get higher scores."""
+    if max_val == min_val:
+        return 50.0
+    normalized = ((value - min_val) / (max_val - min_val)) * 100
+    if reverse:
+        normalized = 100 - normalized
+    return max(0, min(100, normalized))
+
+
 def rank_flights(flights: list[dict]) -> list[dict]:
+    """
+    Implement value-based scoring algorithm:
+    - 40% price (lower = better)
+    - 30% duration (shorter = better)
+    - 20% stops (fewer = better)
+    - 10% OTA safety (existing)
+    """
+    if not flights:
+        return flights
+    
+    # Find ranges for normalization
+    prices = [f["price"] for f in flights]
+    durations = [f.get("duration_hours", 10) for f in flights]
+    
+    min_price, max_price = min(prices), max(prices)
+    min_duration, max_duration = min(durations), max(durations)
+    
     for flight in flights:
-        max_price = 2000
-        price_score = max(0, 100 - (flight["price"] / max_price * 100))
-        safety_score = 80.0  # Fixed stub score
+        # Normalize each factor to 0-100
+        price_score = normalize_score(flight["price"], min_price, max_price, reverse=True)
+        duration_score = normalize_score(flight.get("duration_hours", 10), min_duration, max_duration, reverse=True)
+        
+        # Stops score: 0 stops = 100, 1 stop = 50, 2+ stops = 0
+        stops = flight.get("stops", 0)
+        if stops == 0:
+            stops_score = 100
+        elif stops == 1:
+            stops_score = 50
+        else:
+            stops_score = 0
+        
+        # OTA safety score (existing stub)
+        safety_score = 80.0
+        
+        # Calculate weighted value score
+        value_score = (
+            price_score * 0.40 +
+            duration_score * 0.30 +
+            stops_score * 0.20 +
+            safety_score * 0.10
+        )
+        
+        flight["value_score"] = round(value_score, 1)
+        flight["safety_score"] = safety_score
+        
+        # Legacy "value" field for backward compatibility
         date_score = date_proximity_score(flight["date"])
         flight["value"] = price_score * 0.55 + safety_score * 0.25 + date_score * 0.20
-        flight["safety_score"] = safety_score
-        flight["value_score"] = price_score * 0.65 + date_score * 0.35
-    return sorted(flights, key=lambda x: x["value"], reverse=True)
+    
+    # Sort by value_score descending (highest value first)
+    return sorted(flights, key=lambda x: x["value_score"], reverse=True)
 
 
 def calculate_deal_score(flight: dict) -> float:

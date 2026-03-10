@@ -16,6 +16,8 @@ interface Flight {
   date: string;
   airline: string;
   duration: string;
+  duration_hours?: number;
+  stops?: number;
   safety_score: number;
   value_score: number;
   region: string;
@@ -176,10 +178,10 @@ export default function ResultsPage({ origin = "", month = "", destination = "" 
             onChange={(e) => setSortKey(e.target.value as SortKey)}
             className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="deal">Best Deal</option>
-            <option value="price_asc">Price: Low to High</option>
+            <option value="value">⭐ Best Value</option>
+            <option value="price_asc">💰 Lowest Price</option>
+            <option value="deal">🔥 Best Deal</option>
             <option value="price_desc">Price: High to Low</option>
-            <option value="value">Best Value</option>
           </select>
         </div>
       </div>
@@ -248,6 +250,8 @@ export default function ResultsPage({ origin = "", month = "", destination = "" 
                 date={flight.date}
                 airline={flight.airline}
                 duration={flight.duration}
+                durationHours={flight.duration_hours}
+                stops={flight.stops}
                 safetyScore={flight.safety_score}
                 dealScore={flight.deal_score}
                 dealClassification={flight.deal_classification}
