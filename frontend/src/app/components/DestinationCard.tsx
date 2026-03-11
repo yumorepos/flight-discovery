@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import EmailSubscription from "./EmailSubscription";
 
@@ -28,291 +28,181 @@ interface DestinationCardProps {
   index?: number;
 }
 
+const AIRLINE_CODES: Record<string, string> = {
+  "Air Canada": "AC",
+  "Air France": "AF",
+  "American Airlines": "AA",
+  "ANA": "NH",
+  "British Airways": "BA",
+  "Delta": "DL",
+  "Emirates": "EK",
+  "Iberia": "IB",
+  "JAL": "JL",
+  "JetBlue": "B6",
+  "KLM": "KL",
+  "LATAM": "LA",
+  "Lufthansa": "LH",
+  "Qantas": "QF",
+  "Singapore Airlines": "SQ",
+  "SWISS": "LX",
+  "Turkish Airlines": "TK",
+  "United": "UA",
+  "Virgin Atlantic": "VS",
+};
+
 const DESTINATION_IMAGES: Record<string, string> = {
-  "London": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop",
-  "Paris": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&h=300&fit=crop",
-  "Tokyo": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=300&fit=crop",
-  "Barcelona": "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=400&h=300&fit=crop",
-  "Rome": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&h=300&fit=crop",
-  "Dubai": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&h=300&fit=crop",
-  "Singapore": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400&h=300&fit=crop",
-  "Sydney": "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=400&h=300&fit=crop",
-  "New York": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&h=300&fit=crop",
-  "Los Angeles": "https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=400&h=300&fit=crop",
-  "Bangkok": "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=400&h=300&fit=crop",
-  "Hong Kong": "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?w=400&h=300&fit=crop",
-  "Amsterdam": "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=400&h=300&fit=crop",
-  "Madrid": "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&h=300&fit=crop",
-  "Frankfurt": "https://images.unsplash.com/photo-1564221710304-0b37c8b9d729?w=400&h=300&fit=crop",
-  "Seoul": "https://images.unsplash.com/photo-1534247913992-ba0c5f9e1c7a?w=400&h=300&fit=crop",
-  "Cancún": "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=400&h=300&fit=crop",
-  "Mexico City": "https://images.unsplash.com/photo-1518638150340-f706e86654de?w=400&h=300&fit=crop",
-  "Miami": "https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?w=400&h=300&fit=crop",
-  "Chicago": "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&h=300&fit=crop",
-  "Honolulu": "https://images.unsplash.com/photo-1542259009477-d625272157b7?w=400&h=300&fit=crop",
+  London: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+  Paris: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+  Tokyo: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=1200&q=80",
+  Rome: "https://images.unsplash.com/photo-1525874684015-58379d421a52?auto=format&fit=crop&w=1200&q=80",
+  Barcelona: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80",
+  Singapore: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80",
+  Sydney: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80",
+  Dubai: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=1200&q=80",
 };
 
-// Airline IATA to logo mapping (using public CDN)
-const getAirlineLogo = (airline: string): string => {
-  // Extract IATA code if in format "Airline Name (XX)"
-  const match = airline.match(/\(([A-Z]{2})\)/);
-  const iataCode = match ? match[1] : airline.substring(0, 2).toUpperCase();
-  
-  // Use aviation logos CDN
-  return `https://images.kiwi.com/airlines/64x64/${iataCode}.png`;
-};
+const formatDate = (dateStr: string) =>
+  new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-CA", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
-const getDestinationImage = (city: string): string => {
-  if (DESTINATION_IMAGES[city]) {
-    return DESTINATION_IMAGES[city];
-  }
-  // Fallback: gradient placeholder
-  return "";
-};
+const formatMoney = (value: number) => `CAD $${Math.round(value).toLocaleString()}`;
 
-function formatDate(dateStr: string): string {
-  try {
-    const d = new Date(dateStr + "T00:00:00");
-    return d.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
-  } catch {
-    return dateStr;
-  }
-}
+const getAirlineCode = (airline: string) => {
+  const explicit = airline.match(/\(([A-Z0-9]{2})\)/)?.[1];
+  if (explicit) return explicit;
+  return AIRLINE_CODES[airline] ?? airline.slice(0, 2).toUpperCase();
+};
 
 export default function DestinationCard({
-  id,
   city,
   country,
   destination,
-  price,
   totalPrice,
   taxAmount,
   date,
   airline,
   duration,
-  durationHours,
   stops = 0,
-  safetyScore,
   dealScore,
   dealClassification,
   valueScore,
   historicalPrice,
   destinationEmoji,
   bookingUrl,
-  region,
   index = 0,
 }: DestinationCardProps) {
   const [showSubscription, setShowSubscription] = useState(false);
-  const [imageError, setImageError] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
 
-  const destinationImage = getDestinationImage(city);
-  const airlineLogo = getAirlineLogo(airline);
-  const savingsPercent = Math.round(((historicalPrice - price) / historicalPrice) * 100);
+  const imageUrl = DESTINATION_IMAGES[city] ?? `https://source.unsplash.com/1200x800/?${encodeURIComponent(`${city} skyline travel`)}`;
+  const airlineLogo = `https://images.kiwi.com/airlines/64x64/${getAirlineCode(airline)}.png`;
 
-  let dealBadgeText = "";
-  let dealBadgeClass = "";
-  if (dealClassification === "Mistake Fare") {
-    dealBadgeText = "🔥 Mistake Fare";
-    dealBadgeClass = "bg-gradient-to-r from-red-600 to-red-700 text-white";
-  } else if (dealClassification === "Hot Deal") {
-    dealBadgeText = "⚡ Hot Deal";
-    dealBadgeClass = "bg-gradient-to-r from-orange-500 to-orange-600 text-white";
-  } else if (dealClassification === "Good Deal") {
-    dealBadgeText = "✨ Good Deal";
-    dealBadgeClass = "bg-gradient-to-r from-green-600 to-green-700 text-white";
-  }
+  const savingsPercent = Math.max(0, Math.round(((historicalPrice - totalPrice) / historicalPrice) * 100));
+  const stopLabel = stops === 0 ? "Nonstop" : stops === 1 ? "1 stop" : `${stops} stops`;
+  const valueTone = valueScore >= 75 ? "emerald" : valueScore >= 55 ? "blue" : "amber";
 
-  // Format stops display
-  let stopsText = "";
-  let stopsColor = "";
-  if (stops === 0) {
-    stopsText = "Nonstop";
-    stopsColor = "text-green-600";
-  } else if (stops === 1) {
-    stopsText = "1 stop";
-    stopsColor = "text-amber-600";
-  } else {
-    stopsText = `${stops} stops`;
-    stopsColor = "text-gray-500";
-  }
-
-  // Value score color coding
-  let valueScoreClass = "";
-  if (valueScore >= 80) {
-    valueScoreClass = "bg-gradient-to-r from-green-500 to-emerald-600 text-white";
-  } else if (valueScore >= 60) {
-    valueScoreClass = "bg-gradient-to-r from-blue-500 to-indigo-600 text-white";
-  } else if (valueScore >= 40) {
-    valueScoreClass = "bg-gradient-to-r from-amber-500 to-orange-500 text-white";
-  } else {
-    valueScoreClass = "bg-gray-400 text-white";
-  }
-
-  // Generate deal description
-  let dealDescription = "";
-  if (stops === 0 && savingsPercent > 20) {
-    dealDescription = `Great value nonstop flight — save ${savingsPercent}%`;
-  } else if (stops === 0) {
-    dealDescription = "Direct flight to your destination";
-  } else if (savingsPercent > 30) {
-    dealDescription = `Exceptional price — ${savingsPercent}% below average`;
-  } else if (savingsPercent > 15) {
-    dealDescription = `Good deal — ${savingsPercent}% savings`;
-  } else {
-    dealDescription = "Competitive pricing for this route";
-  }
+  const badgeClass = useMemo(() => {
+    if (dealClassification === "Mistake Fare") return "bg-red-600 text-white";
+    if (dealClassification === "Hot Deal") return "bg-orange-500 text-white";
+    if (dealClassification === "Good Deal") return "bg-emerald-600 text-white";
+    return "bg-slate-700 text-white";
+  }, [dealClassification]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.08, ease: [0.23, 1, 0.32, 1] }}
-      whileHover={{ y: -6, boxShadow: "0 20px 40px rgba(0,0,0,0.12)" }}
-      className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col hover:shadow-2xl transition-all duration-300"
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+      className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
     >
-      {/* Image Header */}
-      <div className="relative h-52 overflow-hidden">
-        {destinationImage && !imageError ? (
+      <div className="relative h-48 overflow-hidden">
+        {!imageFailed ? (
           <img
-            src={destinationImage}
-            alt={city}
-            className="w-full h-full object-cover"
-            onError={() => setImageError(true)}
+            src={imageUrl}
+            alt={`${city} destination`}
+            className="h-full w-full object-cover"
             loading="lazy"
+            onError={() => setImageFailed(true)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center">
-            <span className="text-8xl select-none" role="img" aria-label={city}>
-              {destinationEmoji}
-            </span>
-          </div>
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-700 text-6xl">{destinationEmoji}</div>
         )}
-        
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        
-        {/* Deal badge */}
-        {dealBadgeText && (
-          <span className={`absolute top-3 left-3 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg ${dealBadgeClass}`}>
-            {dealBadgeText}
-          </span>
-        )}
-        
-        {/* Value score badge */}
-        <span className={`absolute top-3 right-3 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg ${valueScoreClass}`}>
-          Value: {Math.round(valueScore)}
-        </span>
-        
-        {/* Airline logo */}
-        <div className="absolute bottom-3 right-3 bg-white rounded-lg p-2 shadow-md">
-          <img
-            src={airlineLogo}
-            alt={airline}
-            className="w-10 h-10 object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
+        <div className="absolute left-4 top-4 flex gap-2">
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}`}>{dealClassification}</span>
+          <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-800">Deal {Math.round(dealScore)}</span>
         </div>
-        
-        {/* City name overlay */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 py-4">
-          <h2 className="text-white font-extrabold text-2xl leading-tight drop-shadow-lg">
-            {city}
-          </h2>
-          <p className="text-white/90 text-sm font-medium drop-shadow">{country}</p>
-          <span className="inline-block mt-1 bg-white/20 backdrop-blur-sm text-white text-xs font-mono font-bold px-2 py-0.5 rounded">
-            {destination}
-          </span>
+        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+          <div>
+            <h3 className="text-2xl font-bold text-white">{city}</h3>
+            <p className="text-sm text-white/90">{country} · {destination}</p>
+          </div>
+          <div className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-800">{stopLabel}</div>
         </div>
       </div>
 
-      {/* Card Body */}
-      <div className="p-5 flex flex-col flex-1 gap-4">
-        {/* Price row */}
-        <div className="flex items-end justify-between">
+      <div className="flex flex-1 flex-col gap-4 p-5">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs text-gray-400 line-through font-medium">CAD ${historicalPrice}</div>
-            <div className="text-4xl font-black bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent leading-none">
-              ${price}
-            </div>
-            <div className="text-xs text-gray-500 mt-1 font-medium">
-              ${totalPrice} CAD total
-              <span className="text-gray-400 ml-1">(+${taxAmount} tax)</span>
-            </div>
+            <p className="text-xs uppercase tracking-wide text-slate-500">Final price (incl. taxes)</p>
+            <p className="text-3xl font-extrabold text-slate-900">{formatMoney(totalPrice)}</p>
+            <p className="text-xs text-slate-500">Tax estimate included: {formatMoney(taxAmount)}</p>
           </div>
-          {savingsPercent > 0 && (
-            <div className="text-right">
-              <span className="inline-block bg-gradient-to-r from-green-500 to-emerald-600 text-white font-extrabold text-sm px-3 py-1.5 rounded-full shadow">
-                Save {savingsPercent}%
-              </span>
-            </div>
-          )}
+          {savingsPercent > 0 && <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Save {savingsPercent}%</span>}
         </div>
 
-        {/* Deal description */}
-        <p className="text-sm text-gray-600 font-medium leading-relaxed">
-          {dealDescription}
-        </p>
-
-        {/* Flight details */}
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">✈️</span>
-            <span className="truncate text-gray-700 font-medium">{airline}</span>
+        <div className="grid grid-cols-2 gap-3 text-sm text-slate-600">
+          <div className="col-span-2 flex items-center gap-2">
+            {!logoFailed ? (
+              <img src={airlineLogo} alt={`${airline} logo`} className="h-6 w-6 object-contain" onError={() => setLogoFailed(true)} />
+            ) : (
+              <div className="h-6 w-6 rounded-full bg-slate-200" />
+            )}
+            <span className="font-medium text-slate-800">{airline}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-lg">📅</span>
-            <span className="text-gray-700 font-medium">{formatDate(date)}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-lg">⏱️</span>
-            <span className="text-gray-700 font-semibold">{duration}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={`text-lg ${stops === 0 ? "text-green-600" : stops === 1 ? "text-amber-500" : "text-gray-400"}`}>
-              {stops === 0 ? "🟢" : stops === 1 ? "🟡" : "🔴"}
+          <p>Departure: {formatDate(date)}</p>
+          <p>Duration: {duration}</p>
+          <p className="col-span-2">
+            Value score:
+            <span className={`ml-2 rounded-md px-2 py-0.5 text-xs font-semibold ${valueTone === "emerald" ? "bg-emerald-100 text-emerald-700" : valueTone === "blue" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
+              {Math.round(valueScore)}/100
             </span>
-            <span className={`font-semibold ${stopsColor}`}>{stopsText}</span>
-          </div>
+          </p>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-3 mt-auto pt-2">
-          <a
-            href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-xl text-center text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-          >
-            <span>View Deal</span>
-            <span className="text-lg">→</span>
-          </a>
-        </div>
-
-        {/* Price alert toggle */}
-        <button
-          onClick={() => setShowSubscription(!showSubscription)}
-          className="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 transition-colors justify-center py-1"
+        <a
+          href={bookingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-auto rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-700"
         >
-          <span>{showSubscription ? "▼" : "▶"}</span>
-          <span>{showSubscription ? "Hide alerts" : "🔔 Get price drop alerts"}</span>
+          Book on Google Flights
+        </a>
+
+        <button
+          onClick={() => setShowSubscription((prev) => !prev)}
+          className="text-left text-xs font-semibold text-blue-700 hover:text-blue-800"
+        >
+          {showSubscription ? "Hide alert form" : "Track price for this destination"}
         </button>
 
         <AnimatePresence>
           {showSubscription && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <EmailSubscription destination={city} price={price} />
+              <EmailSubscription destination={city} price={Math.round(totalPrice)} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }
