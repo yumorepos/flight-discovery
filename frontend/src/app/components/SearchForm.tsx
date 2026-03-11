@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, Fragment } from "react";
-import { Combobox, Transition } from "@headlessui/react";
+import { useMemo, useState } from "react";
 import Fuse from "fuse.js";
 import airportsData from "@/data/airports.json";
 
@@ -16,232 +15,126 @@ interface SearchFormProps {
   onSearch: (origin: string, month: string, destination?: string) => void;
 }
 
-const MONTHS = [
-  { value: "03", label: "March 2026" },
-  { value: "04", label: "April 2026" },
-  { value: "05", label: "May 2026" },
-  { value: "06", label: "June 2026" },
-  { value: "07", label: "July 2026" },
-  { value: "08", label: "August 2026" },
-];
+const NOW = new Date();
+const MONTHS = Array.from({ length: 12 }, (_, idx) => {
+  const date = new Date(NOW.getFullYear(), NOW.getMonth() + idx, 1);
+  const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  const label = date.toLocaleDateString("en-CA", { month: "long", year: "numeric" });
+  return { value, label };
+});
+
+const formatAirport = (airport: Airport) => `${airport.city} (${airport.iata})`;
 
 export default function SearchForm({ onSearch }: SearchFormProps) {
-  const [originQuery, setOriginQuery] = useState("");
-  const [selectedOrigin, setSelectedOrigin] = useState<Airport | null>(null);
-  const [destQuery, setDestQuery] = useState("");
-  const [selectedDest, setSelectedDest] = useState<Airport | null>(null);
+  const [originInput, setOriginInput] = useState("");
+  const [destinationInput, setDestinationInput] = useState("");
   const [month, setMonth] = useState("");
-  const [errors, setErrors] = useState<{ origin?: string }>({});
+  const [error, setError] = useState("");
 
-  // Fuse.js setup for fuzzy search
   const fuse = useMemo(
     () =>
       new Fuse(airportsData as Airport[], {
         keys: ["city", "iata", "name", "country"],
-        threshold: 0.3,
-        includeScore: true,
-        minMatchCharLength: 1,
+        threshold: 0.35,
       }),
     []
   );
 
-  // Filter origin airports
-  const filteredOrigins = useMemo(() => {
-    if (!originQuery) return (airportsData as Airport[]).slice(0, 8);
-    const results = fuse.search(originQuery);
-    return results.slice(0, 8).map((r) => r.item);
-  }, [originQuery, fuse]);
+  const resolveAirport = (value: string): Airport | null => {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
 
-  // Filter destination airports
-  const filteredDests = useMemo(() => {
-    if (!destQuery) return (airportsData as Airport[]).slice(0, 8);
-    const results = fuse.search(destQuery);
-    return results.slice(0, 8).map((r) => r.item);
-  }, [destQuery, fuse]);
-
-  const validate = () => {
-    const errs: { origin?: string } = {};
-    if (!selectedOrigin) {
-      errs.origin = "Please select a departure airport";
+    const codeMatch = trimmed.match(/\(([A-Z]{3})\)$/i)?.[1];
+    if (codeMatch) {
+      const fromCodeLabel = (airportsData as Airport[]).find((airport) => airport.iata.toUpperCase() === codeMatch.toUpperCase());
+      if (fromCodeLabel) return fromCodeLabel;
     }
-    return errs;
+
+    const exactCode = (airportsData as Airport[]).find((airport) => airport.iata.toLowerCase() === trimmed.toLowerCase());
+    if (exactCode) return exactCode;
+
+    const exactCity = (airportsData as Airport[]).find((airport) => airport.city.toLowerCase() === trimmed.toLowerCase());
+    if (exactCity) return exactCity;
+
+    return fuse.search(trimmed)[0]?.item ?? null;
   };
 
-  const handleSearch = () => {
-    const errs = validate();
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs);
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const origin = resolveAirport(originInput);
+    if (!origin) {
+      setError("Enter a valid origin city or IATA code.");
       return;
     }
-    setErrors({});
-    const monthFormatted = month ? `2026-${month}` : "";
-    onSearch(
-      selectedOrigin!.iata.toUpperCase(),
-      monthFormatted,
-      selectedDest?.iata?.toUpperCase() || undefined
-    );
-  };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleSearch();
+    const destination = resolveAirport(destinationInput);
+
+    setError("");
+    setOriginInput(formatAirport(origin));
+    if (destination) {
+      setDestinationInput(formatAirport(destination));
+    }
+
+    onSearch(origin.iata.toUpperCase(), month, destination?.iata.toUpperCase() || undefined);
   };
 
   return (
-    <div className="glass-morphism p-8 rounded-2xl shadow-2xl w-full max-w-3xl">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Origin Airport Autocomplete */}
-        <div className="md:col-span-1">
-          <label className="block text-white text-xs font-bold uppercase tracking-wide mb-2">
-            From
-          </label>
-          <Combobox value={selectedOrigin} onChange={setSelectedOrigin}>
-            <div className="relative">
-              <Combobox.Input
-                className={`w-full px-4 py-3 rounded-xl bg-white/95 text-gray-900 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition placeholder-gray-400 ${
-                  errors.origin ? "ring-2 ring-red-400" : ""
-                }`}
-                displayValue={(airport: Airport | null) =>
-                  airport ? `${airport.city} (${airport.iata})` : ""
-                }
-                onChange={(e) => {
-                  setOriginQuery(e.target.value);
-                  setErrors((err) => ({ ...err, origin: undefined }));
-                }}
-                placeholder="City, airport code..."
-                autoComplete="off"
-              />
-              <Transition
-                as={Fragment}
-                leave="transition ease-in duration-100"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-                afterLeave={() => setOriginQuery("")}
-              >
-                <Combobox.Options className="absolute z-50 mt-1 w-full max-h-60 overflow-auto bg-white rounded-xl shadow-2xl border border-gray-100 py-1">
-                  {filteredOrigins.length === 0 && originQuery !== "" ? (
-                    <div className="px-4 py-3 text-gray-500 text-sm">No airports found.</div>
-                  ) : (
-                    filteredOrigins.map((airport) => (
-                      <Combobox.Option
-                        key={airport.iata}
-                        value={airport}
-                        className={({ active }) =>
-                          `px-4 py-3 cursor-pointer transition-colors ${
-                            active ? "bg-blue-50" : "bg-white"
-                          }`
-                        }
-                      >
-                        {({ selected }) => (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className={`font-bold text-blue-700 mr-2 ${selected ? "underline" : ""}`}>
-                                {airport.iata}
-                              </span>
-                              <span className="text-gray-700">{airport.city}</span>
-                            </div>
-                            <span className="text-xs text-gray-400">{airport.country}</span>
-                          </div>
-                        )}
-                      </Combobox.Option>
-                    ))
-                  )}
-                </Combobox.Options>
-              </Transition>
-            </div>
-          </Combobox>
-          {errors.origin && (
-            <p className="text-red-300 text-xs mt-1 font-medium">{errors.origin}</p>
-          )}
+    <form onSubmit={handleSubmit} className="glass-morphism w-full rounded-2xl p-5 md:p-6">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.4fr_1fr_1.4fr_auto] lg:items-end">
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-blue-50">From</label>
+          <input
+            list="origin-airports"
+            value={originInput}
+            onChange={(event) => {
+              setOriginInput(event.target.value);
+              setError("");
+            }}
+            placeholder="e.g. Montreal or YUL"
+            className="w-full rounded-xl border border-white/40 bg-white/95 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <datalist id="origin-airports">
+            {(airportsData as Airport[]).map((airport) => (
+              <option key={`origin-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>
+            ))}
+          </datalist>
+          {error && <p className="mt-1 text-xs font-medium text-red-200">{error}</p>}
         </div>
 
-        {/* Month Selector */}
-        <div className="md:col-span-1">
-          <label className="block text-white text-xs font-bold uppercase tracking-wide mb-2">
-            When
-          </label>
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-blue-50">Travel month</label>
           <select
             value={month}
-            onChange={(e) => setMonth(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-white/95 text-gray-900 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            onChange={(event) => setMonth(event.target.value)}
+            className="w-full rounded-xl border border-white/40 bg-white/95 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">Any month</option>
-            {MONTHS.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
+            <option value="">Any time (best deals)</option>
+            {MONTHS.map((monthOption) => (
+              <option key={monthOption.value} value={monthOption.value}>{monthOption.label}</option>
             ))}
           </select>
         </div>
 
-        {/* Destination Autocomplete (optional) */}
-        <div className="md:col-span-1">
-          <label className="block text-white text-xs font-bold uppercase tracking-wide mb-2">
-            To (optional)
-          </label>
-          <Combobox value={selectedDest} onChange={setSelectedDest} nullable>
-            <div className="relative">
-              <Combobox.Input
-                className="w-full px-4 py-3 rounded-xl bg-white/95 text-gray-900 placeholder-gray-400 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                displayValue={(airport: Airport | null) =>
-                  airport ? `${airport.city} (${airport.iata})` : ""
-                }
-                onChange={(e) => setDestQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="City, airport code..."
-                autoComplete="off"
-              />
-              <Transition
-                as={Fragment}
-                leave="transition ease-in duration-100"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-                afterLeave={() => setDestQuery("")}
-              >
-                <Combobox.Options className="absolute z-50 mt-1 w-full max-h-60 overflow-auto bg-white rounded-xl shadow-2xl border border-gray-100 py-1">
-                  {filteredDests.length === 0 && destQuery !== "" ? (
-                    <div className="px-4 py-3 text-gray-500 text-sm">No airports found.</div>
-                  ) : (
-                    filteredDests.map((airport) => (
-                      <Combobox.Option
-                        key={airport.iata}
-                        value={airport}
-                        className={({ active }) =>
-                          `px-4 py-3 cursor-pointer transition-colors ${
-                            active ? "bg-blue-50" : "bg-white"
-                          }`
-                        }
-                      >
-                        {({ selected }) => (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className={`font-bold text-blue-700 mr-2 ${selected ? "underline" : ""}`}>
-                                {airport.iata}
-                              </span>
-                              <span className="text-gray-700">{airport.city}</span>
-                            </div>
-                            <span className="text-xs text-gray-400">{airport.country}</span>
-                          </div>
-                        )}
-                      </Combobox.Option>
-                    ))
-                  )}
-                </Combobox.Options>
-              </Transition>
-            </div>
-          </Combobox>
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-blue-50">To (optional)</label>
+          <input
+            list="destination-airports"
+            value={destinationInput}
+            onChange={(event) => setDestinationInput(event.target.value)}
+            placeholder="Anywhere or destination"
+            className="w-full rounded-xl border border-white/40 bg-white/95 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <datalist id="destination-airports">
+            {(airportsData as Airport[]).map((airport) => (
+              <option key={`destination-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>
+            ))}
+          </datalist>
         </div>
-      </div>
 
-      <button
-        onClick={handleSearch}
-        className="mt-6 w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 active:from-orange-700 active:to-orange-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 text-lg"
-        aria-label="Search Flights"
-      >
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        Find Your Next Adventure
-      </button>
-    </div>
+        <button type="submit" className="h-[50px] rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 font-semibold text-white shadow-md transition hover:from-orange-600 hover:to-amber-600">
+          Search deals
+        </button>
+      </div>
+    </form>
   );
 }

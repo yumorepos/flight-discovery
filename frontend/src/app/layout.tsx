@@ -1,17 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-});
-
 export const metadata: Metadata = {
-  title: "FlightFinder – Discover Amazing Flight Deals",
-  description: "Find the best flight deals from your city. Real-time deal scoring, value rankings, and price alerts.",
+  title: "FlightDiscovery – Discover Amazing Flight Deals",
+  description:
+    "Find flight deals by destination with value ranking, final pricing with taxes, and fare alerts.",
 };
 
 export default function RootLayout({
@@ -21,9 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`} style={{ fontFamily: 'var(--font-inter)' }}>
-        {children}
-      </body>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

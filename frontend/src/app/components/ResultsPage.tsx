@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import DestinationCard from "./DestinationCard";
-import { useEffect, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import airportsData from "@/data/airports.json";
 
 interface Flight {
   id: number;
@@ -34,212 +35,167 @@ interface ResultsPageProps {
   destination?: string;
 }
 
-type SortKey = "deal" | "price_asc" | "price_desc" | "value";
+type SortKey = "value" | "deal" | "price_asc" | "price_desc";
+const DEFAULT_ORIGIN = "YUL";
 
 const REGION_LABELS: Record<string, string> = {
-  NA: "🌎 Americas",
-  EU: "🌍 Europe",
-  Asia: "🌏 Asia",
-  Oceania: "🦘 Oceania",
-  AF: "🌍 Africa",
-  SA: "🌎 South America",
+  NA: "Americas",
+  EU: "Europe",
+  Asia: "Asia",
+  Oceania: "Oceania",
+  AF: "Africa",
+  SA: "South America",
 };
 
-function SkeletonCard() {
-  return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-      <div className="h-36 shimmer" />
-      <div className="p-4 space-y-3">
-        <div className="h-4 shimmer rounded w-3/4" />
-        <div className="h-8 shimmer rounded w-1/2" />
-        <div className="h-3 shimmer rounded w-full" />
-        <div className="h-3 shimmer rounded w-2/3" />
-        <div className="h-10 shimmer rounded-xl mt-2" />
-      </div>
-    </div>
-  );
-}
+const airportMap = new Map((airportsData as Array<{ iata: string; city: string }>).map((airport) => [airport.iata, airport.city]));
 
 async function fetchFlights(origin: string, month: string, destination?: string): Promise<Flight[]> {
-  try {
-    const params = new URLSearchParams({ origin });
-    if (month) params.set("month", month);
-    if (destination) params.set("destination", destination);
-    const res = await fetch(`http://localhost:8000/api/search?${params}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  } catch (err) {
-    console.error("Error fetching flights:", err);
-    return [];
+  const params = new URLSearchParams({ origin });
+  if (month) params.set("month", month);
+  if (destination) params.set("destination", destination);
+
+  const response = await fetch(`/api/search?${params}`);
+  if (!response.ok) {
+    throw new Error(`Search failed with ${response.status}`);
   }
+
+  return response.json();
 }
 
 export default function ResultsPage({ origin = "", month = "", destination = "" }: ResultsPageProps) {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeRegion, setActiveRegion] = useState<string>("All");
-  const [sortKey, setSortKey] = useState<SortKey>("deal");
-  const [maxPrice, setMaxPrice] = useState<number>(2000);
+  const [error, setError] = useState("");
+  const [activeRegion, setActiveRegion] = useState("All");
+  const [sortKey, setSortKey] = useState<SortKey>("value");
+  const [maxPrice, setMaxPrice] = useState<number>(3000);
+
+  const effectiveOrigin = origin || DEFAULT_ORIGIN;
 
   useEffect(() => {
-    if (!origin) return;
-    setLoading(true);
-    fetchFlights(origin, month, destination || undefined).then((data) => {
-      setFlights(data);
-      setLoading(false);
-      setActiveRegion("All");
-    });
-  }, [origin, month, destination]);
+    const loadFlights = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const result = await fetchFlights(effectiveOrigin, month, destination || undefined);
+        setFlights(result);
+        setActiveRegion("All");
+      } catch (loadError) {
+        setFlights([]);
+        setError(loadError instanceof Error ? loadError.message : "Unable to load flights");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const regions = useMemo(() => {
-    const seen = new Set<string>();
-    flights.forEach((f) => seen.add(f.region));
-    return Array.from(seen);
-  }, [flights]);
+    loadFlights();
+  }, [effectiveOrigin, month, destination]);
 
   const maxFlightPrice = useMemo(
-    () => (flights.length ? Math.max(...flights.map((f) => f.price)) : 2000),
+    () => (flights.length ? Math.max(...flights.map((flight) => Math.round(flight.total_price))) : 3000),
     [flights]
   );
 
-  const filtered = useMemo(() => {
-    let list = flights.filter((f) => f.price <= maxPrice);
-    if (activeRegion !== "All") list = list.filter((f) => f.region === activeRegion);
-    switch (sortKey) {
-      case "deal":
-        list = [...list].sort((a, b) => b.deal_score - a.deal_score);
-        break;
-      case "price_asc":
-        list = [...list].sort((a, b) => a.price - b.price);
-        break;
-      case "price_desc":
-        list = [...list].sort((a, b) => b.price - a.price);
-        break;
-      case "value":
-        list = [...list].sort((a, b) => b.value_score - a.value_score);
-        break;
-    }
-    return list;
-  }, [flights, activeRegion, sortKey, maxPrice]);
+  useEffect(() => {
+    setMaxPrice(maxFlightPrice);
+  }, [maxFlightPrice]);
 
-  if (!origin) {
-    return (
-      <div className="text-center py-20 text-gray-500">
-        <div className="text-5xl mb-4">✈️</div>
-        <p className="text-xl font-medium">Choose your departure airport to explore deals</p>
-      </div>
-    );
-  }
+  const regions = useMemo(() => Array.from(new Set(flights.map((flight) => flight.region))), [flights]);
+
+  const filtered = useMemo(() => {
+    let list = flights.filter((flight) => Math.round(flight.total_price) <= maxPrice);
+    if (activeRegion !== "All") {
+      list = list.filter((flight) => flight.region === activeRegion);
+    }
+
+    switch (sortKey) {
+      case "value":
+        return [...list].sort((a, b) => b.value_score - a.value_score);
+      case "deal":
+        return [...list].sort((a, b) => b.deal_score - a.deal_score);
+      case "price_asc":
+        return [...list].sort((a, b) => a.total_price - b.total_price);
+      case "price_desc":
+        return [...list].sort((a, b) => b.total_price - a.total_price);
+      default:
+        return list;
+    }
+  }, [flights, activeRegion, maxPrice, sortKey]);
 
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="h-8 shimmer rounded w-48 mb-6" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-      </div>
-    );
+    return <div className="py-20 text-center text-slate-500">Loading flight deals…</div>;
   }
 
-  if (flights.length === 0) {
-    return (
-      <div className="text-center py-20">
-        <div className="text-5xl mb-4">🔍</div>
-        <p className="text-xl font-medium text-gray-700">No flights found</p>
-        <p className="text-gray-500 mt-2">
-          Try a different month or remove the destination filter.
-        </p>
-      </div>
-    );
+  if (error) {
+    return <div className="py-20 text-center text-red-600">{error}</div>;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Results header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <section className="container mx-auto max-w-7xl px-4 py-10">
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Flights from <span className="text-blue-700">{origin}</span>
-          </h2>
-          <p className="text-gray-500 text-sm mt-0.5">
-            {flights.length} deal{flights.length !== 1 ? "s" : ""} found
-            {month ? ` · ${month}` : ""} · All prices in CAD
+          <p className="text-sm font-medium text-blue-700">{origin ? "Search results" : "Discovery mode"}</p>
+          <h2 className="text-3xl font-bold text-slate-900">Flights from {airportMap.get(effectiveOrigin) ?? effectiveOrigin} ({effectiveOrigin})</h2>
+          <p className="text-sm text-slate-500">
+            {flights.length} routes ranked by value · final prices include taxes
+            {month ? ` · ${month}` : " · flexible dates"}
           </p>
         </div>
 
-        {/* Sort control */}
-        <div className="flex items-center gap-2">
-          <label className="text-sm text-gray-600 font-medium whitespace-nowrap">Sort by:</label>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="text-sm font-medium text-slate-600">Sort:</label>
           <select
             value={sortKey}
-            onChange={(e) => setSortKey(e.target.value as SortKey)}
-            className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onChange={(event) => setSortKey(event.target.value as SortKey)}
+            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
           >
-            <option value="value">⭐ Best Value</option>
-            <option value="price_asc">💰 Lowest Price</option>
-            <option value="deal">🔥 Best Deal</option>
-            <option value="price_desc">Price: High to Low</option>
+            <option value="value">Best value</option>
+            <option value="deal">Top deal score</option>
+            <option value="price_asc">Lowest final price</option>
+            <option value="price_desc">Highest final price</option>
           </select>
         </div>
       </div>
 
-      {/* Price range filter */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Max price:</span>
-        <input
-          type="range"
-          min={100}
-          max={maxFlightPrice}
-          step={50}
-          value={maxPrice > maxFlightPrice ? maxFlightPrice : maxPrice}
-          onChange={(e) => setMaxPrice(Number(e.target.value))}
-          className="flex-1 accent-blue-600"
-        />
-        <span className="text-sm font-bold text-blue-700 whitespace-nowrap w-24 text-right">
-          CAD ${Math.min(maxPrice, maxFlightPrice).toLocaleString()}
-        </span>
+      <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <label className="text-sm font-medium text-slate-700">Max final price</label>
+          <input
+            type="range"
+            min={150}
+            max={maxFlightPrice}
+            step={50}
+            value={Math.min(maxPrice, maxFlightPrice)}
+            onChange={(event) => setMaxPrice(Number(event.target.value))}
+            className="w-full accent-blue-600"
+          />
+          <span className="text-sm font-semibold text-slate-800">CAD ${Math.min(maxPrice, maxFlightPrice).toLocaleString()}</span>
+        </div>
       </div>
 
-      {/* Region filter tabs */}
-      <div className="flex gap-2 flex-wrap mb-6">
-        {["All", ...regions].map((r) => (
+      <div className="mb-6 flex flex-wrap gap-2">
+        {["All", ...regions].map((region) => (
           <button
-            key={r}
-            onClick={() => setActiveRegion(r)}
-            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
-              activeRegion === r
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 shadow-sm"
-            }`}
+            key={region}
+            onClick={() => setActiveRegion(region)}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium ${activeRegion === region ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"}`}
           >
-            {r === "All" ? "🌐 All" : REGION_LABELS[r] || r}
+            {region === "All" ? "All regions" : REGION_LABELS[region] ?? region}
           </button>
         ))}
       </div>
 
-      {/* Flight cards grid */}
       <AnimatePresence mode="popLayout">
         {filtered.length === 0 ? (
-          <motion.div
-            key="empty"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12 text-gray-500"
-          >
-            No flights match your filters. Try adjusting the price range or region.
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+            No deals match these filters. Try increasing the max price or selecting another region.
           </motion.div>
         ) : (
-          <motion.div
-            key="grid"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {filtered.map((flight, i) => (
+          <motion.div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((flight, index) => (
               <DestinationCard
                 key={flight.id}
-                index={i}
+                index={index}
                 id={flight.id}
                 city={flight.city}
                 country={flight.country}
@@ -265,6 +221,6 @@ export default function ResultsPage({ origin = "", month = "", destination = "" 
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </section>
   );
 }
