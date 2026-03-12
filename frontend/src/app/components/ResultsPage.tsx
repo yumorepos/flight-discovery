@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import DestinationCard from "./DestinationCard";
 import { useCurrency } from "./CurrencyProvider";
-import { formatPrice } from "@/lib/currency";
+import { convertPrice, convertToCad, formatPrice } from "@/lib/currency";
 import { buildFareMetadata, buildTrendSeries, CabinClass } from "@/lib/flightEnrichment";
 
 interface PriceInsight {
@@ -71,7 +71,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
   const [error, setError] = useState("");
   const [activeRegion, setActiveRegion] = useState("All");
   const [sortKey, setSortKey] = useState<SortKey>("value");
-  const [maxPrice, setMaxPrice] = useState(3000);
+  const [maxPriceCad, setMaxPriceCad] = useState(3000);
   const [maxStops, setMaxStops] = useState(2);
   const [maxDurationHours, setMaxDurationHours] = useState(30);
 
@@ -94,12 +94,19 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
     [flights, month]
   );
 
-  const maxFlightPrice = useMemo(() => (enrichedFlights.length ? Math.max(...enrichedFlights.map((f) => Math.round(f.total_price))) : 3000), [enrichedFlights]);
+  const maxFlightPriceCad = useMemo(() => (enrichedFlights.length ? Math.max(...enrichedFlights.map((f) => Math.round(f.total_price))) : 3000), [enrichedFlights]);
+  const maxFlightPriceDisplay = Math.max(100, Math.round(convertPrice(maxFlightPriceCad, currency, rates)));
+  const minPriceDisplay = Math.max(50, Math.round(convertPrice(100, currency, rates)));
+  const selectedPriceDisplay = Math.round(convertPrice(maxPriceCad, currency, rates));
+
+  useEffect(() => {
+    setMaxPriceCad(maxFlightPriceCad);
+  }, [maxFlightPriceCad]);
 
   const regions = useMemo(() => Array.from(new Set(enrichedFlights.map((f) => f.region))), [enrichedFlights]);
 
   const filtered = useMemo(() => {
-    const effectiveMaxPrice = Math.min(maxPrice, maxFlightPrice);
+    const effectiveMaxPrice = Math.min(maxPriceCad, maxFlightPriceCad);
     let list = enrichedFlights.filter((f) => Math.round(f.total_price) <= effectiveMaxPrice && (f.stops ?? 0) <= maxStops && parseHours(f.duration) <= maxDurationHours);
     if (activeRegion !== "All") list = list.filter((f) => f.region === activeRegion);
     if (fareClass !== "Any") list = list.filter((f) => f.fare.cabinClass === fareClass);
@@ -110,7 +117,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
       if (sortKey === "price_desc") return b.total_price - a.total_price;
       return b.value_score - a.value_score;
     });
-  }, [enrichedFlights, maxPrice, maxStops, maxDurationHours, activeRegion, fareClass, sortKey, maxFlightPrice]);
+  }, [enrichedFlights, maxPriceCad, maxStops, maxDurationHours, activeRegion, fareClass, sortKey, maxFlightPriceCad]);
 
   const calendarByMonth = useMemo(() => {
     const byMonth = new Map<string, number[]>();
@@ -133,34 +140,32 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
         <div className="grid gap-3 lg:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-3">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <label className="text-sm font-semibold">Sort
-                <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-2">
+              <label className="text-sm font-semibold text-slate-700">Sort
+                <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className="mt-1 h-10 w-full rounded-lg border border-slate-200 bg-white px-2">
                   <option value="value">Best value</option><option value="deal">Deal score</option><option value="price_asc">Lowest price</option><option value="price_desc">Highest price</option>
                 </select>
               </label>
-              <label className="text-sm font-semibold">Max {formatPrice(maxPrice, currency, rates)}
-                <input type="range" min={100} max={maxFlightPrice} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} className="mt-2 w-full accent-violet-600" />
+              <label className="text-sm font-semibold text-slate-700">Max {formatPrice(maxPriceCad, currency, rates)}
+                <input type="range" min={minPriceDisplay} max={maxFlightPriceDisplay} value={Math.min(selectedPriceDisplay, maxFlightPriceDisplay)} onChange={(e) => setMaxPriceCad(Math.round(convertToCad(Number(e.target.value), currency, rates)))} className="mt-2 w-full accent-violet-600" />
               </label>
-              <label className="text-sm font-semibold">Stops: {maxStops === 2 ? "Any" : maxStops}
+              <label className="text-sm font-semibold text-slate-700">Stops: {maxStops === 2 ? "Any" : maxStops}
                 <input type="range" min={0} max={2} value={maxStops} onChange={(e) => setMaxStops(Number(e.target.value))} className="mt-2 w-full accent-violet-600" />
               </label>
-              <label className="text-sm font-semibold">Duration: {maxDurationHours}h
+              <label className="text-sm font-semibold text-slate-700">Duration: {maxDurationHours}h
                 <input type="range" min={4} max={30} value={maxDurationHours} onChange={(e) => setMaxDurationHours(Number(e.target.value))} className="mt-2 w-full accent-violet-600" />
               </label>
             </div>
           </div>
-          <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-600 to-fuchsia-500 p-4 text-white">
+          <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-600 to-fuchsia-500 p-4 text-white shadow-lg shadow-violet-200/40">
             <p className="text-xs font-bold uppercase tracking-[0.16em]">Insights</p>
             <p className="mt-2 text-sm">Best month: <span className="font-semibold">{bestMonth ? `${bestMonth.month} · ${formatPrice(bestMonth.avg, currency, rates)}` : "N/A"}</span></p>
+            <p className="mt-2 text-sm">Showing {filtered.length} of {enrichedFlights.length} fares</p>
             <p className="mt-2 text-xs text-violet-100">{flexibleDates ? "Flexible dates enabled for broader fare intelligence." : "Enable flexible dates for richer forecasting."}</p>
           </div>
         </div>
 
         <div className="my-5 flex flex-wrap gap-2">
-          {[
-            "All",
-            ...regions,
-          ].map((region) => (
+          {["All", ...regions].map((region) => (
             <button key={region} onClick={() => setActiveRegion(region)} className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${activeRegion === region ? "border-violet-500 bg-violet-600 text-white" : "border-slate-200 bg-white text-slate-600"}`}>
               {region === "All" ? "All regions" : REGION_LABELS[region] ?? region}
             </button>

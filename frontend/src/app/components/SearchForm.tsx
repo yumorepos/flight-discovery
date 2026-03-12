@@ -103,7 +103,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       </div>
 
       <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3 md:p-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.9fr_1.1fr_0.9fr_auto] xl:items-end">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-[1.1fr_0.9fr_1.1fr_0.9fr_auto] xl:items-end">
           <div>
             <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Departing from</label>
             <input aria-label="Origin airport" list="origin-airports" value={originInput} onChange={(event) => { setOriginInput(event.target.value); setError(""); }} placeholder="Montreal or YUL" className={inputClassName} />
@@ -134,7 +134,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
             </select>
           </div>
 
-          <button type="submit" className="h-12 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 text-sm font-bold text-white shadow-[0_14px_26px_rgba(124,58,237,0.38)] transition hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200">Search fares</button>
+          <button type="submit" className="h-12 w-full rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 text-sm font-bold text-white shadow-[0_14px_26px_rgba(124,58,237,0.38)] transition hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 xl:w-auto">Search fares</button>
         </div>
       </div>
 

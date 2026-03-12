@@ -14,13 +14,6 @@ const remoteSet = (id: string): DestinationImageConfig => ({
   credit: "Unsplash",
 });
 
-const localSet = (asset: string): DestinationImageConfig => ({
-  hero: asset,
-  landscape: asset,
-  portrait: asset,
-  credit: "Local fallback",
-});
-
 const CURATED_DESTINATION_IMAGES: Record<string, DestinationImageConfig> = {
   London: remoteSet("photo-1513635269975-59663e0ac1ad"),
   Paris: remoteSet("photo-1502602898657-3e91760cbb34"),
@@ -70,7 +63,7 @@ const REGION_FALLBACK_IMAGES: Record<string, DestinationImageConfig[]> = {
   SA: [remoteSet("photo-1483729558449-99ef09a8c325")],
 };
 
-const LOCAL_GENERIC_FALLBACK = localSet("/globe.svg");
+const GENERIC_TRAVEL_FALLBACK = remoteSet("photo-1469474968028-56623f02e42e");
 
 const hashValue = (input: string) => Array.from(input).reduce((acc, char) => (acc + char.charCodeAt(0) * 17) % 997, 0);
 
@@ -83,5 +76,5 @@ export const getDestinationImageSet = (city: string, region?: string): Destinati
     return options[hashValue(normalizedCity) % options.length];
   }
 
-  return LOCAL_GENERIC_FALLBACK;
+  return GENERIC_TRAVEL_FALLBACK;
 };
