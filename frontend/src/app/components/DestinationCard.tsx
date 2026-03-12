@@ -105,9 +105,9 @@ export default function DestinationCard({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, delay: index * 0.04 }}
-      className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white shadow-[0_16px_42px_rgba(15,23,42,0.1)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(15,23,42,0.16)]"
+      className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white shadow-[0_16px_42px_rgba(15,23,42,0.1)] transition will-change-transform hover:-translate-y-1 hover:shadow-[0_24px_52px_rgba(15,23,42,0.16)]"
     >
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative aspect-[16/10] overflow-hidden bg-slate-200">
         {!imageFailed ? (
           <Image
             src={imageSet.landscape}
@@ -141,7 +141,7 @@ export default function DestinationCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-4 p-5">
+      <div className="flex flex-1 flex-col gap-4 p-5 md:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Final fare</p>
@@ -176,6 +176,7 @@ export default function DestinationCard({
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-slate-900">{airlineBrand.name}</p>
               <p className="truncate text-xs text-slate-500">{origin} → {destination} · {stopLabel} · {duration}</p>
+              {airlineBrand.alliance && <p className="mt-1 text-[11px] font-medium text-slate-500">{airlineBrand.alliance}</p>}
             </div>
           </div>
         </div>
@@ -201,7 +202,7 @@ export default function DestinationCard({
           href={bookingUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-4 py-3.5 text-center text-base font-bold text-white shadow-[0_10px_24px_rgba(124,58,237,0.35)] transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
+          className="mt-auto rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-4 py-3.5 text-center text-base font-bold text-white shadow-[0_10px_24px_rgba(124,58,237,0.35)] transition hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
         >
           View live fare
         </a>

@@ -33,7 +33,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_10%_0%,_#a78bfa_0%,_#7c3aed_35%,_#4c1d95_68%,_#1e1b4b_100%)] pb-20 pt-14 text-white md:pb-28 md:pt-20">
+      <section className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_10%_0%,_#a78bfa_0%,_#7c3aed_35%,_#4c1d95_68%,_#1e1b4b_100%)] pb-20 pt-12 text-white md:pb-28 md:pt-16">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.2),transparent_40%),linear-gradient(160deg,rgba(255,255,255,0.12),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 md:px-6">
           <div className="mx-auto max-w-3xl text-center">
@@ -42,6 +42,11 @@ export default function Home() {
             <p className="mx-auto mt-4 max-w-2xl text-sm text-violet-100/95 md:text-lg">
               Search curated flight deals with value ranking, destination imagery, airline branding, and flexible date insights.
             </p>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-violet-100/90 md:gap-3">
+              <span className="rounded-full border border-white/25 px-3 py-1">Tax-inclusive pricing</span>
+              <span className="rounded-full border border-white/25 px-3 py-1">Real destination photography</span>
+              <span className="rounded-full border border-white/25 px-3 py-1">Airline logo matching</span>
+            </div>
           </div>
           <div className="mx-auto mt-8 max-w-6xl md:mt-10">
             <SearchForm onSearch={handleSearch} />
@@ -49,7 +54,7 @@ export default function Home() {
         </div>
       </section>
 
-      <main id="results" className="-mt-10 pb-16 md:-mt-16">
+      <main id="results" className="-mt-8 pb-16 md:-mt-14">
         <ResultsPage
           origin={searchState.origin}
           month={searchState.month}

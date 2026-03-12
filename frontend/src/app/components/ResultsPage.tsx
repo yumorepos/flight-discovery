@@ -190,15 +190,15 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-4 pt-10 md:px-6">
-      <div className="rounded-[2rem] border border-slate-200/70 bg-white p-5 shadow-[0_20px_48px_rgba(15,23,42,0.08)] md:p-7">
-        <div className="mb-6 grid gap-4 xl:grid-cols-[2fr_1fr] xl:items-end">
+    <section className="mx-auto max-w-7xl px-4 pt-8 md:px-6 md:pt-10">
+      <div className="rounded-[2rem] border border-slate-200/70 bg-white p-4 shadow-[0_20px_48px_rgba(15,23,42,0.08)] md:p-7">
+        <div className="mb-5 grid gap-4 xl:grid-cols-[2fr_1fr] xl:items-end">
           <div>
             <p className="text-sm font-semibold text-violet-700">Value-ranked flight opportunities</p>
             <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-900 md:text-4xl">{filtered.length} deals from {airportMap.get(effectiveOrigin) ?? effectiveOrigin}</h2>
             <p className="mt-2 text-sm text-slate-500">{month ? `Travel window ${month}` : "Flexible travel dates"} · prices shown in CAD and include taxes/fees.</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
             <label htmlFor="sort" className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Sort results</label>
             <select id="sort" value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)} className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100">
               <option value="value">Best value first</option>
@@ -209,15 +209,13 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
           </div>
         </div>
 
-        <div className="mb-6 grid gap-4 xl:grid-cols-[1.3fr_1.3fr_1fr]">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Price cap</p>
-            <p className="mt-1 text-sm font-semibold text-slate-800">Max CAD ${Math.min(maxPrice, maxFlightPrice).toLocaleString()}</p>
+        <div className="mb-6 grid gap-4 xl:grid-cols-[1.35fr_1.35fr_1fr]">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Budget filters</p>
+            <p className="mt-1 text-sm font-semibold text-slate-800">Max fare: CAD ${Math.min(maxPrice, maxFlightPrice).toLocaleString()}</p>
             <input type="range" min={150} max={maxFlightPrice} step={25} value={Math.min(maxPrice, maxFlightPrice)} onChange={(event) => setMaxPrice(Number(event.target.value))} className="mt-3 w-full accent-violet-600" />
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Route filters</p>
-            <div className="mt-2 space-y-3">
+            <div className="mt-3 h-px bg-slate-200" />
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
               <div>
                 <p className="text-sm font-semibold text-slate-800">Max stops: {maxStops}</p>
                 <input type="range" min={0} max={2} step={1} value={maxStops} onChange={(event) => setMaxStops(Number(event.target.value))} className="mt-1 w-full accent-violet-600" />
@@ -228,17 +226,9 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-violet-600 to-fuchsia-500 p-4 text-white shadow-lg shadow-violet-500/20">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-violet-100">Search insights</p>
-            <p className="mt-2 text-sm">Best month: <span className="font-semibold">{bestMonth ? `${bestMonth.month} · CAD $${bestMonth.avg}` : "Not enough data"}</span></p>
-            <p className="mt-1 text-sm">Cheapest week: <span className="font-semibold">{cheapestWeek ? `${cheapestWeek.week} · CAD $${cheapestWeek.avg}` : "Not enough data"}</span></p>
-            <p className="mt-2 text-xs text-violet-100">{flexibleDates ? "Flexible mode enabled for broader date intelligence." : "Enable flexible dates in search for better insight coverage."}</p>
-          </div>
-        </div>
 
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Flexible month calendar</p>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Timing insights</p>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
               {calendarByMonth.map((row) => (
                 <div key={row.month} className={`rounded-xl border p-2 text-sm ${bestMonth?.month === row.month ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-700"}`}>
@@ -247,10 +237,6 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Weekly price pulse</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               {weekInsights.map((row) => (
                 <div key={row.week} className={`rounded-xl border p-2 text-sm ${cheapestWeek?.week === row.week ? "border-violet-200 bg-violet-50 text-violet-800" : "border-slate-200 bg-white text-slate-700"}`}>
@@ -260,9 +246,16 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
               ))}
             </div>
           </div>
+
+          <div className="rounded-2xl border border-violet-300/40 bg-gradient-to-br from-violet-600 to-fuchsia-500 p-4 text-white shadow-lg shadow-violet-500/20">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-violet-100">Search insights</p>
+            <p className="mt-2 text-sm">Best month: <span className="font-semibold">{bestMonth ? `${bestMonth.month} · CAD $${bestMonth.avg}` : "Not enough data"}</span></p>
+            <p className="mt-1 text-sm">Cheapest week: <span className="font-semibold">{cheapestWeek ? `${cheapestWeek.week} · CAD $${cheapestWeek.avg}` : "Not enough data"}</span></p>
+            <p className="mt-2 text-xs text-violet-100">{flexibleDates ? "Flexible mode enabled for broader date intelligence." : "Enable flexible dates in search for better insight coverage."}</p>
+          </div>
         </div>
 
-        <div className="mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
           <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Region explorer</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {regions.map((region) => {
@@ -299,7 +292,7 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
               {flights.length === 0 ? "No routes found for this search. Try another origin, month, or destination." : "No deals match these filters. Raise max price or broaden stops/duration/region."}
             </motion.div>
           ) : (
-            <motion.div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
+            <motion.div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
               {filtered.map((flight, index) => (
                 <DestinationCard
                   key={flight.id}
