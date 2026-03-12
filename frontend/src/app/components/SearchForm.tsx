@@ -26,7 +26,7 @@ const MONTHS = Array.from({ length: 18 }, (_, idx) => {
 const formatAirport = (airport: Airport) => `${airport.city} (${airport.iata})`;
 
 export default function SearchForm({ onSearch }: SearchFormProps) {
-  const [originInput, setOriginInput] = useState("");
+  const [originInput, setOriginInput] = useState("Montreal (YUL)");
   const [destinationInput, setDestinationInput] = useState("");
   const [month, setMonth] = useState("");
   const [error, setError] = useState("");
@@ -66,6 +66,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       setError("Enter a valid origin city or IATA code.");
       return;
     }
+
     const destination = resolveAirport(destinationInput);
     if (destinationInput.trim() && !destination) {
       setError("Enter a valid destination city or IATA code, or leave it empty.");
@@ -74,18 +75,16 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
 
     setError("");
     setOriginInput(formatAirport(origin));
-    if (destination) {
-      setDestinationInput(formatAirport(destination));
-    }
+    if (destination) setDestinationInput(formatAirport(destination));
 
     onSearch(origin.iata.toUpperCase(), month, destination?.iata.toUpperCase() || undefined);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="glass-morphism w-full rounded-2xl p-5 md:p-6">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.4fr_1fr_1.4fr_auto] lg:items-end">
+    <form onSubmit={handleSubmit} className="rounded-3xl border border-white/40 bg-white/95 p-5 shadow-[0_30px_70px_rgba(15,23,42,0.2)] backdrop-blur md:p-6">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.4fr_1fr_1.3fr_auto] lg:items-end">
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-blue-50">From</label>
+          <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Departing from</label>
           <input
             list="origin-airports"
             value={originInput}
@@ -93,51 +92,64 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
               setOriginInput(event.target.value);
               setError("");
             }}
-            placeholder="e.g. Montreal or YUL"
-            className="w-full rounded-xl border border-white/40 bg-white/95 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Montreal or YUL"
+            className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm transition focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100"
           />
           <datalist id="origin-airports">
             {(airportsData as Airport[]).map((airport) => (
-              <option key={`origin-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>
+              <option key={`origin-${airport.iata}`} value={formatAirport(airport)}>
+                {airport.country}
+              </option>
             ))}
           </datalist>
-          {error && <p className="mt-1 text-xs font-medium text-red-200">{error}</p>}
         </div>
 
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-blue-50">Travel month</label>
+          <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Travel month</label>
           <select
             value={month}
             onChange={(event) => setMonth(event.target.value)}
-            className="w-full rounded-xl border border-white/40 bg-white/95 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm transition focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100"
           >
-            <option value="">Any time (best deals)</option>
+            <option value="">Any month</option>
             {MONTHS.map((monthOption) => (
-              <option key={monthOption.value} value={monthOption.value}>{monthOption.label}</option>
+              <option key={monthOption.value} value={monthOption.value}>
+                {monthOption.label}
+              </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-blue-50">To (optional)</label>
+          <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Destination (optional)</label>
           <input
             list="destination-airports"
             value={destinationInput}
-            onChange={(event) => setDestinationInput(event.target.value)}
-            placeholder="Anywhere or destination"
-            className="w-full rounded-xl border border-white/40 bg-white/95 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onChange={(event) => {
+              setDestinationInput(event.target.value);
+              setError("");
+            }}
+            placeholder="Anywhere, Paris, NRT..."
+            className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm transition focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100"
           />
           <datalist id="destination-airports">
             {(airportsData as Airport[]).map((airport) => (
-              <option key={`destination-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>
+              <option key={`destination-${airport.iata}`} value={formatAirport(airport)}>
+                {airport.country}
+              </option>
             ))}
           </datalist>
         </div>
 
-        <button type="submit" className="h-[50px] rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 font-semibold text-white shadow-md transition hover:from-orange-600 hover:to-amber-600">
-          Search deals
+        <button
+          type="submit"
+          className="h-12 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 font-bold text-white shadow-[0_10px_24px_rgba(124,58,237,0.4)] transition hover:brightness-110"
+        >
+          Search fares
         </button>
       </div>
+
+      {error && <p className="mt-3 text-sm font-medium text-rose-600">{error}</p>}
     </form>
   );
 }

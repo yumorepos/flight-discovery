@@ -50,21 +50,21 @@ export default function EmailSubscription({ destination, price }: EmailSubscript
 
   if (subscribed) {
     return (
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-        Price alert enabled for <strong>{destination}</strong>. We will email you if fares drop below CAD ${price}.
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+        Fare alert enabled for <strong>{destination}</strong>. You will get an email when prices dip below CAD ${price}.
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubscribe} noValidate className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-      <p className="text-sm font-semibold text-slate-800">Get fare alerts for {destination}</p>
-      <p className="mt-1 text-xs text-slate-500">Track this route and get notified under CAD ${price}.</p>
+    <form onSubmit={handleSubscribe} noValidate className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <p className="text-sm font-semibold text-slate-800">Get smart alerts for {destination}</p>
+      <p className="mt-1 text-xs text-slate-500">Receive updates if this route drops under CAD ${price}.</p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
         <input
           type="email"
           placeholder="you@example.com"
-          className="w-full flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-200"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -76,12 +76,12 @@ export default function EmailSubscription({ destination, price }: EmailSubscript
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Saving..." : "Notify me"}
         </button>
       </div>
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-rose-600">{error}</p>}
     </form>
   );
 }
