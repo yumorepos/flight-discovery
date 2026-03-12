@@ -34,6 +34,12 @@ def test_search_rejects_unsupported_destination_code():
     assert exc.value.detail == "Unsupported destination airport code"
 
 
+def test_search_allows_valid_iata_origins_not_in_backend_airports_list():
+    payload = asyncio.run(search_flights(origin="YYC", destination="CDG"))
+
+    assert payload == []
+
+
 def test_search_response_contains_total_price_and_tax():
     payload = asyncio.run(search_flights(origin="YUL", month="2026-03"))
 

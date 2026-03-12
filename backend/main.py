@@ -423,10 +423,8 @@ async def search_flights(
     destination: Optional[str] = None,
 ):
     origin = origin.upper()
-    if len(origin) != 3:
+    if len(origin) != 3 or not origin.isalpha():
         raise HTTPException(status_code=400, detail="Invalid origin airport code")
-    if origin not in AIRPORTS:
-        raise HTTPException(status_code=400, detail="Unsupported origin airport code")
 
     destination_code = destination.upper() if destination else None
     if destination_code and len(destination_code) == 3 and destination_code not in AIRPORTS:
