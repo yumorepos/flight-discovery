@@ -68,7 +68,7 @@ export default function EmailSubscription({ destination, route, price, travelMon
   return (
     <form onSubmit={handleSubscribe} noValidate className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <p className="text-sm font-semibold text-slate-800">Smart price alerts</p>
-      <p className="mt-1 text-xs text-slate-500">Track destination, route, threshold, and travel month.</p>
+      <p className="mt-1 text-xs text-slate-500">Get notified when this route drops below your target.</p>
       <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
         <input
           type="email"
