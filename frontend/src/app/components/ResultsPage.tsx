@@ -168,10 +168,10 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
 
   if (loading) {
     return (
-      <section className="mx-auto max-w-7xl px-4 py-14">
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-[420px] animate-pulse rounded-3xl border border-slate-200 bg-white" />
+            <div key={i} className="h-[460px] animate-pulse rounded-3xl border border-slate-200 bg-white" />
           ))}
         </div>
       </section>
@@ -180,28 +180,27 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
 
   if (error) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-14">
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center">
+      <section className="mx-auto max-w-7xl px-4 py-12 md:px-6">
+        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-6 text-center">
           <p className="font-semibold text-rose-700">We couldn&apos;t load flight deals.</p>
           <p className="mt-1 text-sm text-rose-600">{error}</p>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-4 pb-16 pt-10">
-      <div className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] md:p-7">
-        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <section className="mx-auto max-w-7xl px-4 pt-10 md:px-6">
+      <div className="rounded-[2rem] border border-slate-200/70 bg-white p-5 shadow-[0_20px_48px_rgba(15,23,42,0.08)] md:p-7">
+        <div className="mb-6 grid gap-4 xl:grid-cols-[2fr_1fr] xl:items-end">
           <div>
-            <p className="text-sm font-semibold text-violet-700">Value ranked · intelligent deal scoring</p>
-            <h2 className="mt-1 text-3xl font-black tracking-tight text-slate-900">{filtered.length} flight deals from {airportMap.get(effectiveOrigin) ?? effectiveOrigin}</h2>
-            <p className="mt-1 text-sm text-slate-500">{month ? `Travel window ${month}` : "Flexible travel dates"} · prices in CAD include taxes and fees.</p>
+            <p className="text-sm font-semibold text-violet-700">Value-ranked flight opportunities</p>
+            <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-900 md:text-4xl">{filtered.length} deals from {airportMap.get(effectiveOrigin) ?? effectiveOrigin}</h2>
+            <p className="mt-2 text-sm text-slate-500">{month ? `Travel window ${month}` : "Flexible travel dates"} · prices shown in CAD and include taxes/fees.</p>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
-            <span className="px-2 text-sm font-semibold text-slate-600">Sort</span>
-            <select value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:border-violet-500 focus:outline-none">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <label htmlFor="sort" className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Sort results</label>
+            <select id="sort" value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)} className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100">
               <option value="value">Best value first</option>
               <option value="deal">Highest deal score</option>
               <option value="price_asc">Lowest final price</option>
@@ -210,59 +209,70 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
           </div>
         </div>
 
-        <div className="mb-6 grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:grid-cols-3 lg:items-center">
-          <div>
-            <p className="text-sm font-semibold text-slate-700">Max price: CAD ${Math.min(maxPrice, maxFlightPrice).toLocaleString()}</p>
-            <input type="range" min={150} max={maxFlightPrice} step={25} value={Math.min(maxPrice, maxFlightPrice)} onChange={(event) => setMaxPrice(Number(event.target.value))} className="mt-2 w-full accent-violet-600" />
+        <div className="mb-6 grid gap-4 xl:grid-cols-[1.3fr_1.3fr_1fr]">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Price cap</p>
+            <p className="mt-1 text-sm font-semibold text-slate-800">Max CAD ${Math.min(maxPrice, maxFlightPrice).toLocaleString()}</p>
+            <input type="range" min={150} max={maxFlightPrice} step={25} value={Math.min(maxPrice, maxFlightPrice)} onChange={(event) => setMaxPrice(Number(event.target.value))} className="mt-3 w-full accent-violet-600" />
           </div>
-          <div>
-            <p className="text-sm font-semibold text-slate-700">Max stops: {maxStops}</p>
-            <input type="range" min={0} max={2} step={1} value={maxStops} onChange={(event) => setMaxStops(Number(event.target.value))} className="mt-2 w-full accent-violet-600" />
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Route filters</p>
+            <div className="mt-2 space-y-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-800">Max stops: {maxStops}</p>
+                <input type="range" min={0} max={2} step={1} value={maxStops} onChange={(event) => setMaxStops(Number(event.target.value))} className="mt-1 w-full accent-violet-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">Max duration: {maxDurationHours}h</p>
+                <input type="range" min={4} max={30} step={1} value={maxDurationHours} onChange={(event) => setMaxDurationHours(Number(event.target.value))} className="mt-1 w-full accent-violet-600" />
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold text-slate-700">Max duration: {maxDurationHours}h</p>
-            <input type="range" min={4} max={30} step={1} value={maxDurationHours} onChange={(event) => setMaxDurationHours(Number(event.target.value))} className="mt-2 w-full accent-violet-600" />
+          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-violet-600 to-fuchsia-500 p-4 text-white shadow-lg shadow-violet-500/20">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-violet-100">Search insights</p>
+            <p className="mt-2 text-sm">Best month: <span className="font-semibold">{bestMonth ? `${bestMonth.month} · CAD $${bestMonth.avg}` : "Not enough data"}</span></p>
+            <p className="mt-1 text-sm">Cheapest week: <span className="font-semibold">{cheapestWeek ? `${cheapestWeek.week} · CAD $${cheapestWeek.avg}` : "Not enough data"}</span></p>
+            <p className="mt-2 text-xs text-violet-100">{flexibleDates ? "Flexible mode enabled for broader date intelligence." : "Enable flexible dates in search for better insight coverage."}</p>
           </div>
         </div>
 
         <div className="mb-6 grid gap-4 lg:grid-cols-2">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Flexible date calendar</p>
-            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Flexible month calendar</p>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
               {calendarByMonth.map((row) => (
-                <div key={row.month} className={`rounded-xl p-2 text-sm ${bestMonth?.month === row.month ? "bg-emerald-100 text-emerald-800" : "bg-white text-slate-700"}`}>
+                <div key={row.month} className={`rounded-xl border p-2 text-sm ${bestMonth?.month === row.month ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-700"}`}>
                   <p className="font-semibold">{row.month}</p>
                   <p>Avg CAD ${row.avg}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-xs text-slate-500">Best month suggestion: {bestMonth ? `${bestMonth.month} (CAD $${bestMonth.avg})` : "Not enough data"}.</p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Cheapest week insight {flexibleDates ? "(flex mode on)" : ""}</p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Weekly price pulse</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
               {weekInsights.map((row) => (
-                <div key={row.week} className={`rounded-xl p-2 text-sm ${cheapestWeek?.week === row.week ? "bg-violet-100 text-violet-800" : "bg-white text-slate-700"}`}>
+                <div key={row.week} className={`rounded-xl border p-2 text-sm ${cheapestWeek?.week === row.week ? "border-violet-200 bg-violet-50 text-violet-800" : "border-slate-200 bg-white text-slate-700"}`}>
                   <p className="font-semibold">{row.week}</p>
                   <p>Avg CAD ${row.avg}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-xs text-slate-500">Cheapest week: {cheapestWeek ? `${cheapestWeek.week} (CAD $${cheapestWeek.avg})` : "Not enough data"}.</p>
           </div>
         </div>
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Map exploration</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Region explorer</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {regions.map((region) => {
               const regionFlights = filtered.filter((f) => f.region === region);
               const floor = regionFlights.length ? Math.min(...regionFlights.map((f) => f.total_price)) : 0;
+              const active = activeRegion === region;
               return (
-                <button key={region} onClick={() => setActiveRegion(region)} className="rounded-xl border border-slate-200 bg-white p-3 text-left hover:border-violet-300">
+                <button key={region} onClick={() => setActiveRegion(region)} className={`rounded-xl border p-3 text-left transition ${active ? "border-violet-300 bg-violet-50" : "border-slate-200 bg-white hover:border-violet-200"}`}>
                   <p className="font-semibold text-slate-800">{REGION_LABELS[region] ?? region}</p>
-                  <p className="text-xs text-slate-500">{regionFlights.length} pins · from CAD ${Math.round(floor)}</p>
+                  <p className="text-xs text-slate-500">{regionFlights.length} deals · from CAD ${Math.round(floor)}</p>
                 </button>
               );
             })}
@@ -275,7 +285,7 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
               key={region}
               onClick={() => setActiveRegion(region)}
               className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
-                activeRegion === region ? "border-violet-500 bg-violet-600 text-white shadow-[0_6px_16px_rgba(124,58,237,0.35)]" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                activeRegion === region ? "border-violet-500 bg-violet-600 text-white shadow-[0_8px_20px_rgba(124,58,237,0.25)]" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
               }`}
             >
               {region === "All" ? "All regions" : REGION_LABELS[region] ?? region}
@@ -289,7 +299,7 @@ export default function ResultsPage({ origin = "", month = "", destination = "",
               {flights.length === 0 ? "No routes found for this search. Try another origin, month, or destination." : "No deals match these filters. Raise max price or broaden stops/duration/region."}
             </motion.div>
           ) : (
-            <motion.div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <motion.div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
               {filtered.map((flight, index) => (
                 <DestinationCard
                   key={flight.id}
