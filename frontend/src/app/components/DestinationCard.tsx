@@ -40,11 +40,12 @@ interface DestinationCardProps {
   fare: FareMetadata;
   trend: Array<{ label: string; price: number }>;
   index?: number;
+  featured?: boolean;
 }
 
 const formatDate = (dateStr: string) => new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
 
-function DestinationCardComponent({ origin, city, country, destination, totalPrice, taxAmount, date, airline, duration, stops = 0, dealScore, dealClassification, valueScore, historicalPrice, destinationEmoji, bookingUrl, region, priceInsight, fare, trend, index = 0 }: DestinationCardProps) {
+function DestinationCardComponent({ origin, city, country, destination, totalPrice, taxAmount, date, airline, duration, stops = 0, dealScore, dealClassification, valueScore, historicalPrice, destinationEmoji, bookingUrl, region, priceInsight, fare, trend, index = 0, featured = false }: DestinationCardProps) {
   const { currency, rates } = useCurrency();
   const [showSubscription, setShowSubscription] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -66,24 +67,25 @@ function DestinationCardComponent({ origin, city, country, destination, totalPri
   }, [valueScore]);
 
   return (
-    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, delay: index * 0.04 }} className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white shadow-[0_16px_42px_rgba(15,23,42,0.1)] transition hover:-translate-y-1 hover:shadow-[0_24px_52px_rgba(15,23,42,0.16)]">
-      <div className="relative aspect-[16/10] overflow-hidden bg-slate-200">
+    <motion.article initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, delay: index * 0.04 }} className={`group flex h-full flex-col overflow-hidden rounded-[1.6rem] border bg-white transition hover:-translate-y-1 ${featured ? "border-violet-200 shadow-[0_24px_56px_rgba(124,58,237,0.2)] hover:shadow-[0_28px_62px_rgba(124,58,237,0.24)]" : "border-slate-200 shadow-[0_16px_42px_rgba(15,23,42,0.1)] hover:shadow-[0_24px_52px_rgba(15,23,42,0.16)]"}`}>
+      <div className={`relative overflow-hidden bg-slate-200 ${featured ? "aspect-[16/9]" : "aspect-[16/10]"}`}>
         {!imageFailed ? (
-          <Image src={imageSet.landscape} alt={`${city} destination`} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="(max-width: 768px) 100vw, (max-width: 1400px) 50vw, 33vw" loading="lazy" unoptimized onError={() => setImageFailed(true)} />
+          <Image src={imageSet.landscape} alt={`${city} destination`} fill className="object-cover transition duration-500 group-hover:scale-105" sizes={featured ? "(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 66vw" : "(max-width: 768px) 100vw, (max-width: 1400px) 50vw, 33vw"} loading="lazy" unoptimized onError={() => setImageFailed(true)} />
         ) : (
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-blue-700 to-indigo-900 text-center text-xl font-semibold text-white/90">Explore {city || destinationEmoji}</div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
-        <div className="absolute left-4 top-4 flex flex-wrap gap-2"><span className="rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-slate-900">{dealClassification}</span><span className="rounded-full bg-violet-600/95 px-3 py-1 text-xs font-semibold text-white">Deal {Math.round(dealScore)}</span></div>
-        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3"><div><h3 className="text-3xl font-black leading-none text-white">{city}</h3><p className="mt-1 text-sm text-white/90">{country}</p></div><div className={`rounded-2xl bg-gradient-to-r ${valueMeta.tone} px-3 py-1.5 text-right text-white`}><p className="text-[11px] font-medium uppercase tracking-wide">{valueMeta.label}</p><p className="text-3xl font-black leading-none">{Math.round(valueScore)}%</p></div></div>
+        <div className="absolute left-4 top-4 flex flex-wrap gap-2"><span className="rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-slate-900">{dealClassification}</span><span className="rounded-full bg-violet-600/95 px-3 py-1 text-xs font-semibold text-white">Deal {Math.round(dealScore)}</span>{featured && <span className="rounded-full border border-amber-200/70 bg-amber-300/90 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-amber-950">Top pick</span>}</div>
+        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3"><div><h3 className={`${featured ? "text-4xl md:text-5xl" : "text-3xl"} font-black leading-none text-white`}>{city}</h3><p className="mt-1 text-sm text-white/90">{country}</p>{featured && <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-violet-100">Highest ranked by value</p>}</div><div className={`rounded-2xl bg-gradient-to-r ${valueMeta.tone} ${featured ? "px-4 py-2" : "px-3 py-1.5"} text-right text-white`}><p className="text-[11px] font-medium uppercase tracking-wide">{valueMeta.label}</p><p className={`${featured ? "text-4xl" : "text-3xl"} font-black leading-none`}>{Math.round(valueScore)}%</p></div></div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-4 p-5 md:p-6">
+      <div className={`flex flex-1 flex-col gap-4 ${featured ? "p-6 md:p-7" : "p-5 md:p-6"}`}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Final fare</p>
-            <p className="mt-1 text-4xl font-black leading-none text-violet-700">{formatPrice(totalPrice, currency, rates).replace(`${currency} `, "")}</p>
+            <p className={`mt-1 font-black leading-none text-violet-700 ${featured ? "text-5xl" : "text-4xl"}`}>{formatPrice(totalPrice, currency, rates).replace(`${currency} `, "")}</p>
             <p className="mt-1 text-sm text-slate-500">{currency} per traveler · taxes est. {formatPrice(taxAmount, currency, rates)}</p>
+            {featured && <p className="mt-1 text-xs font-medium text-violet-700">Strongest value-to-price ratio in current results</p>}
           </div>
           <div className="flex flex-col items-end gap-2">{savingsPercent > 0 && <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Save {savingsPercent}%</span>}<span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{fare.fareType}</span></div>
         </div>
@@ -102,7 +104,7 @@ function DestinationCardComponent({ origin, city, country, destination, totalPri
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 md:grid-cols-4"><p className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-center font-medium">{duration}</p><p className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-center font-medium">{stopLabel}</p><p className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-center font-medium">{formatDate(date)}</p><p className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-center font-medium">{fare.aircraft}</p></div>
+        <div className={`grid gap-2 text-sm text-slate-600 ${featured ? "grid-cols-2 lg:grid-cols-5" : "grid-cols-2 md:grid-cols-4"}`}><p className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-center font-medium">{duration}</p><p className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-center font-medium">{stopLabel}</p><p className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-center font-medium">{formatDate(date)}</p><p className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-center font-medium">{fare.aircraft}</p>{featured && <p className="rounded-xl border border-violet-200 bg-violet-50 px-2 py-1.5 text-center font-semibold text-violet-700">Score {Math.round(dealScore)} deal</p>}</div>
 
         <div className="flex flex-wrap gap-2">{fare.amenities.slice(0, 3).map((amenity) => (<span key={amenity} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700">{amenity}</span>))}{fare.amenities.length > 3 && <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-500">+{fare.amenities.length - 3} more</span>}</div>
 

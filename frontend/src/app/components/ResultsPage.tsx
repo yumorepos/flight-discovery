@@ -130,6 +130,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
   }, [enrichedFlights]);
 
   const bestMonth = useMemo(() => [...calendarByMonth].sort((a, b) => a.avg - b.avg)[0], [calendarByMonth]);
+  const [featuredFlight, ...standardFlights] = filtered;
 
   if (loading) return <section className="mx-auto max-w-7xl px-4 py-10 md:px-6"><div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">Loading fares…</div></section>;
   if (error) return <section className="mx-auto max-w-7xl px-4 py-10 md:px-6"><div className="rounded-2xl border border-rose-200 bg-rose-50 p-8 text-center text-rose-700">{error}</div></section>;
@@ -176,10 +177,15 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
           {filtered.length === 0 ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">No deals match these filters.</motion.div>
           ) : (
-            <motion.div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
-              {filtered.map((flight, index) => (
-                <DestinationCard key={flight.id} index={index} origin={flight.origin} city={flight.city} country={flight.country} destination={flight.destination} totalPrice={flight.total_price} taxAmount={flight.tax_amount} date={flight.date} airline={flight.airline} duration={flight.duration} stops={flight.stops} dealScore={flight.deal_score} dealClassification={flight.deal_classification} valueScore={flight.value_score} historicalPrice={flight.historical_price} destinationEmoji={flight.destination_emoji} bookingUrl={flight.booking_url} region={flight.region} priceInsight={flight.price_insight} fare={flight.fare} trend={flight.trend} />
-              ))}
+            <motion.div className="space-y-5">
+              {featuredFlight && (
+                <DestinationCard key={featuredFlight.id} index={0} featured origin={featuredFlight.origin} city={featuredFlight.city} country={featuredFlight.country} destination={featuredFlight.destination} totalPrice={featuredFlight.total_price} taxAmount={featuredFlight.tax_amount} date={featuredFlight.date} airline={featuredFlight.airline} duration={featuredFlight.duration} stops={featuredFlight.stops} dealScore={featuredFlight.deal_score} dealClassification={featuredFlight.deal_classification} valueScore={featuredFlight.value_score} historicalPrice={featuredFlight.historical_price} destinationEmoji={featuredFlight.destination_emoji} bookingUrl={featuredFlight.booking_url} region={featuredFlight.region} priceInsight={featuredFlight.price_insight} fare={featuredFlight.fare} trend={featuredFlight.trend} />
+              )}
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                {standardFlights.map((flight, index) => (
+                  <DestinationCard key={flight.id} index={index + 1} origin={flight.origin} city={flight.city} country={flight.country} destination={flight.destination} totalPrice={flight.total_price} taxAmount={flight.tax_amount} date={flight.date} airline={flight.airline} duration={flight.duration} stops={flight.stops} dealScore={flight.deal_score} dealClassification={flight.deal_classification} valueScore={flight.value_score} historicalPrice={flight.historical_price} destinationEmoji={flight.destination_emoji} bookingUrl={flight.booking_url} region={flight.region} priceInsight={flight.price_insight} fare={flight.fare} trend={flight.trend} />
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
