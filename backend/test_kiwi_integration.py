@@ -15,7 +15,7 @@ from datetime import datetime
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-def test_kiwi_client_import():
+def run_kiwi_client_import():
     """Test 1: Can we import the Kiwi client?"""
     try:
         from kiwi_client import KiwiFlightClient
@@ -26,7 +26,7 @@ def test_kiwi_client_import():
         return False
 
 
-def test_kiwi_client_initialization():
+def run_kiwi_client_initialization():
     """Test 2: Does the client initialize without API key?"""
     try:
         from kiwi_client import KiwiFlightClient
@@ -43,7 +43,7 @@ def test_kiwi_client_initialization():
         return False
 
 
-def test_kiwi_client_availability():
+def run_kiwi_client_availability():
     """Test 3: Does is_available() return False without API key?"""
     try:
         from kiwi_client import KiwiFlightClient
@@ -60,7 +60,7 @@ def test_kiwi_client_availability():
         return False
 
 
-def test_kiwi_response_parsing():
+def run_kiwi_response_parsing():
     """Test 4: Can we parse a mock Kiwi API response?"""
     try:
         from kiwi_client import KiwiFlightClient
@@ -122,7 +122,7 @@ def test_kiwi_response_parsing():
         return False
 
 
-def test_main_py_integration():
+def run_main_py_integration():
     """Test 5: Does main.py import kiwi_client correctly?"""
     try:
         from main import kiwi_client
@@ -142,7 +142,7 @@ def test_main_py_integration():
         return False
 
 
-def test_search_endpoint_fallback():
+def run_search_endpoint_fallback():
     """Test 6: Does /api/search endpoint fall back to mock data?"""
     try:
         from main import search_flights, mock_flights
@@ -172,7 +172,7 @@ def test_search_endpoint_fallback():
         return False
 
 
-def test_value_algorithm_preserved():
+def run_value_algorithm_preserved():
     """Test 7: Is the value scoring algorithm still working?"""
     try:
         from main import rank_flights
@@ -222,7 +222,7 @@ def test_value_algorithm_preserved():
         return False
 
 
-def test_response_format_compatibility():
+def run_response_format_compatibility():
     """Test 8: Do Kiwi flights match the expected frontend format?"""
     try:
         from kiwi_client import KiwiFlightClient
@@ -280,14 +280,14 @@ def main():
     print()
     
     tests = [
-        test_kiwi_client_import,
-        test_kiwi_client_initialization,
-        test_kiwi_client_availability,
-        test_kiwi_response_parsing,
-        test_main_py_integration,
-        test_search_endpoint_fallback,
-        test_value_algorithm_preserved,
-        test_response_format_compatibility,
+        run_kiwi_client_import,
+        run_kiwi_client_initialization,
+        run_kiwi_client_availability,
+        run_kiwi_response_parsing,
+        run_main_py_integration,
+        run_search_endpoint_fallback,
+        run_value_algorithm_preserved,
+        run_response_format_compatibility,
     ]
     
     results = []

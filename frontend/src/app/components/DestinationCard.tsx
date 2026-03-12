@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import EmailSubscription from "./EmailSubscription";
+import Image from "next/image";
 
 interface DestinationCardProps {
   id: number;
@@ -45,6 +46,7 @@ const AIRLINE_CODES: Record<string, string> = {
   "Qantas": "QF",
   "Singapore Airlines": "SQ",
   "SWISS": "LX",
+  "Swiss International": "LX",
   "Turkish Airlines": "TK",
   "United": "UA",
   "Virgin Atlantic": "VS",
@@ -121,11 +123,12 @@ export default function DestinationCard({
     >
       <div className="relative h-48 overflow-hidden">
         {!imageFailed ? (
-          <img
+          <Image
             src={imageUrl}
             alt={`${city} destination`}
-            className="h-full w-full object-cover"
-            loading="lazy"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             onError={() => setImageFailed(true)}
           />
         ) : (
@@ -158,9 +161,9 @@ export default function DestinationCard({
         <div className="grid grid-cols-2 gap-3 text-sm text-slate-600">
           <div className="col-span-2 flex items-center gap-2">
             {!logoFailed ? (
-              <img src={airlineLogo} alt={`${airline} logo`} className="h-6 w-6 object-contain" onError={() => setLogoFailed(true)} />
+              <Image src={airlineLogo} alt={`${airline} logo`} width={24} height={24} className="h-6 w-6 object-contain" onError={() => setLogoFailed(true)} />
             ) : (
-              <div className="h-6 w-6 rounded-full bg-slate-200" />
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-[10px] font-semibold text-slate-600">{getAirlineCode(airline)}</div>
             )}
             <span className="font-medium text-slate-800">{airline}</span>
           </div>

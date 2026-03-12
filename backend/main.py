@@ -243,10 +243,11 @@ def add_tax_and_info(flight: dict) -> dict:
         f["duration"] = f"{hours}h"
     
     f["historical_price"] = round(f.get("price", f.get("total_price", 0)) * 1.4)
-    f["booking_url"] = generate_booking_url(
-        f["origin"], f["destination"], f["date"],
-        orig.get("city", f["origin"]), dest.get("city", f["destination"])
-    )
+    if not f.get("booking_url"):
+        f["booking_url"] = generate_booking_url(
+            f["origin"], f["destination"], f["date"],
+            orig.get("city", f["origin"]), dest.get("city", f["destination"])
+        )
     return f
 
 def generate_booking_url(origin: str, destination: str, date_str: str, origin_city: str, dest_city: str) -> str:
@@ -424,8 +425,14 @@ async def search_flights(
     origin = origin.upper()
     if len(origin) != 3:
         raise HTTPException(status_code=400, detail="Invalid origin airport code")
+    if origin not in AIRPORTS:
+        raise HTTPException(status_code=400, detail="Unsupported origin airport code")
 
-    cache_key = f"flight_search:{origin}:{month}:{destination}"
+    destination_code = destination.upper() if destination else None
+    if destination_code and len(destination_code) == 3 and destination_code not in AIRPORTS:
+        raise HTTPException(status_code=400, detail="Unsupported destination airport code")
+
+    cache_key = f"flight_search:{origin}:{month}:{destination_code}"
     if redis_client:
         cached = redis_client.get(cache_key)
         if cached:
@@ -441,14 +448,14 @@ async def search_flights(
                 api_flights = kiwi_client.search_by_month(
                     origin=origin,
                     month=month,
-                    destination=destination,
+                    destination=destination_code,
                     max_results=100
                 )
             else:
                 # Single search without month
                 api_flights = kiwi_client.search_flights(
                     origin=origin,
-                    destination=destination,
+                    destination=destination_code,
                     max_results=100
                 )
             
@@ -466,7 +473,7 @@ async def search_flights(
             f for f in mock_flights
             if f["origin"] == origin
             and (month is None or f["date"].startswith(month))
-            and (destination is None or f["destination"] == destination.upper() or
+            and (destination is None or f["destination"] == destination_code or
                  destination.lower() in f["city"].lower())
         ]
         api_flights = filtered
