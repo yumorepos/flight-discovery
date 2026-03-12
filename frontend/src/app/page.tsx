@@ -41,15 +41,17 @@ function HomeContent() {
         </div>
       </header>
 
-      <section className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_10%_0%,_#a78bfa_0%,_#7c3aed_35%,_#4c1d95_68%,_#1e1b4b_100%)] pb-20 pt-12 text-white md:pb-28 md:pt-16">
+      <section className="relative isolate overflow-hidden pb-24 pt-14 text-white md:pb-32 md:pt-20">
+        <div className="hero-gradient-animated absolute inset-0" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.2),transparent_40%),linear-gradient(160deg,rgba(255,255,255,0.12),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 md:px-6">
           <div className="mx-auto max-w-3xl text-center">
             <p className="inline-flex rounded-full border border-white/30 bg-white/12 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-100">Destination-first fare discovery</p>
-            <h1 className="mt-5 text-balance text-4xl font-black leading-tight md:text-6xl">Find your next trip at a truly great fare</h1>
+            <h1 className="mt-6 text-balance text-4xl font-black leading-tight md:text-6xl">Find your next trip at a truly great fare</h1>
           </div>
-          <div className="mx-auto mt-8 max-w-6xl md:mt-10">
+          <div className="mx-auto mt-10 max-w-6xl md:mt-12">
             <SearchForm onSearch={handleSearch} />
+            <p className="mt-4 text-center text-sm font-medium text-violet-100/95">Scans millions of fares daily to find the best value routes.</p>
           </div>
         </div>
       </section>

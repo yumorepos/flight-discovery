@@ -90,10 +90,10 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
   };
 
   const inputClassName =
-    "h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-900 shadow-[0_3px_12px_rgba(15,23,42,0.06)] transition placeholder:text-slate-400 hover:border-slate-300 focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100";
+    "h-12 w-full rounded-xl border border-white/70 bg-white/95 px-4 text-sm font-medium text-slate-900 shadow-[0_6px_20px_rgba(15,23,42,0.08)] transition placeholder:text-slate-400 hover:border-slate-300 focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100";
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-[1.8rem] border border-white/60 bg-white/95 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.28)] backdrop-blur-xl md:p-7">
+    <form onSubmit={handleSubmit} className="rounded-[1.8rem] border border-white/60 bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.28)] backdrop-blur-[10px] md:p-7">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Smart search</p>
@@ -102,7 +102,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
         <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">Trusted pricing intelligence</span>
       </div>
 
-      <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3 md:p-4">
+      <div className="rounded-2xl border border-white/75 bg-white/60 p-3 md:p-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-[1.1fr_0.9fr_1.1fr_0.9fr_auto] xl:items-end">
           <div>
             <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Departing from</label>
@@ -134,7 +134,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
             </select>
           </div>
 
-          <button type="submit" className="h-12 w-full rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 text-sm font-bold text-white shadow-[0_14px_26px_rgba(124,58,237,0.38)] transition hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 xl:w-auto">Search fares</button>
+          <button type="submit" className="h-12 w-full rounded-xl bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-500 bg-[length:140%_140%] px-7 text-sm font-bold text-white shadow-[0_14px_26px_rgba(124,58,237,0.38)] transition duration-200 hover:-translate-y-0.5 hover:bg-[position:100%_50%] hover:shadow-[0_18px_34px_rgba(124,58,237,0.45)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 xl:w-auto">Search fares</button>
         </div>
       </div>
 
