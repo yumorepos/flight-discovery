@@ -261,6 +261,11 @@ class KiwiFlightClient:
                 # Origin and destination
                 origin_code = offer.get("flyFrom", "")
                 destination_code = offer.get("flyTo", "")
+                destination_city = offer.get("cityTo", "")
+                destination_country = ""
+                country_to = offer.get("countryTo")
+                if isinstance(country_to, dict):
+                    destination_country = country_to.get("name", "")
                 
                 # Departure date (format: 2026-03-15T14:30:00.000Z)
                 departure_time = offer.get("dTime", 0)
@@ -292,8 +297,8 @@ class KiwiFlightClient:
                     "source": "kiwi",
                     "booking_url": booking_url,
                     # These will be enriched by main.py
-                    "city": "",
-                    "country": "",
+                    "city": destination_city,
+                    "country": destination_country,
                     "region": "",
                     "destination_emoji": "✈️",
                 }

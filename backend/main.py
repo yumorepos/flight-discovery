@@ -263,10 +263,10 @@ def add_tax_and_info(flight: dict) -> dict:
         f["tax_amount"] = tax_amount
         f["total_price"] = total_price
     
-    f["city"] = dest.get("city", f["destination"])
-    f["country"] = dest.get("country", "")
-    f["region"] = dest.get("region", "Other")
-    f["destination_emoji"] = dest.get("emoji", "✈️")
+    f["city"] = dest.get("city") or f.get("city") or f["destination"]
+    f["country"] = dest.get("country") or f.get("country", "")
+    f["region"] = dest.get("region") or f.get("region", "Other")
+    f["destination_emoji"] = dest.get("emoji") or f.get("destination_emoji", "✈️")
     
     # Convert duration_hours to display format (e.g., "7h 30m")
     hours = int(f.get("duration_hours", 0))
@@ -543,15 +543,18 @@ async def search_flights(
             
             # Enrich API flights with airport metadata
             api_flights = [add_tax_and_info(f) for f in api_flights]
-            api_flights = [f for f in api_flights if _matches_destination_query(f, destination_query)]
-            logger.info(f"Retrieved {len(api_flights)} flights from Kiwi API")
+            logger.info(f"Retrieved {len(api_flights)} flights from Kiwi API before destination filtering")
             
         except Exception as e:
             logger.error(f"Kiwi API error: {e} - falling back to mock data")
 
+    # Apply destination filtering after enrichment so city/country matching can use
+    # provider metadata even when destination airport isn't in AIRPORTS.
+    api_flights = [f for f in api_flights if _matches_destination_query(f, destination_query)]
+
     # Fallback to mock data if no API results
     if not api_flights:
-        logger.info("Using mock data (Kiwi unavailable or returned no results)")
+        logger.info("Using mock data (Kiwi unavailable or returned no destination matches)")
         filtered = [
             f for f in mock_flights
             if f["origin"] == origin
