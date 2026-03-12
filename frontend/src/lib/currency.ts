@@ -77,6 +77,11 @@ export const convertPrice = (cadAmount: number, currency: SupportedCurrency, rat
   return cadAmount * (rates[currency] ?? 1);
 };
 
+export const convertToCad = (amount: number, currency: SupportedCurrency, rates: Record<SupportedCurrency, number>) => {
+  const rate = rates[currency] ?? 1;
+  return amount / (rate || 1);
+};
+
 export const formatPrice = (cadAmount: number, currency: SupportedCurrency, rates: Record<SupportedCurrency, number>, options?: Intl.NumberFormatOptions) => {
   const amount = convertPrice(cadAmount, currency, rates);
   const symbol = CURRENCY_META[currency].symbol;

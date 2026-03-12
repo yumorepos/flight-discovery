@@ -56,10 +56,10 @@ const AIRLINE_NAME_TO_CODE: Record<string, string> = {
 
 const resolveCode = (airline: string) => {
   const trimmed = airline.trim();
-  const canonical = AIRLINE_NAME_TO_CODE[trimmed];
+  const canonical = AIRLINE_NAME_TO_CODE[trimmed] ?? AIRLINE_NAME_TO_CODE[trimmed.replace(/\s+/g, " ")] ;
   if (canonical) return canonical;
 
-  const inline = trimmed.match(/\(([A-Z0-9]{2})\)/)?.[1];
+  const inline = trimmed.match(/\(([A-Z0-9]{2})\)/i)?.[1]?.toUpperCase();
   if (inline) return inline;
 
   return trimmed.replace(/[^A-Z]/gi, "").slice(0, 2).toUpperCase() || "XX";
