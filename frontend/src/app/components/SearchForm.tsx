@@ -27,6 +27,20 @@ const formatAirport = (airport: Airport) => `${airport.city} (${airport.iata})`;
 const MAX_FUZZY_MATCH_SCORE = 0.18;
 const MIN_AMBIGUITY_SCORE_GAP = 0.05;
 
+const hasStrongTokenMatch = (query: string, airport: Airport) => {
+  const normalizedQuery = query.toLowerCase().trim();
+  if (!normalizedQuery) return false;
+
+  const queryTokens = normalizedQuery.split(/\s+/).filter(Boolean);
+  if (!queryTokens.length) return false;
+
+  const searchableParts = [airport.city, airport.name, airport.iata, airport.country].map((value) => value.toLowerCase());
+
+  return queryTokens.every((token) =>
+    searchableParts.some((part) => part === token || part.startsWith(token) || part.includes(` ${token}`))
+  );
+};
+
 export default function SearchForm({ onSearch }: SearchFormProps) {
   const [originInput, setOriginInput] = useState("");
   const [destinationInput, setDestinationInput] = useState("");
@@ -80,6 +94,10 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       return null;
     }
 
+    if (!hasStrongTokenMatch(trimmed, fuzzyMatch.item)) {
+      return null;
+    }
+
     return fuzzyMatch.item;
   };
 
@@ -92,11 +110,17 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
     }
 
     const destination = resolveAirport(destinationInput);
+    if (destinationInput.trim() && !destination) {
+      setError("Enter a valid destination city or IATA code.");
+      return;
+    }
 
     setError("");
     setOriginInput(formatAirport(origin));
     if (destination) {
       setDestinationInput(formatAirport(destination));
+    } else {
+      setDestinationInput("");
     }
 
     onSearch(origin.iata.toUpperCase(), month, destination?.iata.toUpperCase() || undefined);
