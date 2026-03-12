@@ -39,3 +39,55 @@ def test_search_response_contains_total_price_and_tax():
 
     assert payload, "Expected at least one flight"
     assert all("total_price" in flight and "tax_amount" in flight for flight in payload)
+
+
+def test_kiwi_metadata_is_preserved_for_unknown_airports():
+    flight = {
+        "id": "kiwi_ber",
+        "origin": "YUL",
+        "destination": "BER",
+        "price": 300,
+        "date": "2026-03-15",
+        "airline": "U2",
+        "duration_hours": 8.0,
+        "source": "kiwi",
+        "city": "Berlin",
+        "country": "Germany",
+        "region": "DE",
+    }
+
+    enriched = add_tax_and_info(flight)
+
+    assert enriched["city"] == "Berlin"
+    assert enriched["country"] == "Germany"
+
+
+def test_destination_query_matches_kiwi_flights_by_city_without_airport_map_entry(monkeypatch):
+    from main import kiwi_client
+
+    sample = [{
+        "id": "kiwi_ber",
+        "origin": "YUL",
+        "destination": "BER",
+        "price": 300,
+        "total_price": 345,
+        "tax_amount": 45,
+        "date": "2026-03-15",
+        "airline": "U2",
+        "duration_hours": 8.0,
+        "stops": 0,
+        "currency": "CAD",
+        "source": "kiwi",
+        "booking_url": "https://example.test",
+        "city": "Berlin",
+        "country": "Germany",
+        "region": "DE",
+    }]
+
+    monkeypatch.setattr(kiwi_client, "is_available", lambda: True)
+    monkeypatch.setattr(kiwi_client, "search_by_month", lambda **kwargs: sample)
+
+    payload = asyncio.run(search_flights(origin="YUL", month="2026-03", destination="berlin"))
+
+    assert len(payload) == 1
+    assert payload[0]["destination"] == "BER"

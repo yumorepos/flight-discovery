@@ -102,19 +102,22 @@ def _matches_destination_query(flight: dict, destination_query: Optional[str]) -
     if not query or query == "anywhere":
         return True
 
-    if len(query) == 3 and query.upper() in AIRPORTS:
-        return flight.get("destination") == query.upper()
+    destination = str(flight.get("destination", "")).upper()
+    city = str(flight.get("city", "")).lower()
+    country = str(flight.get("country", "")).lower()
+
+    if len(query) == 3:
+        return destination == query.upper()
 
     if query in REGION_QUERY_TO_CODE:
-        return flight.get("region") == REGION_QUERY_TO_CODE[query]
+        region = str(flight.get("region", ""))
+        return region == REGION_QUERY_TO_CODE[query] or region.upper() == REGION_QUERY_TO_CODE[query]
 
     if query == "beach":
         beach_codes = {"CUN", "MIA", "HNL", "SYD", "BCN", "LIM"}
-        return flight.get("destination") in beach_codes
+        return destination in beach_codes
 
-    city = str(flight.get("city", "")).lower()
-    country = str(flight.get("country", "")).lower()
-    return query in city or query in country
+    return query in city or query in country or query in destination.lower()
 
 # Duration placeholders (hours) per route distance
 ROUTE_DURATIONS = {
@@ -263,9 +266,9 @@ def add_tax_and_info(flight: dict) -> dict:
         f["tax_amount"] = tax_amount
         f["total_price"] = total_price
     
-    f["city"] = dest.get("city", f["destination"])
-    f["country"] = dest.get("country", "")
-    f["region"] = dest.get("region", "Other")
+    f["city"] = dest.get("city") or f.get("city") or f["destination"]
+    f["country"] = dest.get("country") or f.get("country", "")
+    f["region"] = dest.get("region") or f.get("region", "Other")
     f["destination_emoji"] = dest.get("emoji", "✈️")
     
     # Convert duration_hours to display format (e.g., "7h 30m")

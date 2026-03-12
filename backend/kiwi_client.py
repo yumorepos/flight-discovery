@@ -291,10 +291,10 @@ class KiwiFlightClient:
                     "currency": "CAD",
                     "source": "kiwi",
                     "booking_url": booking_url,
-                    # These will be enriched by main.py
-                    "city": "",
-                    "country": "",
-                    "region": "",
+                    # Preserve destination metadata from Kiwi when available.
+                    "city": offer.get("cityTo", ""),
+                    "country": offer.get("countryTo", {}).get("name", ""),
+                    "region": offer.get("countryTo", {}).get("code", ""),
                     "destination_emoji": "✈️",
                 }
                 
