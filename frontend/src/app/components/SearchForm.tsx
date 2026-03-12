@@ -24,6 +24,7 @@ const MONTHS = Array.from({ length: 12 }, (_, idx) => {
 });
 
 const formatAirport = (airport: Airport) => `${airport.city} (${airport.iata})`;
+const MAX_FUZZY_MATCH_SCORE = 0.2;
 
 export default function SearchForm({ onSearch }: SearchFormProps) {
   const [originInput, setOriginInput] = useState("");
@@ -36,6 +37,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       new Fuse(airportsData as Airport[], {
         keys: ["city", "iata", "name", "country"],
         threshold: 0.35,
+        includeScore: true,
       }),
     []
   );
@@ -56,7 +58,15 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
     const exactCity = (airportsData as Airport[]).find((airport) => airport.city.toLowerCase() === trimmed.toLowerCase());
     if (exactCity) return exactCity;
 
-    return fuse.search(trimmed)[0]?.item ?? null;
+    const exactName = (airportsData as Airport[]).find((airport) => airport.name.toLowerCase() === trimmed.toLowerCase());
+    if (exactName) return exactName;
+
+    const fuzzyMatch = fuse.search(trimmed)[0];
+    if (!fuzzyMatch || fuzzyMatch.score === undefined || fuzzyMatch.score > MAX_FUZZY_MATCH_SCORE) {
+      return null;
+    }
+
+    return fuzzyMatch.item;
   };
 
   const handleSubmit = (event: React.FormEvent) => {
