@@ -8,7 +8,7 @@ import sys
 
 BASE_URL = "http://localhost:8000"
 
-def test_endpoint(name: str, url: str):
+def run_endpoint_check(name: str, url: str):
     """Test a single API endpoint."""
     print(f"\n{'='*60}")
     print(f"Testing: {name}")
@@ -79,7 +79,7 @@ def main():
     
     results = []
     for name, url in tests:
-        success = test_endpoint(name, url)
+        success = run_endpoint_check(name, url)
         results.append((name, success))
     
     # Summary

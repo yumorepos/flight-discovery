@@ -57,7 +57,7 @@ export default function EmailSubscription({ destination, price }: EmailSubscript
   }
 
   return (
-    <form onSubmit={handleSubscribe} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <form onSubmit={handleSubscribe} noValidate className="rounded-xl border border-slate-200 bg-slate-50 p-4">
       <p className="text-sm font-semibold text-slate-800">Get fare alerts for {destination}</p>
       <p className="mt-1 text-xs text-slate-500">Track this route and get notified under CAD ${price}.</p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">

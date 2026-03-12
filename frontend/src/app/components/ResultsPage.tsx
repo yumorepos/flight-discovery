@@ -56,7 +56,8 @@ async function fetchFlights(origin: string, month: string, destination?: string)
 
   const response = await fetch(`/api/search?${params}`);
   if (!response.ok) {
-    throw new Error(`Search failed with ${response.status}`);
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.detail || `Search failed with ${response.status}`);
   }
 
   return response.json();
@@ -110,9 +111,9 @@ export default function ResultsPage({ origin = "", month = "", destination = "" 
 
     switch (sortKey) {
       case "value":
-        return [...list].sort((a, b) => b.value_score - a.value_score);
+        return [...list].sort((a, b) => b.value_score - a.value_score || a.total_price - b.total_price);
       case "deal":
-        return [...list].sort((a, b) => b.deal_score - a.deal_score);
+        return [...list].sort((a, b) => b.deal_score - a.deal_score || b.value_score - a.value_score);
       case "price_asc":
         return [...list].sort((a, b) => a.total_price - b.total_price);
       case "price_desc":
@@ -127,7 +128,14 @@ export default function ResultsPage({ origin = "", month = "", destination = "" 
   }
 
   if (error) {
-    return <div className="py-20 text-center text-red-600">{error}</div>;
+    return (
+      <div className="container mx-auto max-w-7xl px-4 py-14">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
+          <p className="font-semibold text-red-700">We couldn&apos;t load flight deals.</p>
+          <p className="mt-1 text-sm text-red-600">{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -188,7 +196,9 @@ export default function ResultsPage({ origin = "", month = "", destination = "" 
       <AnimatePresence mode="popLayout">
         {filtered.length === 0 ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-slate-200 bg-white p-8 text-center text-slate-500">
-            No deals match these filters. Try increasing the max price or selecting another region.
+            {flights.length === 0
+              ? "No routes found for this search. Try another origin, month, or destination."
+              : "No deals match these filters. Try increasing the max price or selecting another region."}
           </motion.div>
         ) : (
           <motion.div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">

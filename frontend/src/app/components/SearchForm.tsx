@@ -16,7 +16,7 @@ interface SearchFormProps {
 }
 
 const NOW = new Date();
-const MONTHS = Array.from({ length: 12 }, (_, idx) => {
+const MONTHS = Array.from({ length: 18 }, (_, idx) => {
   const date = new Date(NOW.getFullYear(), NOW.getMonth() + idx, 1);
   const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
   const label = date.toLocaleDateString("en-CA", { month: "long", year: "numeric" });
@@ -66,8 +66,11 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       setError("Enter a valid origin city or IATA code.");
       return;
     }
-
     const destination = resolveAirport(destinationInput);
+    if (destinationInput.trim() && !destination) {
+      setError("Enter a valid destination city or IATA code, or leave it empty.");
+      return;
+    }
 
     setError("");
     setOriginInput(formatAirport(origin));
