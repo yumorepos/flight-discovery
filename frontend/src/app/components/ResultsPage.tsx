@@ -92,9 +92,9 @@ const parseHours = (duration: string) => {
 };
 
 const sourceMeta = (source: FlightSource) => {
-  if (source === "live-api") return { label: "Live fares", detail: "Updated just now", badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-700" };
-  if (source === "demo-fallback") return { label: "Preview mode", detail: "Sample fares for demo", badgeClass: "border-amber-200 bg-amber-50 text-amber-700" };
-  return { label: "Fares", detail: "Latest available", badgeClass: "border-slate-200 bg-slate-50 text-slate-700" };
+  if (source === "live-api") return { label: "Live fares", badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-700" };
+  if (source === "demo-fallback") return { label: "Preview fares", badgeClass: "border-amber-200 bg-amber-50 text-amber-700" };
+  return { label: "Fare data", badgeClass: "border-slate-200 bg-slate-50 text-slate-700" };
 };
 
 function LoadingSkeleton() {
@@ -309,15 +309,19 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+        <div className="mt-4 rounded-2xl border border-slate-200/90 bg-gradient-to-r from-slate-50 to-white p-3.5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Results snapshot</p>
+            <p className="text-xs font-medium text-slate-500">Updated {lastUpdatedAt || "just now"}</p>
+          </div>
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
             <span className={`rounded-full border px-3 py-1 ${sourceInfo.badgeClass}`}>{sourceInfo.label}</span>
             <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600">{filtered.length} fares found</span>
             <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600">Top region: {topRegion}</span>
-            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600">{sourceInfo.detail}{lastUpdatedAt ? ` · ${lastUpdatedAt}` : ""}</span>
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600">Best month: {bestMonth ? bestMonth.month : "N/A"}</span>
           </div>
           {source === "demo-fallback" && (
-            <p className="mt-2 text-xs text-amber-700">Preview mode is active while live fare services are unavailable. Search and filters remain fully interactive.</p>
+            <p className="mt-2 text-xs text-amber-700">Showing preview fares while live airline feeds reconnect. Filters and ranking remain fully interactive.</p>
           )}
         </div>
 
