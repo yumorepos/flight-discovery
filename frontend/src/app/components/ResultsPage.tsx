@@ -11,15 +11,12 @@ interface Flight {
   destination: string;
   city: string;
   country: string;
-  price: number;
   total_price: number;
   tax_amount: number;
   date: string;
   airline: string;
   duration: string;
-  duration_hours?: number;
   stops?: number;
-  safety_score: number;
   value_score: number;
   region: string;
   deal_score: number;
@@ -92,10 +89,7 @@ export default function ResultsPage({ origin = "", month = "", destination = "" 
     loadFlights();
   }, [effectiveOrigin, month, destination]);
 
-  const maxFlightPrice = useMemo(
-    () => (flights.length ? Math.max(...flights.map((flight) => Math.round(flight.total_price))) : 3000),
-    [flights]
-  );
+  const maxFlightPrice = useMemo(() => (flights.length ? Math.max(...flights.map((flight) => Math.round(flight.total_price))) : 3000), [flights]);
 
   useEffect(() => {
     setMaxPrice(maxFlightPrice);
@@ -124,113 +118,122 @@ export default function ResultsPage({ origin = "", month = "", destination = "" 
   }, [flights, activeRegion, maxPrice, sortKey]);
 
   if (loading) {
-    return <div className="py-20 text-center text-slate-500">Loading flight deals…</div>;
+    return (
+      <section className="mx-auto max-w-7xl px-4 py-14">
+        <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">Loading premium fare picks…</div>
+      </section>
+    );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto max-w-7xl px-4 py-14">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
-          <p className="font-semibold text-red-700">We couldn&apos;t load flight deals.</p>
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+      <div className="mx-auto max-w-7xl px-4 py-14">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center">
+          <p className="font-semibold text-rose-700">We couldn&apos;t load flight deals.</p>
+          <p className="mt-1 text-sm text-rose-600">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <section className="container mx-auto max-w-7xl px-4 py-10">
-      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm font-medium text-blue-700">{origin ? "Search results" : "Discovery mode"}</p>
-          <h2 className="text-3xl font-bold text-slate-900">Flights from {airportMap.get(effectiveOrigin) ?? effectiveOrigin} ({effectiveOrigin})</h2>
-          <p className="text-sm text-slate-500">
-            {flights.length} routes ranked by value · final prices include taxes
-            {month ? ` · ${month}` : " · flexible dates"}
-          </p>
+    <section className="mx-auto max-w-7xl px-4 pb-16 pt-10">
+      <div className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] md:p-7">
+        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-violet-700">Value ranked · tax included pricing</p>
+            <h2 className="mt-1 text-3xl font-black tracking-tight text-slate-900">{filtered.length} flight deals from {airportMap.get(effectiveOrigin) ?? effectiveOrigin}</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              {month ? `Travel window ${month}` : "Flexible travel dates"} · prices in CAD include taxes and fees.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
+            <span className="px-2 text-sm font-semibold text-slate-600">Sort</span>
+            <select
+              value={sortKey}
+              onChange={(event) => setSortKey(event.target.value as SortKey)}
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:border-violet-500 focus:outline-none"
+            >
+              <option value="value">Best value first</option>
+              <option value="deal">Highest deal score</option>
+              <option value="price_asc">Lowest final price</option>
+              <option value="price_desc">Highest final price</option>
+            </select>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="text-sm font-medium text-slate-600">Sort:</label>
-          <select
-            value={sortKey}
-            onChange={(event) => setSortKey(event.target.value as SortKey)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
-          >
-            <option value="value">Best value</option>
-            <option value="deal">Top deal score</option>
-            <option value="price_asc">Lowest final price</option>
-            <option value="price_desc">Highest final price</option>
-          </select>
+        <div className="mb-6 grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-sm font-semibold text-slate-700">Max final price: CAD ${Math.min(maxPrice, maxFlightPrice).toLocaleString()}</p>
+            <input
+              type="range"
+              min={150}
+              max={maxFlightPrice}
+              step={25}
+              value={Math.min(maxPrice, maxFlightPrice)}
+              onChange={(event) => setMaxPrice(Number(event.target.value))}
+              className="mt-2 w-full accent-violet-600"
+            />
+          </div>
+          <p className="text-sm font-medium text-slate-500">Compare by value and lock in the strongest fares first.</p>
         </div>
-      </div>
 
-      <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <label className="text-sm font-medium text-slate-700">Max final price</label>
-          <input
-            type="range"
-            min={150}
-            max={maxFlightPrice}
-            step={50}
-            value={Math.min(maxPrice, maxFlightPrice)}
-            onChange={(event) => setMaxPrice(Number(event.target.value))}
-            className="w-full accent-blue-600"
-          />
-          <span className="text-sm font-semibold text-slate-800">CAD ${Math.min(maxPrice, maxFlightPrice).toLocaleString()}</span>
+        <div className="mb-7 flex flex-wrap gap-2">
+          {[
+            "All",
+            ...regions,
+          ].map((region) => (
+            <button
+              key={region}
+              onClick={() => setActiveRegion(region)}
+              className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
+                activeRegion === region
+                  ? "border-violet-500 bg-violet-600 text-white shadow-[0_6px_16px_rgba(124,58,237,0.35)]"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+              }`}
+            >
+              {region === "All" ? "All regions" : REGION_LABELS[region] ?? region}
+            </button>
+          ))}
         </div>
-      </div>
 
-      <div className="mb-6 flex flex-wrap gap-2">
-        {["All", ...regions].map((region) => (
-          <button
-            key={region}
-            onClick={() => setActiveRegion(region)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium ${activeRegion === region ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"}`}
-          >
-            {region === "All" ? "All regions" : REGION_LABELS[region] ?? region}
-          </button>
-        ))}
+        <AnimatePresence mode="popLayout">
+          {filtered.length === 0 ? (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+              {flights.length === 0
+                ? "No routes found for this search. Try another origin, month, or destination."
+                : "No deals match these filters. Raise max price or switch to a broader region."}
+            </motion.div>
+          ) : (
+            <motion.div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {filtered.map((flight, index) => (
+                <DestinationCard
+                  key={flight.id}
+                  id={flight.id}
+                  index={index}
+                  city={flight.city}
+                  country={flight.country}
+                  destination={flight.destination}
+                  totalPrice={flight.total_price}
+                  taxAmount={flight.tax_amount}
+                  date={flight.date}
+                  airline={flight.airline}
+                  duration={flight.duration}
+                  stops={flight.stops}
+                  dealScore={flight.deal_score}
+                  dealClassification={flight.deal_classification}
+                  valueScore={flight.value_score}
+                  historicalPrice={flight.historical_price}
+                  destinationEmoji={flight.destination_emoji}
+                  bookingUrl={flight.booking_url}
+                  region={flight.region}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-
-      <AnimatePresence mode="popLayout">
-        {filtered.length === 0 ? (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-slate-200 bg-white p-8 text-center text-slate-500">
-            {flights.length === 0
-              ? "No routes found for this search. Try another origin, month, or destination."
-              : "No deals match these filters. Try increasing the max price or selecting another region."}
-          </motion.div>
-        ) : (
-          <motion.div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {filtered.map((flight, index) => (
-              <DestinationCard
-                key={flight.id}
-                index={index}
-                id={flight.id}
-                city={flight.city}
-                country={flight.country}
-                destination={flight.destination}
-                price={flight.price}
-                totalPrice={flight.total_price}
-                taxAmount={flight.tax_amount}
-                date={flight.date}
-                airline={flight.airline}
-                duration={flight.duration}
-                durationHours={flight.duration_hours}
-                stops={flight.stops}
-                safetyScore={flight.safety_score}
-                dealScore={flight.deal_score}
-                dealClassification={flight.deal_classification}
-                valueScore={flight.value_score}
-                historicalPrice={flight.historical_price}
-                destinationEmoji={flight.destination_emoji}
-                bookingUrl={flight.booking_url}
-                region={flight.region}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }

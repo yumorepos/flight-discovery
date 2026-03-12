@@ -1,24 +1,22 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import EmailSubscription from "./EmailSubscription";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import EmailSubscription from "./EmailSubscription";
+import { getAirlineBrand, getDestinationImage } from "@/lib/visualAssets";
 
 interface DestinationCardProps {
   id: number;
   city: string;
   country: string;
   destination: string;
-  price: number;
   totalPrice: number;
   taxAmount: number;
   date: string;
   airline: string;
   duration: string;
-  durationHours?: number;
   stops?: number;
-  safetyScore: number;
   dealScore: number;
   dealClassification: string;
   valueScore: number;
@@ -29,40 +27,6 @@ interface DestinationCardProps {
   index?: number;
 }
 
-const AIRLINE_CODES: Record<string, string> = {
-  "Air Canada": "AC",
-  "Air France": "AF",
-  "American Airlines": "AA",
-  "ANA": "NH",
-  "British Airways": "BA",
-  "Delta": "DL",
-  "Emirates": "EK",
-  "Iberia": "IB",
-  "JAL": "JL",
-  "JetBlue": "B6",
-  "KLM": "KL",
-  "LATAM": "LA",
-  "Lufthansa": "LH",
-  "Qantas": "QF",
-  "Singapore Airlines": "SQ",
-  "SWISS": "LX",
-  "Swiss International": "LX",
-  "Turkish Airlines": "TK",
-  "United": "UA",
-  "Virgin Atlantic": "VS",
-};
-
-const DESTINATION_IMAGES: Record<string, string> = {
-  London: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
-  Paris: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
-  Tokyo: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=1200&q=80",
-  Rome: "https://images.unsplash.com/photo-1525874684015-58379d421a52?auto=format&fit=crop&w=1200&q=80",
-  Barcelona: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80",
-  Singapore: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80",
-  Sydney: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80",
-  Dubai: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=1200&q=80",
-};
-
 const formatDate = (dateStr: string) =>
   new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-CA", {
     month: "short",
@@ -72,10 +36,17 @@ const formatDate = (dateStr: string) =>
 
 const formatMoney = (value: number) => `CAD $${Math.round(value).toLocaleString()}`;
 
-const getAirlineCode = (airline: string) => {
-  const explicit = airline.match(/\(([A-Z0-9]{2})\)/)?.[1];
-  if (explicit) return explicit;
-  return AIRLINE_CODES[airline] ?? airline.slice(0, 2).toUpperCase();
+const getDealTone = (classification: string) => {
+  switch (classification) {
+    case "Mistake Fare":
+      return "bg-rose-500/95 text-white";
+    case "Hot Deal":
+      return "bg-orange-500/95 text-white";
+    case "Good Deal":
+      return "bg-emerald-500/95 text-white";
+    default:
+      return "bg-slate-900/75 text-white";
+  }
 };
 
 export default function DestinationCard({
@@ -94,103 +65,117 @@ export default function DestinationCard({
   historicalPrice,
   destinationEmoji,
   bookingUrl,
+  region,
   index = 0,
 }: DestinationCardProps) {
   const [showSubscription, setShowSubscription] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
 
-  const imageUrl = DESTINATION_IMAGES[city] ?? `https://source.unsplash.com/1200x800/?${encodeURIComponent(`${city} skyline travel`)}`;
-  const airlineLogo = `https://images.kiwi.com/airlines/64x64/${getAirlineCode(airline)}.png`;
+  const imageUrl = getDestinationImage(city, region);
+  const { airlineCode, logoUrl } = getAirlineBrand(airline);
 
   const savingsPercent = Math.max(0, Math.round(((historicalPrice - totalPrice) / historicalPrice) * 100));
-  const stopLabel = stops === 0 ? "Nonstop" : stops === 1 ? "1 stop" : `${stops} stops`;
-  const valueTone = valueScore >= 75 ? "emerald" : valueScore >= 55 ? "blue" : "amber";
+  const stopLabel = stops === 0 ? "Direct" : stops === 1 ? "1 stop" : `${stops} stops`;
 
-  const badgeClass = useMemo(() => {
-    if (dealClassification === "Mistake Fare") return "bg-red-600 text-white";
-    if (dealClassification === "Hot Deal") return "bg-orange-500 text-white";
-    if (dealClassification === "Good Deal") return "bg-emerald-600 text-white";
-    return "bg-slate-700 text-white";
-  }, [dealClassification]);
+  const valueMeta = useMemo(() => {
+    if (valueScore >= 90) return { label: "Exceptional Value", tone: "from-emerald-500 to-green-400" };
+    if (valueScore >= 75) return { label: "Great Value", tone: "from-blue-500 to-cyan-400" };
+    if (valueScore >= 60) return { label: "Good Value", tone: "from-violet-500 to-purple-500" };
+    return { label: "Fair Value", tone: "from-amber-500 to-orange-500" };
+  }, [valueScore]);
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
-      className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      transition={{ duration: 0.28, delay: index * 0.04 }}
+      className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_45px_rgba(15,23,42,0.13)]"
     >
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-52 overflow-hidden">
         {!imageFailed ? (
           <Image
             src={imageUrl}
             alt={`${city} destination`}
             fill
-            className="object-cover"
+            className="object-cover transition duration-500 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             onError={() => setImageFailed(true)}
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-700 text-6xl">{destinationEmoji}</div>
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-blue-700 to-indigo-900 text-7xl">{destinationEmoji}</div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
-        <div className="absolute left-4 top-4 flex gap-2">
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}`}>{dealClassification}</span>
-          <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-800">Deal {Math.round(dealScore)}</span>
+
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/35 to-transparent" />
+
+        <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getDealTone(dealClassification)}`}>{dealClassification}</span>
+          <span className="rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-slate-900">Deal score {Math.round(dealScore)}</span>
         </div>
-        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+
+        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
           <div>
-            <h3 className="text-2xl font-bold text-white">{city}</h3>
-            <p className="text-sm text-white/90">{country} · {destination}</p>
+            <h3 className="text-3xl font-bold leading-none text-white">{city}</h3>
+            <p className="mt-1 text-sm text-white/90">{country}</p>
           </div>
-          <div className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-800">{stopLabel}</div>
+          <div className={`rounded-2xl bg-gradient-to-r ${valueMeta.tone} px-3 py-1.5 text-right text-white shadow-lg`}>
+            <p className="text-[11px] font-medium uppercase tracking-wide">{valueMeta.label}</p>
+            <p className="text-3xl font-black leading-none">{Math.round(valueScore)}%</p>
+          </div>
         </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-5">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Final price (incl. taxes)</p>
-            <p className="text-3xl font-extrabold text-slate-900">{formatMoney(totalPrice)}</p>
-            <p className="text-xs text-slate-500">Tax estimate included: {formatMoney(taxAmount)}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Final tax-inclusive fare</p>
+            <p className="mt-1 text-4xl font-black leading-none text-violet-600">{formatMoney(totalPrice).replace("CAD ", "")}</p>
+            <p className="mt-1 text-sm text-slate-500">CAD per traveler · taxes included ({formatMoney(taxAmount)} est.)</p>
           </div>
-          {savingsPercent > 0 && <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Save {savingsPercent}%</span>}
+          {savingsPercent > 0 && <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">↓ {savingsPercent}% vs typical</span>}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 text-sm text-slate-600">
-          <div className="col-span-2 flex items-center gap-2">
+        <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+          <div className="flex items-center gap-3">
             {!logoFailed ? (
-              <Image src={airlineLogo} alt={`${airline} logo`} width={24} height={24} className="h-6 w-6 object-contain" onError={() => setLogoFailed(true)} />
+              <Image
+                src={logoUrl}
+                alt={`${airline} logo`}
+                width={38}
+                height={38}
+                className="h-10 w-10 rounded-xl border border-slate-200 bg-white p-1 object-contain"
+                onError={() => setLogoFailed(true)}
+              />
             ) : (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-[10px] font-semibold text-slate-600">{getAirlineCode(airline)}</div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-600">{airlineCode}</div>
             )}
-            <span className="font-medium text-slate-800">{airline}</span>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">{airline}</p>
+              <p className="text-xs text-slate-500">Operated by {airlineCode} · {destination}</p>
+            </div>
           </div>
-          <p>Departure: {formatDate(date)}</p>
-          <p>Duration: {duration}</p>
-          <p className="col-span-2">
-            Value score:
-            <span className={`ml-2 rounded-md px-2 py-0.5 text-xs font-semibold ${valueTone === "emerald" ? "bg-emerald-100 text-emerald-700" : valueTone === "blue" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
-              {Math.round(valueScore)}/100
-            </span>
-          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 text-sm text-slate-600">
+          <p className="rounded-xl bg-slate-50 px-2 py-1.5 text-center font-medium">{duration}</p>
+          <p className="rounded-xl bg-slate-50 px-2 py-1.5 text-center font-medium">{stopLabel}</p>
+          <p className="rounded-xl bg-slate-50 px-2 py-1.5 text-center font-medium">{formatDate(date)}</p>
         </div>
 
         <a
           href={bookingUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-700"
+          className="mt-auto rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-4 py-3.5 text-center text-base font-bold text-white shadow-[0_8px_22px_rgba(124,58,237,0.35)] transition hover:brightness-110"
         >
-          Book on Google Flights
+          Book this fare
         </a>
 
         <button
           onClick={() => setShowSubscription((prev) => !prev)}
-          className="text-left text-xs font-semibold text-blue-700 hover:text-blue-800"
+          className="text-left text-xs font-semibold text-violet-700 transition hover:text-violet-800"
         >
-          {showSubscription ? "Hide alert form" : "Track price for this destination"}
+          {showSubscription ? "Hide price alerts" : `Track ${city} price alerts`}
         </button>
 
         <AnimatePresence>
