@@ -9,10 +9,11 @@ export default function Home() {
     origin: "YUL",
     month: "",
     destination: "",
+    flexibleDates: true,
   });
 
-  const handleSearch = (origin: string, month: string, destination?: string) => {
-    setSearchState({ origin, month, destination: destination ?? "" });
+  const handleSearch = (origin: string, month: string, destination?: string, flexibleDates = true) => {
+    setSearchState({ origin, month, destination: destination ?? "", flexibleDates });
   };
 
   return (
@@ -36,13 +37,9 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(130deg,rgba(255,255,255,0.08),transparent_40%)]" />
         <div className="relative mx-auto max-w-7xl px-4">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="inline-flex rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-100">
-              Destination-first fare discovery
-            </p>
+            <p className="inline-flex rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-100">Destination-first fare discovery</p>
             <h1 className="mt-5 text-4xl font-black leading-tight md:text-6xl">Find your next trip at a truly great fare</h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-violet-100 md:text-xl">
-              Explore hand-ranked flight deals by destination image, value score, and tax-inclusive final pricing.
-            </p>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-violet-100 md:text-xl">Explore AI-ranked deals with destination imagery, airline branding, flexible dates, and price insight explanations.</p>
           </div>
           <div className="mx-auto mt-10 max-w-5xl">
             <SearchForm onSearch={handleSearch} />
@@ -51,7 +48,12 @@ export default function Home() {
       </section>
 
       <main id="results" className="-mt-10 md:-mt-16">
-        <ResultsPage origin={searchState.origin} month={searchState.month} destination={searchState.destination} />
+        <ResultsPage
+          origin={searchState.origin}
+          month={searchState.month}
+          destination={searchState.destination}
+          flexibleDates={searchState.flexibleDates}
+        />
       </main>
     </div>
   );
