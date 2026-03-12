@@ -75,7 +75,7 @@ function DestinationCardComponent({ origin, city, country, destination, totalPri
         ) : (
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-blue-700 to-indigo-900 text-center text-xl font-semibold text-white/90">Explore {city || destinationEmoji}</div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/45 to-transparent" />
         <div className="absolute left-4 top-4 flex flex-wrap gap-2"><span className="rounded-full border border-white/70 bg-white/90 px-3 py-1 text-xs font-semibold text-slate-900 backdrop-blur">{dealClassification}</span><span className="rounded-full bg-violet-600/95 px-3 py-1 text-xs font-semibold text-white">Deal {Math.round(dealScore)}</span>{featured && <span className="rounded-full border border-amber-200/70 bg-amber-300/95 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-amber-950">🔥 Best value today</span>}</div>
         <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3"><div><h3 className={`${featured ? "text-4xl md:text-5xl" : "text-3xl"} font-black leading-none tracking-tight text-white`}>{city}</h3><p className="mt-1 text-sm text-white/90">{country}</p>{featured && <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-violet-100">Highest ranked by value</p>}</div><div className="text-right text-white">
               <div className={`mx-auto flex items-center justify-center rounded-full border border-white/55 bg-gradient-to-br ${valueMeta.tone} ${featured ? "h-20 w-20" : "h-16 w-16"} shadow-lg`}>
@@ -111,7 +111,7 @@ function DestinationCardComponent({ origin, city, country, destination, totalPri
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">{fare.amenities.slice(0, 3).map((amenity) => (<span key={amenity} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600">{amenity}</span>))}{fare.amenities.length > 3 && <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">+{fare.amenities.length - 3} more</span>}</div>
+        <div className="flex min-h-7 flex-wrap gap-2">{fare.amenities.slice(0, 3).map((amenity) => (<span key={amenity} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600">{amenity}</span>))}{fare.amenities.length > 3 && <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">+{fare.amenities.length - 3} more</span>}</div>
 
         <div className="rounded-2xl border border-violet-100 bg-violet-50 p-3">
           <p className="text-xs font-bold uppercase tracking-[0.15em] text-violet-700">Price trend</p>
@@ -119,7 +119,7 @@ function DestinationCardComponent({ origin, city, country, destination, totalPri
           <div className="mt-1 grid grid-cols-4 gap-1 text-[11px] text-slate-600">{trend.map((t) => (<p key={t.label} className="text-center">{t.label}<br />{formatPrice(t.price, currency, rates).replace(`${currency} `, "")}</p>))}</div>
         </div>
 
-        {priceInsight && <p className="text-xs text-slate-500">Typical fare {formatPrice(priceInsight.usual_price, currency, rates)} · {priceInsight.historical_comparison}</p>}
+        {priceInsight ? <p className="min-h-4 text-xs text-slate-500">Typical fare {formatPrice(priceInsight.usual_price, currency, rates)} · {priceInsight.historical_comparison}</p> : <div className="min-h-4" />}
 
         <a href={bookingUrl} target="_blank" rel="noopener noreferrer" className={`mt-auto rounded-2xl bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-500 bg-[length:140%_140%] text-center font-bold text-white shadow-[0_10px_24px_rgba(124,58,237,0.35)] transition duration-200 hover:bg-[position:100%_50%] hover:shadow-[0_14px_30px_rgba(124,58,237,0.45)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 ${featured ? "px-4 py-4 text-lg" : "px-4 py-3 text-[15px]"}`}>See deal →</a>
         <button onClick={() => setShowDetails((prev) => !prev)} className="text-left text-xs font-semibold text-violet-700 transition hover:text-violet-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-200">{showDetails ? "Hide fare details" : "Show fare details"}</button>

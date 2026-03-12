@@ -123,7 +123,7 @@ function LoadingSkeleton() {
           </div>
         </div>
 
-        <div className="my-5 flex flex-wrap gap-2">
+        <div className="my-5 flex flex-wrap gap-2.5">
           {Array.from({ length: 5 }).map((_, i) => (<div key={i} className="h-8 w-24 rounded-full bg-slate-100" />))}
         </div>
 
@@ -142,7 +142,7 @@ function LoadingSkeleton() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white">
                 <div className="aspect-[16/10] w-full bg-slate-200" />
@@ -302,16 +302,16 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
             </div>
           </div>
           <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-600 to-fuchsia-500 p-4 text-white shadow-lg shadow-violet-200/40">
-            <p className="text-xs font-bold uppercase tracking-[0.16em]">Insights</p>
-            <p className="mt-2 text-sm">Best month: <span className="font-semibold">{bestMonth ? `${bestMonth.month} · ${formatPrice(bestMonth.avg, currency, rates)}` : "N/A"}</span></p>
-            <p className="mt-2 text-sm">Showing {filtered.length} of {enrichedFlights.length} fares</p>
-            <p className="mt-2 text-xs text-violet-100">{flexibleDates ? "Flexible dates enabled for broader fare intelligence." : "Enable flexible dates for richer forecasting."}</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-violet-100">Insights</p>
+            <p className="mt-2 text-sm font-semibold">Best month: <span className="font-bold">{bestMonth ? `${bestMonth.month} · ${formatPrice(bestMonth.avg, currency, rates)}` : "N/A"}</span></p>
+            <p className="mt-1.5 text-sm">Showing {filtered.length} of {enrichedFlights.length} fares</p>
+            <p className="mt-2 text-xs text-violet-100/95">{flexibleDates ? "Flexible dates enabled for broader fare intelligence." : "Enable flexible dates for richer forecasting."}</p>
           </div>
         </div>
 
         <div className="mt-4 rounded-2xl border border-slate-200/90 bg-gradient-to-r from-slate-50 to-white p-3.5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
-          <div className="mb-2 flex items-center justify-between gap-3">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Results snapshot</p>
+          <div className="mb-2.5 flex items-center justify-between gap-3">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Results snapshot</p>
             <p className="text-xs font-medium text-slate-500">Updated {lastUpdatedAt || "just now"}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
@@ -325,7 +325,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
           )}
         </div>
 
-        <div className="my-5 flex flex-wrap gap-2">
+        <div className="my-5 flex flex-wrap gap-2.5">
           {["All", ...regions].map((region) => (
             <button key={region} onClick={() => setActiveRegion(region)} className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${activeRegion === region ? "border-violet-500 bg-violet-600 text-white" : "border-slate-200 bg-white text-slate-600"}`}>
               {region === "All" ? "All regions" : REGION_LABELS[region] ?? region}
@@ -354,7 +354,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
                   <DestinationCard key={featuredFlight.id} index={0} featured origin={featuredFlight.origin} city={featuredFlight.city} country={featuredFlight.country} destination={featuredFlight.destination} totalPrice={featuredFlight.total_price} taxAmount={featuredFlight.tax_amount} date={featuredFlight.date} airline={featuredFlight.airline} duration={featuredFlight.duration} stops={featuredFlight.stops} dealScore={featuredFlight.deal_score} dealClassification={featuredFlight.deal_classification} valueScore={featuredFlight.value_score} historicalPrice={featuredFlight.historical_price} destinationEmoji={featuredFlight.destination_emoji} bookingUrl={featuredFlight.booking_url} region={featuredFlight.region} priceInsight={featuredFlight.price_insight} fare={featuredFlight.fare} trend={featuredFlight.trend} />
                 </div>
               )}
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:gap-6">
                 {standardFlights.map((flight, index) => (
                   <DestinationCard key={flight.id} index={index + 1} origin={flight.origin} city={flight.city} country={flight.country} destination={flight.destination} totalPrice={flight.total_price} taxAmount={flight.tax_amount} date={flight.date} airline={flight.airline} duration={flight.duration} stops={flight.stops} dealScore={flight.deal_score} dealClassification={flight.deal_classification} valueScore={flight.value_score} historicalPrice={flight.historical_price} destinationEmoji={flight.destination_emoji} bookingUrl={flight.booking_url} region={flight.region} priceInsight={flight.price_insight} fare={flight.fare} trend={flight.trend} />
                 ))}

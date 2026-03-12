@@ -42,6 +42,8 @@ const CURATED_DESTINATION_IMAGES: Record<string, DestinationImageConfig> = {
   CapeTown: remoteSet("photo-1576485290814-1c72aa4bbb8e"),
   "Cape Town": remoteSet("photo-1576485290814-1c72aa4bbb8e"),
   Cancun: remoteSet("photo-1552074284-5e88ef1aef18"),
+  "Cancún": remoteSet("photo-1552074284-5e88ef1aef18"),
+  Honolulu: remoteSet("photo-1507525428034-b723cf961d3e"),
   "New York": remoteSet("photo-1499092346589-b9b6be3e94b2"),
   "Los Angeles": remoteSet("photo-1534190760961-74e8c1c5c3da"),
   Vancouver: remoteSet("photo-1566698629409-787a68fc5724"),
@@ -50,7 +52,7 @@ const CURATED_DESTINATION_IMAGES: Record<string, DestinationImageConfig> = {
   MexicoCity: remoteSet("photo-1518105779142-d975f22f1b0a"),
   "Mexico City": remoteSet("photo-1518105779142-d975f22f1b0a"),
   "Rio de Janeiro": remoteSet("photo-1483729558449-99ef09a8c325"),
-  Lima: remoteSet("photo-1520637836862-4d197d17c90a"),
+  Lima: remoteSet("photo-1531968455001-5c5272a41129"),
   Bogota: remoteSet("photo-1531968455001-5c5272a41129"),
 };
 
