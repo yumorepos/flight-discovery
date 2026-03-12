@@ -82,6 +82,40 @@ AIRPORTS = {
 # Origin airports supported (for the dropdown)
 ORIGIN_AIRPORTS = ["YUL", "YYZ", "YVR", "JFK", "LAX", "ORD", "LHR", "CDG"]
 
+
+REGION_QUERY_TO_CODE = {
+    "europe": "EU",
+    "asia": "Asia",
+    "americas": "NA",
+    "north america": "NA",
+    "south america": "SA",
+    "africa": "AF",
+    "oceania": "Oceania",
+}
+
+
+def _matches_destination_query(flight: dict, destination_query: Optional[str]) -> bool:
+    if not destination_query:
+        return True
+
+    query = destination_query.strip().lower()
+    if not query or query == "anywhere":
+        return True
+
+    if len(query) == 3 and query.upper() in AIRPORTS:
+        return flight.get("destination") == query.upper()
+
+    if query in REGION_QUERY_TO_CODE:
+        return flight.get("region") == REGION_QUERY_TO_CODE[query]
+
+    if query == "beach":
+        beach_codes = {"CUN", "MIA", "HNL", "SYD", "BCN", "LIM"}
+        return flight.get("destination") in beach_codes
+
+    city = str(flight.get("city", "")).lower()
+    country = str(flight.get("country", "")).lower()
+    return query in city or query in country
+
 # Duration placeholders (hours) per route distance
 ROUTE_DURATIONS = {
     # Short-haul
@@ -343,29 +377,75 @@ def rank_flights(flights: list[dict]) -> list[dict]:
     return sorted(flights, key=lambda x: x["value_score"], reverse=True)
 
 
-def calculate_deal_score(flight: dict) -> float:
-    avg_price = flight["price"] * 1.4  # Historical avg ~ 40% above
-    discount = (avg_price - flight["price"]) / avg_price  # ~28%
-    price_vs_historical = min(100, max(0, discount * 200 + 40))
-    value_score = flight.get("value", 50)
-    rarity_score = 70
-    route_popularity = 75
+def _month_seasonality_score(flight: dict) -> float:
+    """Lower scores for peak travel windows, higher for shoulder/off-season."""
+    month = int(flight["date"].split("-")[1])
+    destination = flight.get("destination", "")
+
+    peak_routes = {
+        "CUN": {12, 1, 2, 3},
+        "MIA": {12, 1, 2, 3},
+        "HNL": {12, 1, 2, 3, 7, 8},
+        "LHR": {6, 7, 8},
+        "CDG": {6, 7, 8},
+        "FCO": {6, 7, 8},
+    }
+    route_peak_months = peak_routes.get(destination, {6, 7, 8, 12})
+    return 45 if month in route_peak_months else 80
+
+
+def _rarity_score(flight: dict, flights: list[dict]) -> float:
+    """Fewer available flights on a route means the fare is rarer."""
+    route_total = len([f for f in flights if f["origin"] == flight["origin"] and f["destination"] == flight["destination"]])
+    if route_total <= 2:
+        return 90
+    if route_total <= 4:
+        return 75
+    return 60
+
+
+def _price_insight(flight: dict) -> dict:
+    current_price = float(flight["total_price"])
+    usual_price = float(flight.get("historical_price", current_price * 1.3))
+    discount_amount = round(max(0, usual_price - current_price), 2)
+    discount_pct = round((discount_amount / usual_price) * 100, 1) if usual_price else 0
+    return {
+        "usual_price": round(usual_price, 2),
+        "current_discount": discount_pct,
+        "discount_amount": discount_amount,
+        "historical_comparison": f"CAD ${round(current_price):,} now vs CAD ${round(usual_price):,} usual",
+    }
+
+
+def calculate_deal_score(flight: dict, flights: list[dict]) -> float:
+    current_price = float(flight["total_price"])
+    historical_price = float(flight.get("historical_price", current_price * 1.35))
+    discount = (historical_price - current_price) / historical_price if historical_price else 0
+    price_vs_historical = min(100, max(0, discount * 250 + 35))
+
+    duration_component = normalize_score(flight.get("duration_hours", 12), 1.0, 22.0, reverse=True)
+    stops = flight.get("stops", 0)
+    stops_component = 100 if stops == 0 else 65 if stops == 1 else 35
+    seasonality_component = _month_seasonality_score(flight)
+    rarity_component = _rarity_score(flight, flights)
 
     deal_score = (
-        0.50 * price_vs_historical
-        + 0.25 * value_score
-        + 0.15 * rarity_score
-        + 0.10 * route_popularity
+        0.35 * price_vs_historical
+        + 0.25 * flight.get("value_score", 50)
+        + 0.15 * duration_component
+        + 0.10 * stops_component
+        + 0.10 * seasonality_component
+        + 0.05 * rarity_component
     )
     return round(deal_score, 1)
 
 
 def classify_deal(deal_score: float) -> str:
-    if deal_score >= 90:
-        return "Mistake Fare"
-    elif deal_score >= 75:
-        return "Hot Deal"
-    elif deal_score >= 60:
+    if deal_score >= 86:
+        return "Exceptional Deal"
+    elif deal_score >= 72:
+        return "Great Deal"
+    elif deal_score >= 58:
         return "Good Deal"
     elif deal_score >= 40:
         return "Fair Price"
@@ -375,8 +455,9 @@ def classify_deal(deal_score: float) -> str:
 
 def enrich_flights_with_deals(flights: list[dict]) -> list[dict]:
     for flight in flights:
-        flight["deal_score"] = calculate_deal_score(flight)
+        flight["deal_score"] = calculate_deal_score(flight, flights)
         flight["deal_classification"] = classify_deal(flight["deal_score"])
+        flight["price_insight"] = _price_insight(flight)
     return flights
 
 
@@ -428,11 +509,12 @@ async def search_flights(
     if origin not in AIRPORTS:
         raise HTTPException(status_code=400, detail="Unsupported origin airport code")
 
-    destination_code = destination.upper() if destination else None
-    if destination_code and len(destination_code) == 3 and destination_code not in AIRPORTS:
+    destination_query = destination.strip() if destination else None
+    destination_code = destination_query.upper() if destination_query and len(destination_query) == 3 else None
+    if destination_code and destination_code not in AIRPORTS:
         raise HTTPException(status_code=400, detail="Unsupported destination airport code")
 
-    cache_key = f"flight_search:{origin}:{month}:{destination_code}"
+    cache_key = f"flight_search:{origin}:{month}:{destination_query}"
     if redis_client:
         cached = redis_client.get(cache_key)
         if cached:
@@ -461,6 +543,7 @@ async def search_flights(
             
             # Enrich API flights with airport metadata
             api_flights = [add_tax_and_info(f) for f in api_flights]
+            api_flights = [f for f in api_flights if _matches_destination_query(f, destination_query)]
             logger.info(f"Retrieved {len(api_flights)} flights from Kiwi API")
             
         except Exception as e:
@@ -473,8 +556,7 @@ async def search_flights(
             f for f in mock_flights
             if f["origin"] == origin
             and (month is None or f["date"].startswith(month))
-            and (destination is None or f["destination"] == destination_code or
-                 destination.lower() in f["city"].lower())
+            and _matches_destination_query(f, destination_query)
         ]
         api_flights = filtered
 
@@ -507,23 +589,48 @@ subscriptions = []
 async def subscribe_to_alerts(request: dict):
     email = request.get("email", "")
     destination = request.get("destination", "")
+    route = request.get("route", "")
+    threshold_price = request.get("threshold_price")
+    travel_month = request.get("travel_month", "")
 
     if not email or "@" not in email:
         raise HTTPException(status_code=400, detail="Invalid email address")
 
-    if not destination:
-        raise HTTPException(status_code=400, detail="Destination required")
+    if not destination and not route:
+        raise HTTPException(status_code=400, detail="Destination or route required")
 
-    existing = [s for s in subscriptions if s["email"] == email and s["destination"] == destination]
+    if threshold_price is not None:
+        try:
+            threshold_price = float(threshold_price)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Threshold price must be numeric")
+
+    existing = [
+        s for s in subscriptions
+        if s["email"] == email
+        and s.get("destination") == destination
+        and s.get("route") == route
+        and s.get("travel_month") == travel_month
+    ]
     if existing:
         return {"message": "Already subscribed", "email": email, "destination": destination}
 
     subscriptions.append({
         "email": email,
         "destination": destination,
+        "route": route,
+        "threshold_price": threshold_price,
+        "travel_month": travel_month,
         "created_at": datetime.now().isoformat(),
     })
-    return {"message": "Subscription successful", "email": email, "destination": destination}
+    return {
+        "message": "Subscription successful",
+        "email": email,
+        "destination": destination,
+        "route": route,
+        "threshold_price": threshold_price,
+        "travel_month": travel_month,
+    }
 
 
 @app.get("/api/subscriptions")
