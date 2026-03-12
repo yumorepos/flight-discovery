@@ -22,6 +22,10 @@ const AIRLINE_METADATA: Record<string, Omit<AirlineBrand, "logoUrls"> & { domain
   PD: { code: "PD", name: "Porter Airlines", color: "#1f2937", domain: "flyporter.com" },
   F8: { code: "F8", name: "Flair Airlines", color: "#84cc16", domain: "flyflair.com" },
   NH: { code: "NH", name: "ANA", alliance: "Star Alliance", color: "#0f2f87", domain: "ana.co.jp" },
+
+  JL: { code: "JL", name: "Japan Airlines", alliance: "oneworld", color: "#c6002b", domain: "jal.co.jp" },
+  B6: { code: "B6", name: "JetBlue", color: "#003876", domain: "jetblue.com" },
+  VS: { code: "VS", name: "Virgin Atlantic", color: "#da0530", domain: "virginatlantic.com" },
 };
 
 const AIRLINE_NAME_TO_CODE: Record<string, string> = {
@@ -40,6 +44,10 @@ const AIRLINE_NAME_TO_CODE: Record<string, string> = {
   Qantas: "QF",
   LATAM: "LA",
   ANA: "NH",
+  "Japan Airlines": "JL",
+  JAL: "JL",
+  JetBlue: "B6",
+  "Virgin Atlantic": "VS",
   KLM: "KL",
   WestJet: "WS",
   Flair: "F8",

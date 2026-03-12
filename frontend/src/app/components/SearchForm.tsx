@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Fuse from "fuse.js";
 import airportsData from "@/data/airports.json";
+import type { CabinClass } from "@/lib/flightEnrichment";
 
 interface Airport {
   iata: string;
@@ -12,7 +13,7 @@ interface Airport {
 }
 
 interface SearchFormProps {
-  onSearch: (origin: string, month: string, destination?: string, flexibleDates?: boolean) => void;
+  onSearch: (origin: string, month: string, destination?: string, flexibleDates?: boolean, fareClass?: "Any" | CabinClass) => void;
 }
 
 const NOW = new Date();
@@ -30,6 +31,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
   const [originInput, setOriginInput] = useState("Montreal (YUL)");
   const [destinationInput, setDestinationInput] = useState("Anywhere");
   const [month, setMonth] = useState("");
+  const [fareClass, setFareClass] = useState<"Any" | CabinClass>("Any");
   const [flexibleDates, setFlexibleDates] = useState(true);
   const [error, setError] = useState("");
 
@@ -84,7 +86,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
     if (destination) setDestinationInput(formatAirport(destination));
 
     const flexibleDestination = FLEXIBLE_DESTINATIONS.includes(destinationToken) ? destinationToken : undefined;
-    onSearch(origin.iata.toUpperCase(), month, destination?.iata.toUpperCase() ?? flexibleDestination, flexibleDates);
+    onSearch(origin.iata.toUpperCase(), month, destination?.iata.toUpperCase() ?? flexibleDestination, flexibleDates, fareClass);
   };
 
   const inputClassName =
@@ -101,77 +103,44 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       </div>
 
       <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3 md:p-4">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.25fr_1fr_1.2fr_auto] lg:items-end">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.9fr_1.1fr_0.9fr_auto] xl:items-end">
           <div>
             <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Departing from</label>
-            <input
-              aria-label="Origin airport"
-              list="origin-airports"
-              value={originInput}
-              onChange={(event) => {
-                setOriginInput(event.target.value);
-                setError("");
-              }}
-              placeholder="Montreal or YUL"
-              className={inputClassName}
-            />
-            <datalist id="origin-airports">
-              {(airportsData as Airport[]).slice(0, 160).map((airport) => (
-                <option key={`origin-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>
-              ))}
-            </datalist>
+            <input aria-label="Origin airport" list="origin-airports" value={originInput} onChange={(event) => { setOriginInput(event.target.value); setError(""); }} placeholder="Montreal or YUL" className={inputClassName} />
+            <datalist id="origin-airports">{(airportsData as Airport[]).slice(0, 160).map((airport) => (<option key={`origin-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>))}</datalist>
           </div>
 
           <div>
             <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Travel month</label>
             <select aria-label="Travel month" value={month} onChange={(event) => setMonth(event.target.value)} className={inputClassName}>
               <option value="">Any month</option>
-              {MONTHS.map((monthOption) => (
-                <option key={monthOption.value} value={monthOption.value}>{monthOption.label}</option>
-              ))}
+              {MONTHS.map((monthOption) => (<option key={monthOption.value} value={monthOption.value}>{monthOption.label}</option>))}
             </select>
           </div>
 
           <div>
             <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Destination</label>
-            <input
-              aria-label="Destination airport or flexible region"
-              list="destination-airports"
-              value={destinationInput}
-              onChange={(event) => {
-                setDestinationInput(event.target.value);
-                setError("");
-              }}
-              placeholder="Anywhere, Europe, Paris, NRT"
-              className={inputClassName}
-            />
+            <input aria-label="Destination airport or flexible region" list="destination-airports" value={destinationInput} onChange={(event) => { setDestinationInput(event.target.value); setError(""); }} placeholder="Anywhere, Europe, Paris, NRT" className={inputClassName} />
             <datalist id="destination-airports">
-              {popularSuggestions.map((suggestion) => (
-                <option key={suggestion} value={suggestion} />
-              ))}
-              {(airportsData as Airport[]).slice(0, 180).map((airport) => (
-                <option key={`destination-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>
-              ))}
+              {popularSuggestions.map((suggestion) => (<option key={suggestion} value={suggestion} />))}
+              {(airportsData as Airport[]).slice(0, 180).map((airport) => (<option key={`destination-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>))}
             </datalist>
           </div>
 
-          <button
-            type="submit"
-            className="h-12 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 text-sm font-bold text-white shadow-[0_14px_26px_rgba(124,58,237,0.38)] transition hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
-          >
-            Search fares
-          </button>
+          <div>
+            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Fare class</label>
+            <select aria-label="Fare class" value={fareClass} onChange={(event) => setFareClass(event.target.value as "Any" | CabinClass)} className={inputClassName}>
+              <option>Any</option><option>Economy</option><option>Premium Economy</option><option>Business</option><option>First</option>
+            </select>
+          </div>
+
+          <button type="submit" className="h-12 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 text-sm font-bold text-white shadow-[0_14px_26px_rgba(124,58,237,0.38)] transition hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200">Search fares</button>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-700">
-          <input
-            type="checkbox"
-            checked={flexibleDates}
-            onChange={(event) => setFlexibleDates(event.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 accent-violet-600"
-          />
+          <input type="checkbox" checked={flexibleDates} onChange={(event) => setFlexibleDates(event.target.checked)} className="h-4 w-4 rounded border-slate-300 accent-violet-600" />
           Flexible dates (+/- 3 days)
         </label>
         <p className="text-xs text-slate-500">Tip: use region keywords like Europe, Asia, or Beach for inspiration.</p>
