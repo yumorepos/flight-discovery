@@ -85,14 +85,12 @@ const monogramFallback = (airlineName: string, color: string) => {
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("") || "FL";
 
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=${encodeURIComponent(color.replace("#", ""))}&color=ffffff&bold=true&size=128&format=png`;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='${color}'/><stop offset='100%' stop-color='#1f2937'/></linearGradient></defs><rect width='128' height='128' rx='64' fill='url(#g)'/><circle cx='64' cy='64' r='60' fill='none' stroke='rgba(255,255,255,0.45)' stroke-width='2'/><text x='64' y='74' text-anchor='middle' font-size='42' font-family='Inter, Arial, sans-serif' fill='white' font-weight='700'>${initials}</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 };
 
 const getLogoUrls = (code: string, name: string, color: string, domain?: string) => {
-  const sources = [
-    `https://images.kiwi.com/airlines/128x128/${code}.png`,
-    `https://images.kiwi.com/airlines/64x64/${code}.png`,
-  ];
+  const sources = [`https://images.kiwi.com/airlines/128x128/${code}.png`, `https://images.kiwi.com/airlines/64x64/${code}.png`];
 
   if (domain) {
     sources.push(`https://logo.clearbit.com/${domain}`);

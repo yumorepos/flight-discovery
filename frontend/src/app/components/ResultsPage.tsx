@@ -110,7 +110,7 @@ const sourceMeta = (source: FlightSource) => {
 function LoadingSkeleton() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6 animate-pulse">
-      <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+      <div className="rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-[0_18px_44px_rgba(15,23,42,0.08)] md:p-6">
         <div className="grid gap-3 lg:grid-cols-4">
           <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-3">
             <div className="h-4 w-1/5 rounded bg-slate-200" />
@@ -301,7 +301,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
-      <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+      <div className="rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-[0_18px_44px_rgba(15,23,42,0.08)] md:p-6">
         <div className="grid gap-3 lg:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-3">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -311,21 +311,21 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
                 </select>
               </label>
               <label className="text-sm font-semibold text-slate-700">Max {formatPrice(maxPriceCad, currency, rates)}
-                <input type="range" min={minPriceDisplay} max={maxFlightPriceDisplay} value={Math.min(selectedPriceDisplay, maxFlightPriceDisplay)} onChange={(e) => setMaxPriceCad(Math.round(convertToCad(Number(e.target.value), currency, rates)))} className="mt-2 w-full accent-violet-600" />
+                <input type="range" min={minPriceDisplay} max={maxFlightPriceDisplay} value={Math.min(selectedPriceDisplay, maxFlightPriceDisplay)} onChange={(e) => setMaxPriceCad(Math.round(convertToCad(Number(e.target.value), currency, rates)))} className="mt-2 w-full accent-orange-500" />
               </label>
               <label className="text-sm font-semibold text-slate-700">Stops: {maxStops === 2 ? "Any" : maxStops}
-                <input type="range" min={0} max={2} value={maxStops} onChange={(e) => setMaxStops(Number(e.target.value))} className="mt-2 w-full accent-violet-600" />
+                <input type="range" min={0} max={2} value={maxStops} onChange={(e) => setMaxStops(Number(e.target.value))} className="mt-2 w-full accent-orange-500" />
               </label>
               <label className="text-sm font-semibold text-slate-700">Duration: {maxDurationHours}h
-                <input type="range" min={4} max={30} value={maxDurationHours} onChange={(e) => setMaxDurationHours(Number(e.target.value))} className="mt-2 w-full accent-violet-600" />
+                <input type="range" min={4} max={30} value={maxDurationHours} onChange={(e) => setMaxDurationHours(Number(e.target.value))} className="mt-2 w-full accent-orange-500" />
               </label>
             </div>
           </div>
-          <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-600 to-fuchsia-500 p-4 text-white shadow-lg shadow-violet-200/40">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-violet-100">Insights</p>
+          <div className="rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-500 to-amber-500 p-4 text-white shadow-lg shadow-orange-200/40">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-100">Insights</p>
             <p className="mt-2 text-sm font-semibold">Best month: <span className="font-bold">{bestMonth ? `${bestMonth.month} · ${formatPrice(bestMonth.avg, currency, rates)}` : "N/A"}</span></p>
             <p className="mt-1.5 text-sm">Showing {filtered.length} of {enrichedFlights.length} fares</p>
-            <p className="mt-2 text-xs text-violet-100/95">{discoveryMode ? "Anywhere mode keeps destination variety high for true discovery." : "Set destination to Anywhere for broader destination inspiration."} {flexibleDates ? "Flexible dates are on for wider fare coverage." : "Turn on flexible dates for even better discovery."}</p>
+            <p className="mt-2 text-xs text-orange-100/95">{discoveryMode ? "Anywhere mode keeps destination variety high for true discovery." : "Set destination to Anywhere for broader destination inspiration."} {flexibleDates ? "Flexible dates are on for wider fare coverage." : "Turn on flexible dates for even better discovery."}</p>
           </div>
         </div>
 
@@ -347,7 +347,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
 
         <div className="my-5 flex flex-wrap gap-2.5">
           {["All", ...regions].map((region) => (
-            <button key={region} onClick={() => setActiveRegion(region)} className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${activeRegion === region ? "border-violet-500 bg-violet-600 text-white" : "border-slate-200 bg-white text-slate-600"}`}>
+            <button key={region} onClick={() => setActiveRegion(region)} className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${activeRegion === region ? "border-orange-500 bg-orange-500 text-white" : "border-slate-200 bg-white text-slate-600"}`}>
               {region === "All" ? "All regions" : REGION_LABELS[region] ?? region}
             </button>
           ))}
@@ -365,13 +365,13 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
                 <li>• Use Any fare class for broader inventory.</li>
                 <li>• Try Anywhere to unlock destination-first discovery mode.</li>
               </ul>
-              <button onClick={resetFilters} className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 px-5 text-sm font-bold text-violet-700 transition hover:bg-violet-100">Reset filters</button>
+              <button onClick={resetFilters} className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-5 text-sm font-bold text-orange-700 transition hover:bg-orange-100">Reset filters</button>
             </motion.div>
           ) : (
             <motion.div className="space-y-5">
               {featuredFlight && (
-                <div className="relative rounded-[1.8rem] border-2 border-violet-100/90 bg-gradient-to-b from-violet-50/40 to-white p-1.5">
-                  <div className="pointer-events-none absolute right-5 top-4 rounded-full border border-violet-200 bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-violet-700">Featured deal</div>
+                <div className="relative rounded-[1.8rem] border-2 border-orange-100/90 bg-gradient-to-b from-orange-50/40 to-white p-1.5">
+                  <div className="pointer-events-none absolute right-5 top-4 rounded-full border border-orange-200 bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-orange-700">Featured deal</div>
                   <DestinationCard key={featuredFlight.id} index={0} featured origin={featuredFlight.origin} city={featuredFlight.city} country={featuredFlight.country} destination={featuredFlight.destination} totalPrice={featuredFlight.total_price} taxAmount={featuredFlight.tax_amount} date={featuredFlight.date} airline={featuredFlight.airline} duration={featuredFlight.duration} stops={featuredFlight.stops} dealScore={featuredFlight.deal_score} dealClassification={featuredFlight.deal_classification} valueScore={featuredFlight.value_score} historicalPrice={featuredFlight.historical_price} destinationEmoji={featuredFlight.destination_emoji} bookingUrl={featuredFlight.booking_url} region={featuredFlight.region} priceInsight={featuredFlight.price_insight} fare={featuredFlight.fare} trend={featuredFlight.trend} />
                 </div>
               )}

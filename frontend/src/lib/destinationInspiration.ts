@@ -2,30 +2,32 @@ export type DestinationInspiration = {
   blurb: string;
   vibe: string;
   bestFor: string;
+  seasonHook: string;
 };
 
 const DESTINATION_STORIES: Record<string, DestinationInspiration> = {
-  Paris: { blurb: "Golden-hour boulevards, iconic cafés, and museum-heavy city breaks.", vibe: "Romantic classic", bestFor: "Art weekends" },
-  London: { blurb: "Royal landmarks, neighborhood markets, and nonstop cultural events.", vibe: "Cosmopolitan", bestFor: "City-hopping" },
-  Tokyo: { blurb: "Neon nights, temple mornings, and world-class food districts.", vibe: "High-energy", bestFor: "Food + design" },
-  Rome: { blurb: "Ancient streets, late dinners, and timeless piazza evenings.", vibe: "Historic glow", bestFor: "Slow travel" },
-  Barcelona: { blurb: "Beach mornings and Gaudí-lined afternoons in one compact city.", vibe: "Sunny creative", bestFor: "Culture + coast" },
-  "Cancún": { blurb: "Turquoise shoreline escapes with easy access to cenotes and ruins.", vibe: "Tropical reset", bestFor: "Beach downtime" },
-  Honolulu: { blurb: "Pacific sunsets, surf-ready beaches, and lush volcanic backdrops.", vibe: "Island luxury", bestFor: "Nature + wellness" },
-  Lima: { blurb: "Clifftop views paired with one of Latin America's best food scenes.", vibe: "Urban coastal", bestFor: "Culinary trips" },
+  Paris: { blurb: "Café terraces, timeless boulevards, and museum-filled afternoons.", vibe: "Romantic classic", bestFor: "Art weekends", seasonHook: "Best in spring" },
+  London: { blurb: "Royal landmarks, neighborhood markets, and packed cultural calendars.", vibe: "Cosmopolitan", bestFor: "City-hopping", seasonHook: "Best in shoulder season" },
+  Tokyo: { blurb: "Temple mornings, neon nights, and endlessly good food districts.", vibe: "High-energy", bestFor: "Food + design", seasonHook: "Great year-round" },
+  Rome: { blurb: "Ancient landmarks, long dinners, and golden-hour piazza walks.", vibe: "Historic glow", bestFor: "Slow travel", seasonHook: "Best in spring/fall" },
+  Barcelona: { blurb: "Beach downtime meets Gaudí architecture in one compact city.", vibe: "Sunny creative", bestFor: "Culture + coast", seasonHook: "Best in early summer" },
+  "Cancún": { blurb: "Turquoise water escapes with cenotes and easy coastal luxury.", vibe: "Tropical reset", bestFor: "Beach downtime", seasonHook: "Best in winter" },
+  Honolulu: { blurb: "Pacific sunsets, surf-friendly shores, and volcanic scenery.", vibe: "Island luxury", bestFor: "Nature + wellness", seasonHook: "Best in spring" },
+  Lima: { blurb: "Clifftop ocean views anchored by one of the region's top food scenes.", vibe: "Urban coastal", bestFor: "Culinary trips", seasonHook: "Best in dry season" },
 };
 
 const REGION_STORIES: Record<string, DestinationInspiration> = {
-  EU: { blurb: "Storybook old towns and rail-friendly city pairs for fast escapes.", vibe: "Old-world charm", bestFor: "Multi-city breaks" },
-  NA: { blurb: "Coastal weekends, mountain air, and easy short-haul flexibility.", vibe: "Easy getaway", bestFor: "Long weekends" },
-  Asia: { blurb: "Skyline energy, street-food discoveries, and rich cultural contrast.", vibe: "Dynamic", bestFor: "Big adventures" },
-  SA: { blurb: "Warm coastlines and rhythm-filled cities with standout cuisine.", vibe: "Colorful", bestFor: "Food + nature" },
+  EU: { blurb: "Storybook old towns and rail-friendly city pairs for easy escapes.", vibe: "Old-world charm", bestFor: "Multi-city breaks", seasonHook: "Best in spring/fall" },
+  NA: { blurb: "Short-haul coastlines, mountain air, and quick premium getaways.", vibe: "Easy getaway", bestFor: "Long weekends", seasonHook: "Great year-round" },
+  Asia: { blurb: "Skyline energy, market streets, and rich cultural contrast.", vibe: "Dynamic", bestFor: "Big adventures", seasonHook: "Best by region" },
+  SA: { blurb: "Warm coastlines and colorful cities with standout cuisine.", vibe: "Colorful", bestFor: "Food + nature", seasonHook: "Best in shoulder season" },
 };
 
 export const getDestinationInspiration = (city: string, region: string): DestinationInspiration => {
   return DESTINATION_STORIES[city] ?? REGION_STORIES[region] ?? {
-    blurb: "Fresh routes with strong value and enough variety to spark your next trip.",
+    blurb: "Strong-value routes with enough variety to spark your next trip.",
     vibe: "Discovery mode",
     bestFor: "Flexible travelers",
+    seasonHook: "Best with flexible dates",
   };
 };
