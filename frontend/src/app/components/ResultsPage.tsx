@@ -6,6 +6,7 @@ import DestinationCard from "./DestinationCard";
 import { useCurrency } from "./CurrencyProvider";
 import { convertPrice, convertToCad, formatPrice } from "@/lib/currency";
 import { buildFareMetadata, buildTrendSeries, CabinClass } from "@/lib/flightEnrichment";
+import { buildDemoFlights } from "@/lib/demoFlights";
 
 interface PriceInsight {
   usual_price: number;
@@ -51,6 +52,15 @@ interface FlightResponse {
   flights: Flight[];
   source: FlightSource;
 }
+
+const dedupeByDestination = (items: Flight[]) => {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.destination)) return false;
+    seen.add(item.destination);
+    return true;
+  });
+};
 
 const REGION_LABELS: Record<string, string> = { NA: "Americas", EU: "Europe", Asia: "Asia", Oceania: "Oceania", AF: "Africa", SA: "South America" };
 
@@ -215,10 +225,19 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
     setRequestToken((prev) => prev + 1);
   };
 
-  const enrichedFlights = useMemo(
-    () => flights.map((flight) => ({ ...flight, fare: buildFareMetadata(`${flight.id}-${flight.destination}`, flight.airline, flight.stops ?? 0), trend: buildTrendSeries(flight.total_price, month) })),
-    [flights, month]
-  );
+  const enrichedFlights = useMemo(() => {
+    const liveOrFallback = dedupeByDestination(flights);
+    const needsMoreDiscovery = liveOrFallback.length < 6;
+    const previewPool = needsMoreDiscovery ? buildDemoFlights(origin, month, "anywhere") : [];
+
+    const mergedFlights = dedupeByDestination([...liveOrFallback, ...previewPool]).slice(0, 12);
+
+    return mergedFlights.map((flight) => ({
+      ...flight,
+      fare: buildFareMetadata(`${flight.id}-${flight.destination}`, flight.airline, flight.stops ?? 0),
+      trend: buildTrendSeries(flight.total_price, month),
+    }));
+  }, [flights, month, origin]);
 
   const maxFlightPriceCad = useMemo(() => (enrichedFlights.length ? Math.max(...enrichedFlights.map((f) => Math.round(f.total_price))) : 3000), [enrichedFlights]);
   const maxFlightPriceDisplay = Math.max(100, Math.round(convertPrice(maxFlightPriceCad, currency, rates)));
@@ -278,6 +297,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
   if (error) return <ErrorState error={error} onRetry={handleRetry} />;
 
   const sourceInfo = sourceMeta(source);
+  const discoveryMode = destination ? destination.toUpperCase() === "ANYWHERE" : true;
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
@@ -305,7 +325,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-violet-100">Insights</p>
             <p className="mt-2 text-sm font-semibold">Best month: <span className="font-bold">{bestMonth ? `${bestMonth.month} · ${formatPrice(bestMonth.avg, currency, rates)}` : "N/A"}</span></p>
             <p className="mt-1.5 text-sm">Showing {filtered.length} of {enrichedFlights.length} fares</p>
-            <p className="mt-2 text-xs text-violet-100/95">{flexibleDates ? "Flexible dates enabled for broader fare intelligence." : "Enable flexible dates for richer forecasting."}</p>
+            <p className="mt-2 text-xs text-violet-100/95">{discoveryMode ? "Anywhere mode keeps destination variety high for true discovery." : "Set destination to Anywhere for broader destination inspiration."} {flexibleDates ? "Flexible dates are on for wider fare coverage." : "Turn on flexible dates for even better discovery."}</p>
           </div>
         </div>
 
@@ -320,7 +340,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
             <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600">Top region: {topRegion}</span>
             <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600">Best month: {bestMonth ? bestMonth.month : "N/A"}</span>
           </div>
-          {source === "demo-fallback" && (
+          {(source === "demo-fallback" || flights.length < 6) && (
             <p className="mt-2 text-xs text-amber-700">Showing preview fares while live airline feeds reconnect. Filters and ranking remain fully interactive.</p>
           )}
         </div>
@@ -343,6 +363,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
                 <li>• Increase max price or duration range.</li>
                 <li>• Switch region to All regions.</li>
                 <li>• Use Any fare class for broader inventory.</li>
+                <li>• Try Anywhere to unlock destination-first discovery mode.</li>
               </ul>
               <button onClick={resetFilters} className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 px-5 text-sm font-bold text-violet-700 transition hover:bg-violet-100">Reset filters</button>
             </motion.div>

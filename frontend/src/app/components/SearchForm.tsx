@@ -90,16 +90,16 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
   };
 
   const inputClassName =
-    "h-12 w-full rounded-xl border border-white/70 bg-white/95 px-4 text-sm font-medium text-slate-900 shadow-[0_6px_20px_rgba(15,23,42,0.08)] transition placeholder:text-slate-400 hover:border-slate-300 focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100";
+    "h-12 w-full rounded-xl border border-white/70 bg-white/95 px-4 text-sm font-medium text-slate-900 shadow-[0_6px_20px_rgba(15,23,42,0.08)] transition placeholder:text-slate-400 hover:border-slate-300 focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100";
 
   return (
     <form onSubmit={handleSubmit} className="rounded-[1.8rem] border border-white/60 bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.28)] backdrop-blur-[10px] md:p-7">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Smart search</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-700">Smart search</p>
           <p className="text-sm text-slate-600">Discover the best-value routes with tax-inclusive fares and real-time ranking.</p>
         </div>
-        <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">Trusted pricing intelligence</span>
+        <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">Trusted pricing intelligence</span>
       </div>
 
       <div className="rounded-2xl border border-white/75 bg-white/60 p-3 md:p-4">
@@ -134,13 +134,13 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
             </select>
           </div>
 
-          <button type="submit" className="h-12 w-full rounded-xl bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-500 bg-[length:140%_140%] px-7 text-sm font-bold text-white shadow-[0_14px_26px_rgba(124,58,237,0.38)] transition duration-200 hover:-translate-y-0.5 hover:bg-[position:100%_50%] hover:shadow-[0_18px_34px_rgba(124,58,237,0.45)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 xl:w-auto">Search fares</button>
+          <button type="submit" className="h-12 w-full rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-[length:140%_140%] px-7 text-sm font-bold text-white shadow-[0_14px_26px_rgba(249,115,22,0.35)] transition duration-200 hover:-translate-y-0.5 hover:bg-[position:100%_50%] hover:shadow-[0_18px_34px_rgba(249,115,22,0.45)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200 xl:w-auto">Search fares</button>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-700">
-          <input type="checkbox" checked={flexibleDates} onChange={(event) => setFlexibleDates(event.target.checked)} className="h-4 w-4 rounded border-slate-300 accent-violet-600" />
+          <input type="checkbox" checked={flexibleDates} onChange={(event) => setFlexibleDates(event.target.checked)} className="h-4 w-4 rounded border-slate-300 accent-orange-500" />
           Flexible dates (+/- 3 days)
         </label>
         <p className="text-xs text-slate-500">Tip: use region keywords like Europe, Asia, or Beach for inspiration.</p>
