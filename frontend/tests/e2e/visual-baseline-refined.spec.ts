@@ -20,8 +20,9 @@ const STABLE_VISUAL_FLIGHTS = [
   { id: 7008, origin: 'YUL', destination: 'BCN', city: 'Barcelona', country: 'Spain', total_price: 671, tax_amount: 115, date: '2026-06-18', airline: 'Air Transat', duration: '8h 15m', stops: 0, value_score: 79, region: 'EU', deal_score: 73, deal_classification: 'Good Deal', historical_price: 799, destination_emoji: '⛪', booking_url: 'https://example.com/deal/bcn' },
 ];
 
-const useStableVisualFlights = async (page: Page) => {
+const useStableVisualFlights = async (page: Page, onHit?: () => void) => {
   await page.route('**/api/search**', async (route) => {
+    onHit?.();
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -29,6 +30,16 @@ const useStableVisualFlights = async (page: Page) => {
       body: JSON.stringify(STABLE_VISUAL_FLIGHTS),
     });
   });
+};
+
+const waitForImagesToSettle = async (locator: Locator) => {
+  await expect.poll(async () => {
+    return locator.evaluate((node) => {
+      const images = Array.from(node.querySelectorAll('img')) as HTMLImageElement[];
+      if (!images.length) return true;
+      return images.every((img) => img.complete);
+    });
+  }, { timeout: 10000 }).toBe(true);
 };
 
 const waitForDealsLoaded = async (page: Page) => {
@@ -229,21 +240,33 @@ test.describe('Visual Regression - Refined Discovery UI', () => {
 
   test('VISUAL: featured route card section (desktop)', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1400 });
-    await useStableVisualFlights(page);
+    let searchMockHits = 0;
+    await useStableVisualFlights(page, () => {
+      searchMockHits += 1;
+    });
     await waitForDealsLoaded(page);
+
+    expect(searchMockHits).toBeGreaterThan(0);
 
     const featured = page.locator('#results').getByText('Featured deal').first().locator('xpath=ancestor::div[1]');
     await featured.scrollIntoViewIfNeeded();
+    await waitForImagesToSettle(featured);
     await expectVisualHashWithin(featured, BASELINE_HASHES.featuredDesktop, 20);
   });
 
   test('VISUAL: standard result-card grid view (desktop)', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1800 });
-    await useStableVisualFlights(page);
+    let searchMockHits = 0;
+    await useStableVisualFlights(page, () => {
+      searchMockHits += 1;
+    });
     await waitForDealsLoaded(page);
 
-    const grid = page.locator('#results').locator('div.grid.grid-cols-1.gap-5.md\\:grid-cols-2').first();
+    expect(searchMockHits).toBeGreaterThan(0);
+
+    const grid = page.locator('#results').locator('div.grid.grid-cols-1.gap-5.md\:grid-cols-2').first();
     await grid.scrollIntoViewIfNeeded();
+    await waitForImagesToSettle(grid);
     await expectVisualHashWithin(grid, BASELINE_HASHES.gridDesktop, 22);
   });
 
