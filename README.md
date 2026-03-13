@@ -4,7 +4,9 @@
 
 A production-ready full-stack application that ranks flights by true value (not just price) using multi-factor analysis: price competitiveness, booking platform safety, and travel timing.
 
-[![Deploy Status](https://img.shields.io/badge/status-production-success)](https://github.com/yumorepos/flight-discovery)
+🌐 **[Live Demo →](https://flight-discovery.vercel.app)**
+
+[![Deploy Status](https://img.shields.io/badge/status-production-success)](https://flight-discovery.vercel.app)
 [![API Status](https://img.shields.io/badge/Kiwi%20API-live-brightgreen)](https://tequila.kiwi.com)
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
