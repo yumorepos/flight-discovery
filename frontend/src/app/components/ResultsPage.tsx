@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import DestinationCard from "./DestinationCard";
 import { useCurrency } from "./CurrencyProvider";
 import { convertPrice, convertToCad, formatPrice } from "@/lib/currency";
 import { buildFareMetadata, buildTrendSeries, CabinClass } from "@/lib/flightEnrichment";
 import { buildDemoFlights } from "@/lib/demoFlights";
+import { getDestinationImageSet } from "@/lib/destinationImages";
+import { getDestinationInspiration } from "@/lib/destinationInspiration";
 
 interface PriceInsight {
   usual_price: number;
@@ -53,6 +56,14 @@ interface FlightResponse {
   source: FlightSource;
 }
 
+interface CuratedSection {
+  id: string;
+  title: string;
+  subtitle: string;
+  rationale: string;
+  flights: Flight[];
+}
+
 const dedupeByDestination = (items: Flight[]) => {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -63,6 +74,8 @@ const dedupeByDestination = (items: Flight[]) => {
 };
 
 const REGION_LABELS: Record<string, string> = { NA: "Americas", EU: "Europe", Asia: "Asia", Oceania: "Oceania", AF: "Africa", SA: "South America" };
+
+const WARM_REGIONS = new Set(["SA", "AF", "Oceania"]);
 
 async function fetchFlights(origin: string, month: string, destination?: string): Promise<FlightResponse> {
   const params = new URLSearchParams({ origin });
@@ -99,6 +112,28 @@ const parseHours = (duration: string) => {
   const h = Number(duration.match(/(\d+)h/)?.[1] ?? 0);
   const m = Number(duration.match(/(\d+)m/)?.[1] ?? 0);
   return h + m / 60;
+};
+
+const parseIsoDate = (value: string) => {
+  const parsed = new Date(`${value}T00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const getDaysUntilFlight = (flightDate: string) => {
+  const date = parseIsoDate(flightDate);
+  if (!date) return Number.POSITIVE_INFINITY;
+  return (date.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+};
+
+const pickUniqueFlights = (pool: Flight[], count: number, usedDestinations: Set<string>) => {
+  const picks: Flight[] = [];
+  for (const flight of pool) {
+    if (picks.length >= count) break;
+    if (usedDestinations.has(flight.destination)) continue;
+    picks.push(flight);
+    usedDestinations.add(flight.destination);
+  }
+  return picks;
 };
 
 const sourceMeta = (source: FlightSource) => {
@@ -285,6 +320,87 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
   }, [filtered]);
   const [featuredFlight, ...standardFlights] = filtered;
 
+  const curatedSections = useMemo<CuratedSection[]>(() => {
+    const candidates = filtered.length >= 8 ? filtered : enrichedFlights;
+    if (!candidates.length) return [];
+
+    const used = new Set<string>();
+    const sections: CuratedSection[] = [];
+    const underThresholdCad = 700;
+
+    const bestValuePool = [...candidates].sort((a, b) => b.value_score - a.value_score || a.total_price - b.total_price);
+    const bestValueFlights = pickUniqueFlights(bestValuePool, 3, used);
+    if (bestValueFlights.length) {
+      sections.push({
+        id: "best-value",
+        title: "Best value this month",
+        subtitle: "High score-to-price routes with strong upside.",
+        rationale: "Ranked by value score and deal quality.",
+        flights: bestValueFlights,
+      });
+    }
+
+    const weekendPool = [...candidates]
+      .filter((flight) => {
+        const date = parseIsoDate(flight.date);
+        const day = date?.getDay();
+        return day === 4 || day === 5 || day === 6;
+      })
+      .sort((a, b) => parseHours(a.duration) - parseHours(b.duration) || a.total_price - b.total_price);
+    const weekendFlights = pickUniqueFlights(weekendPool, 3, used);
+    if (weekendFlights.length) {
+      sections.push({
+        id: "weekend-escapes",
+        title: "Weekend escapes",
+        subtitle: "Shorter itineraries for easy spontaneous trips.",
+        rationale: "Friday/Saturday departures with low friction flight times.",
+        flights: weekendFlights,
+      });
+    }
+
+    const warmPool = [...candidates]
+      .filter((flight) => WARM_REGIONS.has(flight.region) || ["Cancún", "Honolulu", "Lima"].includes(flight.city))
+      .sort((a, b) => a.total_price - b.total_price);
+    const warmFlights = pickUniqueFlights(warmPool, 3, used);
+    if (warmFlights.length) {
+      sections.push({
+        id: "warm-picks",
+        title: "Warm-weather picks",
+        subtitle: "Sun-led routes curated for a climate reset.",
+        rationale: "Favoring warmer regions and beach-friendly cities.",
+        flights: warmFlights,
+      });
+    }
+
+    const budgetPool = [...candidates].filter((flight) => flight.total_price <= underThresholdCad).sort((a, b) => a.total_price - b.total_price);
+    const budgetFlights = pickUniqueFlights(budgetPool, 3, used);
+    if (budgetFlights.length) {
+      sections.push({
+        id: "under-threshold",
+        title: `Under ${formatPrice(underThresholdCad, currency, rates)}`,
+        subtitle: "Low-fare options to keep discovery practical.",
+        rationale: "Prioritizes routes below the affordability threshold.",
+        flights: budgetFlights,
+      });
+    }
+
+    const longHaulPool = [...candidates]
+      .filter((flight) => parseHours(flight.duration) >= 10 || getDaysUntilFlight(flight.date) > 45)
+      .sort((a, b) => b.deal_score - a.deal_score);
+    const longHaulFlights = pickUniqueFlights(longHaulPool, 3, used);
+    if (longHaulFlights.length) {
+      sections.push({
+        id: "long-haul",
+        title: "Long-haul highlights",
+        subtitle: "Bigger journeys surfaced for strategic planning.",
+        rationale: "Weighted toward stronger long-duration value opportunities.",
+        flights: longHaulFlights,
+      });
+    }
+
+    return sections.slice(0, 4);
+  }, [currency, enrichedFlights, filtered, rates]);
+
   const resetFilters = () => {
     setActiveRegion("All");
     setSortKey("value");
@@ -352,6 +468,53 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
             </button>
           ))}
         </div>
+
+        {curatedSections.length > 0 && (
+          <div className="mb-6 space-y-4">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-600">Curated discovery</p>
+                <h3 className="mt-1 text-lg font-bold text-slate-900">Browse intelligently picked routes before deep filtering</h3>
+              </div>
+              <p className="text-xs text-slate-500">Sections stay populated even when live inventory is thin.</p>
+            </div>
+            {curatedSections.map((section) => (
+              <article key={section.id} className="rounded-2xl border border-slate-200 bg-slate-50/55 p-4 md:p-5">
+                <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900">{section.title}</h4>
+                    <p className="text-sm text-slate-600">{section.subtitle}</p>
+                  </div>
+                  <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold text-orange-700">{section.rationale}</span>
+                </div>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {section.flights.map((flight) => {
+                    const inspiration = getDestinationInspiration(flight.city, flight.region);
+                    const image = getDestinationImageSet(flight.city, flight.region).landscape;
+                    return (
+                      <div key={`${section.id}-${flight.id}`} className="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
+                        <div className="relative aspect-[16/10] overflow-hidden">
+                          <Image src={image} alt={flight.city} fill unoptimized className="object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent" />
+                          <p className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-800">{REGION_LABELS[flight.region] ?? flight.region}</p>
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <p className="text-lg font-black leading-tight text-white">{flight.city}</p>
+                            <p className="text-xs text-white/90">{flight.country}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-2.5 p-3.5">
+                          <p className="text-xl font-black text-orange-600">{formatPrice(flight.total_price, currency, rates)}</p>
+                          <p className="text-xs font-semibold text-slate-600">{inspiration.seasonHook} · Best for {inspiration.bestFor.toLowerCase()}</p>
+                          <p className="line-clamp-2 text-sm text-slate-700">{inspiration.blurb}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <AnimatePresence mode="popLayout">
           {filtered.length === 0 ? (
