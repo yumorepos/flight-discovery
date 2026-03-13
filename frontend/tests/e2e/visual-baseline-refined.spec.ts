@@ -105,22 +105,43 @@ const grayscaleAt = (img: PngData, x: number, y: number) => {
 
 const computeDHash = (pngBuffer: Buffer, size = 8) => {
   const img = decodePngRgba(pngBuffer);
-  let hash = 0n;
+  const bits: string[] = [];
 
   for (let y = 0; y < size; y += 1) {
     for (let x = 0; x < size; x += 1) {
       const left = grayscaleAt(img, Math.floor((x / (size + 1)) * img.width), Math.floor((y / size) * img.height));
       const right = grayscaleAt(img, Math.floor(((x + 1) / (size + 1)) * img.width), Math.floor((y / size) * img.height));
-      hash = (hash << 1n) | (left > right ? 1n : 0n);
+      bits.push(left > right ? '1' : '0');
     }
   }
 
-  return hash.toString(16).padStart(16, '0');
+  let hex = '';
+  for (let i = 0; i < bits.length; i += 4) {
+    const nibble = bits.slice(i, i + 4).join('').padEnd(4, '0');
+    hex += Number.parseInt(nibble, 2).toString(16);
+  }
+
+  return hex.padStart(16, '0');
 };
 
+const hexToBitString = (value: string) =>
+  value
+    .toLowerCase()
+    .split('')
+    .map((char) => Number.parseInt(char, 16).toString(2).padStart(4, '0'))
+    .join('');
+
 const hammingDistance = (a: string, b: string) => {
-  const xor = BigInt(`0x${a}`) ^ BigInt(`0x${b}`);
-  return xor.toString(2).replace(/0/g, '').length;
+  const bitsA = hexToBitString(a);
+  const bitsB = hexToBitString(b);
+  const length = Math.max(bitsA.length, bitsB.length);
+  let distance = 0;
+
+  for (let i = 0; i < length; i += 1) {
+    if ((bitsA[i] ?? '0') !== (bitsB[i] ?? '0')) distance += 1;
+  }
+
+  return distance;
 };
 
 const expectVisualHashWithin = async (locator: Locator, expectedHash: string, threshold: number) => {
