@@ -237,7 +237,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
   const [requestToken, setRequestToken] = useState(0);
 
   const loadFlights = useCallback(() => {
-    queueMicrotask(() => setLoading(true));
+    setLoading(true);
     fetchFlights(origin, month, destination || undefined)
       .then((result) => {
         setFlights(result.flights);
