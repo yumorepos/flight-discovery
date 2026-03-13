@@ -14,7 +14,7 @@ body {
 
 body {
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  background: radial-gradient(circle at top, #ede9fe 0%, #f8fafc 32%, #f1f5f9 100%);
+  background: radial-gradient(circle at top, #ffedd5 0%, #fff7ed 28%, #f8fafc 62%, #f1f5f9 100%);
   color: #0f172a;
   line-height: 1.5;
   min-height: 100vh;
@@ -26,7 +26,7 @@ a {
 }
 
 ::selection {
-  background: rgba(124, 58, 237, 0.2);
+  background: rgba(249, 115, 22, 0.22);
 }
 
 @keyframes heroGradientDrift {
@@ -43,9 +43,9 @@ a {
 
 .hero-gradient-animated {
   background:
-    radial-gradient(circle at 15% 10%, rgba(196, 181, 253, 0.58), transparent 42%),
-    radial-gradient(circle at 80% 22%, rgba(216, 180, 254, 0.45), transparent 38%),
-    linear-gradient(132deg, #5b21b6 0%, #6d28d9 38%, #312e81 72%, #1e1b4b 100%);
+    radial-gradient(circle at 15% 10%, rgba(251, 191, 36, 0.42), transparent 42%),
+    radial-gradient(circle at 78% 24%, rgba(251, 146, 60, 0.35), transparent 38%),
+    linear-gradient(132deg, #7c2d12 0%, #c2410c 38%, #9a3412 72%, #7f1d1d 100%);
   animation: heroGradientDrift 14s ease-in-out infinite;
   transform-origin: center;
 }

@@ -2,10 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import DestinationCard from "./DestinationCard";
 import { useCurrency } from "./CurrencyProvider";
 import { convertPrice, convertToCad, formatPrice } from "@/lib/currency";
 import { buildFareMetadata, buildTrendSeries, CabinClass } from "@/lib/flightEnrichment";
+import { buildDemoFlights } from "@/lib/demoFlights";
+import { getDestinationImageSet } from "@/lib/destinationImages";
+import { getDestinationInspiration } from "@/lib/destinationInspiration";
 
 interface PriceInsight {
   usual_price: number;
@@ -52,7 +56,26 @@ interface FlightResponse {
   source: FlightSource;
 }
 
+interface CuratedSection {
+  id: string;
+  title: string;
+  subtitle: string;
+  rationale: string;
+  flights: Flight[];
+}
+
+const dedupeByDestination = (items: Flight[]) => {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.destination)) return false;
+    seen.add(item.destination);
+    return true;
+  });
+};
+
 const REGION_LABELS: Record<string, string> = { NA: "Americas", EU: "Europe", Asia: "Asia", Oceania: "Oceania", AF: "Africa", SA: "South America" };
+
+const WARM_REGIONS = new Set(["SA", "AF", "Oceania"]);
 
 async function fetchFlights(origin: string, month: string, destination?: string): Promise<FlightResponse> {
   const params = new URLSearchParams({ origin });
@@ -91,6 +114,28 @@ const parseHours = (duration: string) => {
   return h + m / 60;
 };
 
+const parseIsoDate = (value: string) => {
+  const parsed = new Date(`${value}T00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const getDaysUntilFlight = (flightDate: string) => {
+  const date = parseIsoDate(flightDate);
+  if (!date) return Number.POSITIVE_INFINITY;
+  return (date.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+};
+
+const pickUniqueFlights = (pool: Flight[], count: number, usedDestinations: Set<string>) => {
+  const picks: Flight[] = [];
+  for (const flight of pool) {
+    if (picks.length >= count) break;
+    if (usedDestinations.has(flight.destination)) continue;
+    picks.push(flight);
+    usedDestinations.add(flight.destination);
+  }
+  return picks;
+};
+
 const sourceMeta = (source: FlightSource) => {
   if (source === "live-api") return { label: "Live fares", badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-700" };
   if (source === "demo-fallback") return { label: "Preview fares", badgeClass: "border-amber-200 bg-amber-50 text-amber-700" };
@@ -100,7 +145,7 @@ const sourceMeta = (source: FlightSource) => {
 function LoadingSkeleton() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6 animate-pulse">
-      <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+      <div className="rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-[0_18px_44px_rgba(15,23,42,0.08)] md:p-6">
         <div className="grid gap-3 lg:grid-cols-4">
           <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-3">
             <div className="h-4 w-1/5 rounded bg-slate-200" />
@@ -192,7 +237,7 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
   const [requestToken, setRequestToken] = useState(0);
 
   const loadFlights = useCallback(() => {
-    queueMicrotask(() => setLoading(true));
+    setLoading(true);
     fetchFlights(origin, month, destination || undefined)
       .then((result) => {
         setFlights(result.flights);
@@ -215,10 +260,19 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
     setRequestToken((prev) => prev + 1);
   };
 
-  const enrichedFlights = useMemo(
-    () => flights.map((flight) => ({ ...flight, fare: buildFareMetadata(`${flight.id}-${flight.destination}`, flight.airline, flight.stops ?? 0), trend: buildTrendSeries(flight.total_price, month) })),
-    [flights, month]
-  );
+  const enrichedFlights = useMemo(() => {
+    const liveOrFallback = dedupeByDestination(flights);
+    const needsMoreDiscovery = liveOrFallback.length < 6;
+    const previewPool = needsMoreDiscovery ? buildDemoFlights(origin, month, "anywhere") : [];
+
+    const mergedFlights = dedupeByDestination([...liveOrFallback, ...previewPool]).slice(0, 12);
+
+    return mergedFlights.map((flight) => ({
+      ...flight,
+      fare: buildFareMetadata(`${flight.id}-${flight.destination}`, flight.airline, flight.stops ?? 0),
+      trend: buildTrendSeries(flight.total_price, month),
+    }));
+  }, [flights, month, origin]);
 
   const maxFlightPriceCad = useMemo(() => (enrichedFlights.length ? Math.max(...enrichedFlights.map((f) => Math.round(f.total_price))) : 3000), [enrichedFlights]);
   const maxFlightPriceDisplay = Math.max(100, Math.round(convertPrice(maxFlightPriceCad, currency, rates)));
@@ -266,6 +320,87 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
   }, [filtered]);
   const [featuredFlight, ...standardFlights] = filtered;
 
+  const curatedSections = useMemo<CuratedSection[]>(() => {
+    const candidates = filtered.length >= 8 ? filtered : enrichedFlights;
+    if (!candidates.length) return [];
+
+    const used = new Set<string>();
+    const sections: CuratedSection[] = [];
+    const underThresholdCad = 700;
+
+    const bestValuePool = [...candidates].sort((a, b) => b.value_score - a.value_score || a.total_price - b.total_price);
+    const bestValueFlights = pickUniqueFlights(bestValuePool, 3, used);
+    if (bestValueFlights.length) {
+      sections.push({
+        id: "best-value",
+        title: "Best value this month",
+        subtitle: "High score-to-price routes with strong upside.",
+        rationale: "Ranked by value score and deal quality.",
+        flights: bestValueFlights,
+      });
+    }
+
+    const weekendPool = [...candidates]
+      .filter((flight) => {
+        const date = parseIsoDate(flight.date);
+        const day = date?.getDay();
+        return day === 4 || day === 5 || day === 6;
+      })
+      .sort((a, b) => parseHours(a.duration) - parseHours(b.duration) || a.total_price - b.total_price);
+    const weekendFlights = pickUniqueFlights(weekendPool, 3, used);
+    if (weekendFlights.length) {
+      sections.push({
+        id: "weekend-escapes",
+        title: "Weekend escapes",
+        subtitle: "Shorter itineraries for easy spontaneous trips.",
+        rationale: "Friday/Saturday departures with low friction flight times.",
+        flights: weekendFlights,
+      });
+    }
+
+    const warmPool = [...candidates]
+      .filter((flight) => WARM_REGIONS.has(flight.region) || ["Cancún", "Honolulu", "Lima"].includes(flight.city))
+      .sort((a, b) => a.total_price - b.total_price);
+    const warmFlights = pickUniqueFlights(warmPool, 3, used);
+    if (warmFlights.length) {
+      sections.push({
+        id: "warm-picks",
+        title: "Warm-weather picks",
+        subtitle: "Sun-led routes curated for a climate reset.",
+        rationale: "Favoring warmer regions and beach-friendly cities.",
+        flights: warmFlights,
+      });
+    }
+
+    const budgetPool = [...candidates].filter((flight) => flight.total_price <= underThresholdCad).sort((a, b) => a.total_price - b.total_price);
+    const budgetFlights = pickUniqueFlights(budgetPool, 3, used);
+    if (budgetFlights.length) {
+      sections.push({
+        id: "under-threshold",
+        title: `Under ${formatPrice(underThresholdCad, currency, rates)}`,
+        subtitle: "Low-fare options to keep discovery practical.",
+        rationale: "Prioritizes routes below the affordability threshold.",
+        flights: budgetFlights,
+      });
+    }
+
+    const longHaulPool = [...candidates]
+      .filter((flight) => parseHours(flight.duration) >= 10 || getDaysUntilFlight(flight.date) > 45)
+      .sort((a, b) => b.deal_score - a.deal_score);
+    const longHaulFlights = pickUniqueFlights(longHaulPool, 3, used);
+    if (longHaulFlights.length) {
+      sections.push({
+        id: "long-haul",
+        title: "Long-haul highlights",
+        subtitle: "Bigger journeys surfaced for strategic planning.",
+        rationale: "Weighted toward stronger long-duration value opportunities.",
+        flights: longHaulFlights,
+      });
+    }
+
+    return sections.slice(0, 4);
+  }, [currency, enrichedFlights, filtered, rates]);
+
   const resetFilters = () => {
     setActiveRegion("All");
     setSortKey("value");
@@ -278,10 +413,11 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
   if (error) return <ErrorState error={error} onRetry={handleRetry} />;
 
   const sourceInfo = sourceMeta(source);
+  const discoveryMode = destination ? destination.toUpperCase() === "ANYWHERE" : true;
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
-      <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+      <div className="rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-[0_18px_44px_rgba(15,23,42,0.08)] md:p-6">
         <div className="grid gap-3 lg:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-3">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -291,21 +427,21 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
                 </select>
               </label>
               <label className="text-sm font-semibold text-slate-700">Max {formatPrice(maxPriceCad, currency, rates)}
-                <input type="range" min={minPriceDisplay} max={maxFlightPriceDisplay} value={Math.min(selectedPriceDisplay, maxFlightPriceDisplay)} onChange={(e) => setMaxPriceCad(Math.round(convertToCad(Number(e.target.value), currency, rates)))} className="mt-2 w-full accent-violet-600" />
+                <input type="range" min={minPriceDisplay} max={maxFlightPriceDisplay} value={Math.min(selectedPriceDisplay, maxFlightPriceDisplay)} onChange={(e) => setMaxPriceCad(Math.round(convertToCad(Number(e.target.value), currency, rates)))} className="mt-2 w-full accent-orange-500" />
               </label>
               <label className="text-sm font-semibold text-slate-700">Stops: {maxStops === 2 ? "Any" : maxStops}
-                <input type="range" min={0} max={2} value={maxStops} onChange={(e) => setMaxStops(Number(e.target.value))} className="mt-2 w-full accent-violet-600" />
+                <input type="range" min={0} max={2} value={maxStops} onChange={(e) => setMaxStops(Number(e.target.value))} className="mt-2 w-full accent-orange-500" />
               </label>
               <label className="text-sm font-semibold text-slate-700">Duration: {maxDurationHours}h
-                <input type="range" min={4} max={30} value={maxDurationHours} onChange={(e) => setMaxDurationHours(Number(e.target.value))} className="mt-2 w-full accent-violet-600" />
+                <input type="range" min={4} max={30} value={maxDurationHours} onChange={(e) => setMaxDurationHours(Number(e.target.value))} className="mt-2 w-full accent-orange-500" />
               </label>
             </div>
           </div>
-          <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-600 to-fuchsia-500 p-4 text-white shadow-lg shadow-violet-200/40">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-violet-100">Insights</p>
+          <div className="rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-500 to-amber-500 p-4 text-white shadow-lg shadow-orange-200/40">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-100">Insights</p>
             <p className="mt-2 text-sm font-semibold">Best month: <span className="font-bold">{bestMonth ? `${bestMonth.month} · ${formatPrice(bestMonth.avg, currency, rates)}` : "N/A"}</span></p>
             <p className="mt-1.5 text-sm">Showing {filtered.length} of {enrichedFlights.length} fares</p>
-            <p className="mt-2 text-xs text-violet-100/95">{flexibleDates ? "Flexible dates enabled for broader fare intelligence." : "Enable flexible dates for richer forecasting."}</p>
+            <p className="mt-2 text-xs text-orange-100/95">{discoveryMode ? "Anywhere mode keeps destination variety high for true discovery." : "Set destination to Anywhere for broader destination inspiration."} {flexibleDates ? "Flexible dates are on for wider fare coverage." : "Turn on flexible dates for even better discovery."}</p>
           </div>
         </div>
 
@@ -320,18 +456,65 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
             <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600">Top region: {topRegion}</span>
             <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-600">Best month: {bestMonth ? bestMonth.month : "N/A"}</span>
           </div>
-          {source === "demo-fallback" && (
+          {(source === "demo-fallback" || flights.length < 6) && (
             <p className="mt-2 text-xs text-amber-700">Showing preview fares while live airline feeds reconnect. Filters and ranking remain fully interactive.</p>
           )}
         </div>
 
         <div className="my-5 flex flex-wrap gap-2.5">
           {["All", ...regions].map((region) => (
-            <button key={region} onClick={() => setActiveRegion(region)} className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${activeRegion === region ? "border-violet-500 bg-violet-600 text-white" : "border-slate-200 bg-white text-slate-600"}`}>
+            <button key={region} onClick={() => setActiveRegion(region)} className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${activeRegion === region ? "border-orange-500 bg-orange-500 text-white" : "border-slate-200 bg-white text-slate-600"}`}>
               {region === "All" ? "All regions" : REGION_LABELS[region] ?? region}
             </button>
           ))}
         </div>
+
+        {curatedSections.length > 0 && (
+          <div className="mb-6 space-y-4">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-600">Curated discovery</p>
+                <h3 className="mt-1 text-lg font-bold text-slate-900">Browse intelligently picked routes before deep filtering</h3>
+              </div>
+              <p className="text-xs text-slate-500">Sections stay populated even when live inventory is thin.</p>
+            </div>
+            {curatedSections.map((section) => (
+              <article key={section.id} className="rounded-2xl border border-slate-200 bg-slate-50/55 p-4 md:p-5">
+                <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900">{section.title}</h4>
+                    <p className="text-sm text-slate-600">{section.subtitle}</p>
+                  </div>
+                  <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold text-orange-700">{section.rationale}</span>
+                </div>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {section.flights.map((flight) => {
+                    const inspiration = getDestinationInspiration(flight.city, flight.region);
+                    const image = getDestinationImageSet(flight.city, flight.region).landscape;
+                    return (
+                      <div key={`${section.id}-${flight.id}`} className="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
+                        <div className="relative aspect-[16/10] overflow-hidden">
+                          <Image src={image} alt={flight.city} fill unoptimized className="object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent" />
+                          <p className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-800">{REGION_LABELS[flight.region] ?? flight.region}</p>
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <p className="text-lg font-black leading-tight text-white">{flight.city}</p>
+                            <p className="text-xs text-white/90">{flight.country}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-2.5 p-3.5">
+                          <p className="text-xl font-black text-orange-600">{formatPrice(flight.total_price, currency, rates)}</p>
+                          <p className="text-xs font-semibold text-slate-600">{inspiration.seasonHook} · Best for {inspiration.bestFor.toLowerCase()}</p>
+                          <p className="line-clamp-2 text-sm text-slate-700">{inspiration.blurb}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <AnimatePresence mode="popLayout">
           {filtered.length === 0 ? (
@@ -343,14 +526,15 @@ export default function ResultsPage({ origin = "YUL", month = "", destination = 
                 <li>• Increase max price or duration range.</li>
                 <li>• Switch region to All regions.</li>
                 <li>• Use Any fare class for broader inventory.</li>
+                <li>• Try Anywhere to unlock destination-first discovery mode.</li>
               </ul>
-              <button onClick={resetFilters} className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 px-5 text-sm font-bold text-violet-700 transition hover:bg-violet-100">Reset filters</button>
+              <button onClick={resetFilters} className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-5 text-sm font-bold text-orange-700 transition hover:bg-orange-100">Reset filters</button>
             </motion.div>
           ) : (
             <motion.div className="space-y-5">
               {featuredFlight && (
-                <div className="relative rounded-[1.8rem] border-2 border-violet-100/90 bg-gradient-to-b from-violet-50/40 to-white p-1.5">
-                  <div className="pointer-events-none absolute right-5 top-4 rounded-full border border-violet-200 bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-violet-700">Featured deal</div>
+                <div className="relative rounded-[1.8rem] border-2 border-orange-100/90 bg-gradient-to-b from-orange-50/40 to-white p-1.5">
+                  <div className="pointer-events-none absolute right-5 top-4 rounded-full border border-orange-200 bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-orange-700">Featured deal</div>
                   <DestinationCard key={featuredFlight.id} index={0} featured origin={featuredFlight.origin} city={featuredFlight.city} country={featuredFlight.country} destination={featuredFlight.destination} totalPrice={featuredFlight.total_price} taxAmount={featuredFlight.tax_amount} date={featuredFlight.date} airline={featuredFlight.airline} duration={featuredFlight.duration} stops={featuredFlight.stops} dealScore={featuredFlight.deal_score} dealClassification={featuredFlight.deal_classification} valueScore={featuredFlight.value_score} historicalPrice={featuredFlight.historical_price} destinationEmoji={featuredFlight.destination_emoji} bookingUrl={featuredFlight.booking_url} region={featuredFlight.region} priceInsight={featuredFlight.price_insight} fare={featuredFlight.fare} trend={featuredFlight.trend} />
                 </div>
               )}

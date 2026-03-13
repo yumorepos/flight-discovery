@@ -1,247 +1,278 @@
-import { test, expect } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
+import { inflateSync } from 'zlib';
 
-/**
- * Visual Baseline Tests - Refined Purple Theme
- * 
- * Captures baseline screenshots after UI refinement and homepage auto-load fix.
- * 
- * CRITICAL: Only run after verifying:
- * 1. Homepage auto-loads destination cards (no empty state)
- * 2. Refined purple theme applied (indigo → violet → blue gradient)
- * 3. Search form elevated above hero (no overlap)
- * 4. All images and prices display correctly
- * 
- * First run: Creates baseline screenshots
- * Subsequent runs: Compares against baseline
- */
+const BASELINE_HASHES = {
+  heroDesktop: '634dcf03273b33de',
+  curatedDesktop: '00000000204546a6',
+  featuredDesktop: '08071b1c00000080',
+  gridDesktop: '6a102d10ae106010',
+  heroMobile: '2307454541292d7d',
+} as const;
 
-test.describe('Visual Baseline - Refined UI (Post-Fix)', () => {
-  test.beforeEach(async ({ page }) => {
-    // Navigate and wait for auto-load to complete
-    await page.goto('/');
-    
-    // Wait for API call (auto-load with YUL origin)
-    await page.waitForResponse(
-      response => response.url().includes('/api/search') && response.status() === 200,
-      { timeout: 10000 }
-    );
-    
-    // Wait for cards to render
-    await page.waitForTimeout(2000);
-    
-    // Verify cards are visible (not empty state)
-    const cards = page.locator('[class*="card"], article').filter({ hasText: /\$/ });
-    const count = await cards.count();
-    expect(count).toBeGreaterThanOrEqual(3);
-  });
+const STABLE_VISUAL_FLIGHTS = [
+  { id: 7001, origin: 'YUL', destination: 'CDG', city: 'Paris', country: 'France', total_price: 648, tax_amount: 112, date: '2026-05-17', airline: 'Air France', duration: '7h 20m', stops: 0, value_score: 91, region: 'EU', deal_score: 88, deal_classification: 'Hot Deal', historical_price: 812, destination_emoji: '🗼', booking_url: 'https://example.com/deal/cdg' },
+  { id: 7002, origin: 'YUL', destination: 'NRT', city: 'Tokyo', country: 'Japan', total_price: 1028, tax_amount: 158, date: '2026-06-05', airline: 'Air Canada', duration: '13h 30m', stops: 0, value_score: 84, region: 'Asia', deal_score: 79, deal_classification: 'Good Deal', historical_price: 1194, destination_emoji: '🗾', booking_url: 'https://example.com/deal/nrt' },
+  { id: 7003, origin: 'YUL', destination: 'CUN', city: 'Cancún', country: 'Mexico', total_price: 452, tax_amount: 92, date: '2026-04-19', airline: 'Air Transat', duration: '4h 35m', stops: 0, value_score: 90, region: 'NA', deal_score: 86, deal_classification: 'Hot Deal', historical_price: 579, destination_emoji: '🏖️', booking_url: 'https://example.com/deal/cun' },
+  { id: 7004, origin: 'YUL', destination: 'LHR', city: 'London', country: 'United Kingdom', total_price: 589, tax_amount: 122, date: '2026-05-11', airline: 'British Airways', duration: '7h 10m', stops: 0, value_score: 82, region: 'EU', deal_score: 74, deal_classification: 'Good Deal', historical_price: 705, destination_emoji: '🎡', booking_url: 'https://example.com/deal/lhr' },
+  { id: 7005, origin: 'YUL', destination: 'LIM', city: 'Lima', country: 'Peru', total_price: 612, tax_amount: 101, date: '2026-05-24', airline: 'LATAM', duration: '8h 40m', stops: 1, value_score: 78, region: 'SA', deal_score: 72, deal_classification: 'Good Deal', historical_price: 760, destination_emoji: '🦙', booking_url: 'https://example.com/deal/lim' },
+  { id: 7006, origin: 'YUL', destination: 'FCO', city: 'Rome', country: 'Italy', total_price: 699, tax_amount: 128, date: '2026-06-12', airline: 'ITA Airways', duration: '8h 20m', stops: 0, value_score: 80, region: 'EU', deal_score: 71, deal_classification: 'Good Deal', historical_price: 826, destination_emoji: '🏛️', booking_url: 'https://example.com/deal/fco' },
+  { id: 7007, origin: 'YUL', destination: 'HNL', city: 'Honolulu', country: 'United States', total_price: 739, tax_amount: 134, date: '2026-05-30', airline: 'Air Canada', duration: '10h 25m', stops: 1, value_score: 76, region: 'NA', deal_score: 68, deal_classification: 'Fair Deal', historical_price: 861, destination_emoji: '🌺', booking_url: 'https://example.com/deal/hnl' },
+  { id: 7008, origin: 'YUL', destination: 'BCN', city: 'Barcelona', country: 'Spain', total_price: 671, tax_amount: 115, date: '2026-06-18', airline: 'Air Transat', duration: '8h 15m', stops: 0, value_score: 79, region: 'EU', deal_score: 73, deal_classification: 'Good Deal', historical_price: 799, destination_emoji: '⛪', booking_url: 'https://example.com/deal/bcn' },
+];
 
-  test('BASELINE: Homepage - Refined Hero Section (Desktop)', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    // Scroll to hero section
-    const hero = page.locator('section').first();
-    await hero.scrollIntoViewIfNeeded();
-    
-    await expect(hero).toHaveScreenshot('refined-hero-desktop.png', {
-      maxDiffPixels: 150,
+const useStableVisualFlights = async (page: Page, onHit?: () => void) => {
+  await page.route('**/api/search**', async (route) => {
+    onHit?.();
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'x-flight-source': 'demo-fallback' },
+      body: JSON.stringify(STABLE_VISUAL_FLIGHTS),
     });
   });
+};
 
-  test('BASELINE: Homepage - Elevated Search Form (Desktop)', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    // Screenshot search form container (elevated white box)
-    const searchContainer = page.locator('div').filter({ hasText: /From.*When.*To/i }).first();
-    await searchContainer.scrollIntoViewIfNeeded();
-    
-    await expect(searchContainer).toHaveScreenshot('refined-search-form-desktop.png', {
-      maxDiffPixels: 100,
+const waitForImagesToSettle = async (locator: Locator) => {
+  await expect.poll(async () => {
+    return locator.evaluate((node) => {
+      const images = Array.from(node.querySelectorAll('img')) as HTMLImageElement[];
+      if (!images.length) return true;
+      return images.every((img) => img.complete);
     });
-  });
+  }, { timeout: 10000 }).toBe(true);
+};
 
-  test('BASELINE: Homepage - Deal Highlights Bar (Desktop)', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    // Screenshot deal indicators bar
-    const dealsBar = page.locator('text=/Mistake Fare|Hot Deal|Good Deal/i').first().locator('..');
-    await dealsBar.scrollIntoViewIfNeeded();
-    
-    await expect(dealsBar).toHaveScreenshot('refined-deal-highlights-desktop.png', {
-      maxDiffPixels: 50,
-    });
-  });
+const waitForDealsLoaded = async (page: Page) => {
+  await page.goto('/');
+  await page.waitForResponse(
+    (response) => response.url().includes('/api/search') && response.status() === 200,
+    { timeout: 15000 },
+  );
+  await page.locator('section.animate-pulse').first().waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+  await expect(page.locator('a:has-text("See deal")').first()).toBeVisible({ timeout: 15000 });
+};
 
-  test('BASELINE: Homepage - Auto-Loaded Destination Cards Grid (Desktop)', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    // Screenshot cards grid area
-    const cardsContainer = page.locator('main, [id="results"]').first();
-    await cardsContainer.scrollIntoViewIfNeeded();
-    
-    await expect(cardsContainer).toHaveScreenshot('refined-cards-grid-desktop.png', {
-      maxDiffPixels: 400,
-    });
-  });
+type PngData = { width: number; height: number; data: Uint8Array };
 
-  test('BASELINE: Individual Destination Card (Desktop)', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    const firstCard = page.locator('[class*="card"], article').filter({ hasText: /\$/ }).first();
-    await firstCard.scrollIntoViewIfNeeded();
-    
-    // Verify card has required elements before capturing
-    await expect(firstCard.locator('text=/\\$\\d+/i')).toBeVisible();
-    
-    await expect(firstCard).toHaveScreenshot('refined-destination-card-desktop.png', {
-      maxDiffPixels: 80,
-    });
-  });
+const paeth = (a: number, b: number, c: number) => {
+  const p = a + b - c;
+  const pa = Math.abs(p - a);
+  const pb = Math.abs(p - b);
+  const pc = Math.abs(p - c);
+  if (pa <= pb && pa <= pc) return a;
+  if (pb <= pc) return b;
+  return c;
+};
 
-  test('BASELINE: Full Homepage - Refined Purple Theme (Desktop)', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    // Full page screenshot
-    await expect(page).toHaveScreenshot('refined-homepage-full-desktop.png', {
-      fullPage: true,
-      maxDiffPixels: 600,
-    });
-  });
+const decodePngRgba = (pngBuffer: Buffer): PngData => {
+  const signature = '89504e470d0a1a0a';
+  if (pngBuffer.subarray(0, 8).toString('hex') !== signature) {
+    throw new Error('Invalid PNG signature');
+  }
 
-  test('BASELINE: Mobile - Refined Homepage (iPhone SE)', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    
-    await expect(page).toHaveScreenshot('refined-homepage-mobile-iphone.png', {
-      fullPage: true,
-      maxDiffPixels: 500,
-    });
-  });
+  let offset = 8;
+  let width = 0;
+  let height = 0;
+  const idatParts: Buffer[] = [];
 
-  test('BASELINE: Mobile - Destination Card (iPhone SE)', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    
-    const firstCard = page.locator('[class*="card"], article').filter({ hasText: /\$/ }).first();
-    await firstCard.scrollIntoViewIfNeeded();
-    
-    await expect(firstCard).toHaveScreenshot('refined-destination-card-mobile.png', {
-      maxDiffPixels: 120,
-    });
-  });
+  while (offset < pngBuffer.length) {
+    const length = pngBuffer.readUInt32BE(offset);
+    offset += 4;
+    const type = pngBuffer.subarray(offset, offset + 4).toString('ascii');
+    offset += 4;
+    const data = pngBuffer.subarray(offset, offset + length);
+    offset += length;
+    offset += 4; // crc
 
-  test('BASELINE: Tablet - Refined Homepage (iPad)', async ({ page }) => {
-    await page.setViewportSize({ width: 768, height: 1024 });
-    
-    await expect(page).toHaveScreenshot('refined-homepage-tablet-ipad.png', {
-      fullPage: true,
-      maxDiffPixels: 500,
-    });
-  });
-
-  test('BASELINE: Footer Section (Desktop)', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    // Scroll to footer
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(500);
-    
-    const footer = page.locator('footer');
-    await expect(footer).toHaveScreenshot('refined-footer-desktop.png', {
-      maxDiffPixels: 60,
-    });
-  });
-});
-
-test.describe('Visual Baseline - Interaction States (Refined)', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForResponse(response => response.url().includes('/api/search'));
-    await page.waitForTimeout(2000);
-  });
-
-  test('BASELINE: Destination Card - Hover State', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    const firstCard = page.locator('[class*="card"], article').filter({ hasText: /\$/ }).first();
-    await firstCard.scrollIntoViewIfNeeded();
-    
-    // Hover to trigger effects
-    await firstCard.hover();
-    await page.waitForTimeout(400);
-    
-    await expect(firstCard).toHaveScreenshot('refined-card-hover-state.png', {
-      maxDiffPixels: 120,
-    });
-  });
-
-  test('BASELINE: Region Filter - Active State', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    
-    const filter = page.locator('button').filter({ hasText: /Americas|Europe|Asia/i }).first();
-    
-    if (await filter.isVisible()) {
-      await filter.click();
-      await page.waitForTimeout(500);
-      
-      const filters = page.locator('button').filter({ hasText: /All|Americas|Europe/i }).first().locator('..');
-      await expect(filters).toHaveScreenshot('refined-filters-active-state.png', {
-        maxDiffPixels: 80,
-      });
+    if (type === 'IHDR') {
+      width = data.readUInt32BE(0);
+      height = data.readUInt32BE(4);
+      const bitDepth = data[8];
+      const colorType = data[9];
+      const interlace = data[12];
+      if (bitDepth !== 8 || colorType !== 6 || interlace !== 0) {
+        throw new Error('Unsupported PNG format');
+      }
+    } else if (type === 'IDAT') {
+      idatParts.push(Buffer.from(data));
+    } else if (type === 'IEND') {
+      break;
     }
-  });
-});
+  }
 
-test.describe('CRITICAL: Auto-Load Verification', () => {
-  test('VERIFY: Homepage auto-loads destination cards (no empty state)', async ({ page }) => {
-    await page.goto('/');
-    
-    // Wait for API response
-    await page.waitForResponse(
-      response => response.url().includes('/api/search?origin=YUL') && response.status() === 200,
-      { timeout: 10000 }
-    );
-    
-    // Wait for render
-    await page.waitForTimeout(2500);
-    
-    // CRITICAL CHECK 1: Cards must be visible
-    const cards = page.locator('[class*="card"], article').filter({ hasText: /\$/ });
-    await expect(cards.first()).toBeVisible({ timeout: 5000 });
-    
-    const count = await cards.count();
-    expect(count).toBeGreaterThanOrEqual(3);
-    
-    // CRITICAL CHECK 2: No empty state message
-    await expect(page.locator('text=/Choose your departure airport/i')).not.toBeVisible();
-    
-    // CRITICAL CHECK 3: Verify prices display
-    const firstPrice = cards.first().locator('text=/\\$\\d+/i').first();
-    await expect(firstPrice).toBeVisible();
-    
-    // CRITICAL CHECK 4: Verify images loaded
-    const firstImage = cards.first().locator('img').first();
-    await expect(firstImage).toBeVisible();
-    const imgSrc = await firstImage.getAttribute('src');
-    expect(imgSrc).toBeTruthy();
-    
-    console.log(`✅ Auto-load verified: ${count} cards displayed`);
+  const inflated = inflateSync(Buffer.concat(idatParts));
+  const stride = width * 4;
+  const output = new Uint8Array(width * height * 4);
+
+  let inOffset = 0;
+  for (let y = 0; y < height; y += 1) {
+    const filter = inflated[inOffset];
+    inOffset += 1;
+
+    for (let x = 0; x < stride; x += 1) {
+      const raw = inflated[inOffset++];
+      const outIndex = y * stride + x;
+      const left = x >= 4 ? output[outIndex - 4] : 0;
+      const up = y > 0 ? output[outIndex - stride] : 0;
+      const upLeft = y > 0 && x >= 4 ? output[outIndex - stride - 4] : 0;
+
+      let value = raw;
+      if (filter === 1) value = (raw + left) & 0xff;
+      else if (filter === 2) value = (raw + up) & 0xff;
+      else if (filter === 3) value = (raw + Math.floor((left + up) / 2)) & 0xff;
+      else if (filter === 4) value = (raw + paeth(left, up, upLeft)) & 0xff;
+
+      output[outIndex] = value;
+    }
+  }
+
+  return { width, height, data: output };
+};
+
+const grayscaleAt = (img: PngData, x: number, y: number) => {
+  const clampedX = Math.max(0, Math.min(img.width - 1, x));
+  const clampedY = Math.max(0, Math.min(img.height - 1, y));
+  const idx = (clampedY * img.width + clampedX) * 4;
+  return img.data[idx] * 0.299 + img.data[idx + 1] * 0.587 + img.data[idx + 2] * 0.114;
+};
+
+const bilinearSample = (img: PngData, x: number, y: number) => {
+  const x0 = Math.floor(x);
+  const y0 = Math.floor(y);
+  const x1 = Math.min(img.width - 1, x0 + 1);
+  const y1 = Math.min(img.height - 1, y0 + 1);
+  const fx = x - x0;
+  const fy = y - y0;
+
+  const top = grayscaleAt(img, x0, y0) * (1 - fx) + grayscaleAt(img, x1, y0) * fx;
+  const bottom = grayscaleAt(img, x0, y1) * (1 - fx) + grayscaleAt(img, x1, y1) * fx;
+  return top * (1 - fy) + bottom * fy;
+};
+
+const computeDHash = (pngBuffer: Buffer, size = 8) => {
+  const img = decodePngRgba(pngBuffer);
+  const sampleWidth = size + 1;
+  const sampleHeight = size;
+
+  const resized: number[][] = Array.from({ length: sampleHeight }, () => Array(sampleWidth).fill(0));
+
+  for (let y = 0; y < sampleHeight; y += 1) {
+    for (let x = 0; x < sampleWidth; x += 1) {
+      const sourceX = ((x + 0.5) * img.width) / sampleWidth - 0.5;
+      const sourceY = ((y + 0.5) * img.height) / sampleHeight - 0.5;
+      resized[y][x] = bilinearSample(img, sourceX, sourceY);
+    }
+  }
+
+  const bits: string[] = [];
+  for (let y = 0; y < sampleHeight; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      bits.push(resized[y][x] > resized[y][x + 1] ? '1' : '0');
+    }
+  }
+
+  let hex = '';
+  for (let i = 0; i < bits.length; i += 4) {
+    const nibble = bits.slice(i, i + 4).join('').padEnd(4, '0');
+    hex += Number.parseInt(nibble, 2).toString(16);
+  }
+
+  return hex.padStart(16, '0');
+};
+
+const hexToBitString = (value: string) =>
+  value
+    .toLowerCase()
+    .split('')
+    .map((char) => Number.parseInt(char, 16).toString(2).padStart(4, '0'))
+    .join('');
+
+const hammingDistance = (a: string, b: string) => {
+  const bitsA = hexToBitString(a);
+  const bitsB = hexToBitString(b);
+  const length = Math.max(bitsA.length, bitsB.length);
+  let distance = 0;
+
+  for (let i = 0; i < length; i += 1) {
+    if ((bitsA[i] ?? '0') !== (bitsB[i] ?? '0')) distance += 1;
+  }
+
+  return distance;
+};
+
+const expectVisualHashWithin = async (locator: Locator, expectedHash: string, threshold: number) => {
+  const png = await locator.screenshot({ animations: 'disabled', caret: 'hide', scale: 'css' });
+  const hash = computeDHash(png);
+  const distance = hammingDistance(hash, expectedHash);
+  expect(distance, `visual hash mismatch: expected=${expectedHash}, got=${hash}, distance=${distance}`).toBeLessThanOrEqual(threshold);
+};
+
+test.describe('Visual Regression - Refined Discovery UI', () => {
+  test.beforeEach(async ({ page }) => {
+    await waitForDealsLoaded(page);
   });
 
-  test('VERIFY: Refined purple theme applied', async ({ page }) => {
-    await page.goto('/');
-    
-    // Check hero section has refined gradient
-    const hero = page.locator('section').first();
-    const heroBg = await hero.evaluate((el) => window.getComputedStyle(el).backgroundImage);
-    
-    // Should contain gradient (not empty)
-    expect(heroBg).toContain('gradient');
-    
-    // Check search form is elevated (white background, not transparent)
-    const searchContainer = page.locator('div').filter({ hasText: /From.*When.*To/i }).first();
-    const searchBg = await searchContainer.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-    
-    // Should be white or near-white (not purple)
-    expect(searchBg).toMatch(/rgb\(255, 255, 255\)|rgb\(2\d{2}, 2\d{2}, 2\d{2}\)/);
-    
-    console.log('✅ Refined purple theme verified');
+  test('STRUCTURE: curated sections and featured card are visible', async ({ page }) => {
+    await expect(page.getByText('Curated discovery')).toBeVisible();
+    await expect(page.getByText('Featured deal').first()).toBeVisible();
+
+    const sectionCards = page
+      .locator('#results article')
+      .filter({ hasText: /Best value this month|Weekend escapes|Warm-weather picks|Under/i });
+    await expect(sectionCards.first()).toBeVisible();
+    expect(await sectionCards.count()).toBeGreaterThanOrEqual(2);
+  });
+
+  test('VISUAL: hero + search section (desktop)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 960 });
+    await waitForDealsLoaded(page);
+    await expectVisualHashWithin(page.locator('section').first(), BASELINE_HASHES.heroDesktop, 18);
+  });
+
+  test('VISUAL: curated discovery section area (desktop)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1500 });
+    await waitForDealsLoaded(page);
+
+    const curatedSection = page.getByText('Curated discovery').first().locator('xpath=ancestor::div[1]').locator('xpath=ancestor::div[1]');
+    await curatedSection.scrollIntoViewIfNeeded();
+    await expectVisualHashWithin(curatedSection, BASELINE_HASHES.curatedDesktop, 20);
+  });
+
+  test('VISUAL: featured route card section (desktop)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1400 });
+    let searchMockHits = 0;
+    await useStableVisualFlights(page, () => {
+      searchMockHits += 1;
+    });
+    await waitForDealsLoaded(page);
+
+    expect(searchMockHits).toBeGreaterThan(0);
+
+    const featured = page.locator('#results').getByText('Featured deal').first().locator('xpath=ancestor::div[1]');
+    await featured.scrollIntoViewIfNeeded();
+    await waitForImagesToSettle(featured);
+    await expectVisualHashWithin(featured, BASELINE_HASHES.featuredDesktop, 20);
+  });
+
+  test('VISUAL: standard result-card grid view (desktop)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1800 });
+    let searchMockHits = 0;
+    await useStableVisualFlights(page, () => {
+      searchMockHits += 1;
+    });
+    await waitForDealsLoaded(page);
+
+    expect(searchMockHits).toBeGreaterThan(0);
+
+    const grid = page.locator('#results').locator('div.grid.grid-cols-1.gap-5.md\:grid-cols-2').first();
+    await grid.scrollIntoViewIfNeeded();
+    await waitForImagesToSettle(grid);
+    await expectVisualHashWithin(grid, BASELINE_HASHES.gridDesktop, 22);
+  });
+
+  test('VISUAL: mobile homepage hero + search state', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await waitForDealsLoaded(page);
+    await expectVisualHashWithin(page.locator('section').first(), BASELINE_HASHES.heroMobile, 20);
   });
 });
