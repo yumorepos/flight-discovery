@@ -4,10 +4,32 @@ import { inflateSync } from 'zlib';
 const BASELINE_HASHES = {
   heroDesktop: '634dcf03273b33de',
   curatedDesktop: '00000000204546a6',
-  featuredDesktop: '0ef2c2ce01818282',
-  gridDesktop: '8a88282a292ee0a0',
+  featuredDesktop: '08071b1c00000080',
+  gridDesktop: '6a102d10ae106010',
   heroMobile: '2307454541292d7d',
 } as const;
+
+const STABLE_VISUAL_FLIGHTS = [
+  { id: 7001, origin: 'YUL', destination: 'CDG', city: 'Paris', country: 'France', total_price: 648, tax_amount: 112, date: '2026-05-17', airline: 'Air France', duration: '7h 20m', stops: 0, value_score: 91, region: 'EU', deal_score: 88, deal_classification: 'Hot Deal', historical_price: 812, destination_emoji: '🗼', booking_url: 'https://example.com/deal/cdg' },
+  { id: 7002, origin: 'YUL', destination: 'NRT', city: 'Tokyo', country: 'Japan', total_price: 1028, tax_amount: 158, date: '2026-06-05', airline: 'Air Canada', duration: '13h 30m', stops: 0, value_score: 84, region: 'Asia', deal_score: 79, deal_classification: 'Good Deal', historical_price: 1194, destination_emoji: '🗾', booking_url: 'https://example.com/deal/nrt' },
+  { id: 7003, origin: 'YUL', destination: 'CUN', city: 'Cancún', country: 'Mexico', total_price: 452, tax_amount: 92, date: '2026-04-19', airline: 'Air Transat', duration: '4h 35m', stops: 0, value_score: 90, region: 'NA', deal_score: 86, deal_classification: 'Hot Deal', historical_price: 579, destination_emoji: '🏖️', booking_url: 'https://example.com/deal/cun' },
+  { id: 7004, origin: 'YUL', destination: 'LHR', city: 'London', country: 'United Kingdom', total_price: 589, tax_amount: 122, date: '2026-05-11', airline: 'British Airways', duration: '7h 10m', stops: 0, value_score: 82, region: 'EU', deal_score: 74, deal_classification: 'Good Deal', historical_price: 705, destination_emoji: '🎡', booking_url: 'https://example.com/deal/lhr' },
+  { id: 7005, origin: 'YUL', destination: 'LIM', city: 'Lima', country: 'Peru', total_price: 612, tax_amount: 101, date: '2026-05-24', airline: 'LATAM', duration: '8h 40m', stops: 1, value_score: 78, region: 'SA', deal_score: 72, deal_classification: 'Good Deal', historical_price: 760, destination_emoji: '🦙', booking_url: 'https://example.com/deal/lim' },
+  { id: 7006, origin: 'YUL', destination: 'FCO', city: 'Rome', country: 'Italy', total_price: 699, tax_amount: 128, date: '2026-06-12', airline: 'ITA Airways', duration: '8h 20m', stops: 0, value_score: 80, region: 'EU', deal_score: 71, deal_classification: 'Good Deal', historical_price: 826, destination_emoji: '🏛️', booking_url: 'https://example.com/deal/fco' },
+  { id: 7007, origin: 'YUL', destination: 'HNL', city: 'Honolulu', country: 'United States', total_price: 739, tax_amount: 134, date: '2026-05-30', airline: 'Air Canada', duration: '10h 25m', stops: 1, value_score: 76, region: 'NA', deal_score: 68, deal_classification: 'Fair Deal', historical_price: 861, destination_emoji: '🌺', booking_url: 'https://example.com/deal/hnl' },
+  { id: 7008, origin: 'YUL', destination: 'BCN', city: 'Barcelona', country: 'Spain', total_price: 671, tax_amount: 115, date: '2026-06-18', airline: 'Air Transat', duration: '8h 15m', stops: 0, value_score: 79, region: 'EU', deal_score: 73, deal_classification: 'Good Deal', historical_price: 799, destination_emoji: '⛪', booking_url: 'https://example.com/deal/bcn' },
+];
+
+const useStableVisualFlights = async (page: Page) => {
+  await page.route('**/api/search**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'x-flight-source': 'demo-fallback' },
+      body: JSON.stringify(STABLE_VISUAL_FLIGHTS),
+    });
+  });
+};
 
 const waitForDealsLoaded = async (page: Page) => {
   await page.goto('/');
@@ -207,6 +229,7 @@ test.describe('Visual Regression - Refined Discovery UI', () => {
 
   test('VISUAL: featured route card section (desktop)', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1400 });
+    await useStableVisualFlights(page);
     await waitForDealsLoaded(page);
 
     const featured = page.locator('#results').getByText('Featured deal').first().locator('xpath=ancestor::div[1]');
@@ -216,6 +239,7 @@ test.describe('Visual Regression - Refined Discovery UI', () => {
 
   test('VISUAL: standard result-card grid view (desktop)', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1800 });
+    await useStableVisualFlights(page);
     await waitForDealsLoaded(page);
 
     const grid = page.locator('#results').locator('div.grid.grid-cols-1.gap-5.md\\:grid-cols-2').first();
