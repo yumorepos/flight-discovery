@@ -41,9 +41,17 @@ jobs:
       
       - name: Validate API starts
         run: |
-          timeout 30s uvicorn main:app --host 0.0.0.0 --port 8000 &
-          sleep 5
-          curl --fail http://localhost:8000/api/search?origin=YUL || exit 1
+          timeout 45s uvicorn main:app --host 0.0.0.0 --port 8000 &
+          for attempt in {1..20}; do
+            if curl --silent --fail http://localhost:8000/api/airports > /dev/null; then
+              curl --silent --fail http://localhost:8000/api/search?origin=YUL > /dev/null
+              echo "API became ready on attempt ${attempt}."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "API did not become ready in time."
+          exit 1
         env:
           KIWI_API_KEY: ${{ secrets.KIWI_API_KEY || 'mock-key' }}
 
@@ -124,7 +132,15 @@ jobs:
         working-directory: ./backend
         run: |
           uvicorn main:app --host 0.0.0.0 --port 8000 &
-          sleep 5
+          for attempt in {1..20}; do
+            if curl --silent --fail http://localhost:8000/api/airports > /dev/null; then
+              echo "Backend ready on attempt ${attempt}."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend failed readiness check."
+          exit 1
         env:
           KIWI_API_KEY: ${{ secrets.KIWI_API_KEY || 'mock-key' }}
       
@@ -189,13 +205,21 @@ jobs:
         working-directory: ./backend
         run: |
           uvicorn main:app --host 0.0.0.0 --port 8000 &
-          sleep 5
+          for attempt in {1..20}; do
+            if curl --silent --fail http://localhost:8000/api/airports > /dev/null; then
+              echo "Backend ready on attempt ${attempt}."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend failed readiness check."
+          exit 1
         env:
           KIWI_API_KEY: ${{ secrets.KIWI_API_KEY || 'mock-key' }}
       
       - name: Run visual regression tests
         working-directory: ./frontend
-        run: npx playwright test visual-baseline
+        run: npm run test:visual
         env:
           CI: true
       

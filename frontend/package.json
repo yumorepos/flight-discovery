@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "npm run test:e2e",
+    "test:e2e": "playwright test tests/e2e/ci-smoke.spec.ts --project=chromium",
+    "test:visual": "playwright test tests/e2e/visual-baseline-refined.spec.ts --project=chromium",
+    "test:visual:update": "playwright test tests/e2e/visual-baseline-refined.spec.ts --project=chromium --update-snapshots"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
