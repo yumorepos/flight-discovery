@@ -178,14 +178,23 @@ function DestinationCardComponent({ origin, city, country, destination, totalPri
         </div>
 
         <a
-          href={bookingUrl}
+          href={`${bookingUrl}${bookingUrl.includes('?') ? '&' : '?'}affilid=flightdiscovery`}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer sponsored"
+          onClick={() => {
+            if (typeof window !== 'undefined' && (window as any).gtag) {
+              (window as any).gtag('event', 'affiliate_click', {
+                destination: city,
+                price: totalPrice,
+                airline: airline
+              });
+            }
+          }}
           className={`mt-auto rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 bg-[length:140%_140%] text-center font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition duration-200 hover:bg-[position:100%_50%] hover:shadow-[0_14px_30px_rgba(249,115,22,0.45)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200 ${
             featured ? "px-4 py-4 text-lg" : "px-4 py-3 text-[15px]"
           }`}
         >
-          See deal →
+          Book flight →
         </a>
 
         <button onClick={() => setShowDetails((prev) => !prev)} className="text-left text-xs font-semibold text-slate-500 transition hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200">

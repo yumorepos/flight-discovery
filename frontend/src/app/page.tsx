@@ -37,7 +37,7 @@ function HomeContent() {
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-lg text-white shadow-lg shadow-orange-400/40">✈</span>
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-orange-700">FlightFinder</p>
-              <p className="text-sm font-semibold text-slate-900 md:text-base">Premium destination deals</p>
+              <p className="text-sm font-semibold text-slate-900 md:text-base">Free flight deal finder</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -94,6 +94,9 @@ export default function Home() {
   return (
     <CurrencyProvider>
       <HomeContent />
+      <EmailCaptureModal />
     </CurrencyProvider>
   );
 }
+
+import EmailCaptureModal from "./components/EmailCaptureModal";
