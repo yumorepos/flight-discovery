@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Discovery API - Find Cheap Flights Programmatically</title>
+    <meta name="description" content="REST API for flight deals from 900+ airlines. Free tier: 10 requests/day. JSON responses, smart deal scoring, email alerts.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; color: white; padding: 60px 20px; }
+        h1 { font-size: 3em; margin-bottom: 20px; }
+        .subtitle { font-size: 1.3em; opacity: 0.9; margin-bottom: 30px; }
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover { transform: scale(1.05); }
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 60px;
+            margin-top: -40px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+        .feature {
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            background: #f7fafc;
+        }
+        .feature h3 { color: #667eea; margin-bottom: 15px; }
+        .pricing {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+        .tier {
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .tier:hover { transform: translateY(-10px); border-color: #667eea; }
+        .tier.popular {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+        .tier h3 { font-size: 1.8em; margin-bottom: 10px; }
+        .tier .price { font-size: 2.5em; font-weight: bold; margin: 20px 0; }
+        .tier .price span { font-size: 0.4em; opacity: 0.7; }
+        .tier ul { list-style: none; margin: 30px 0; }
+        .tier li { padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .tier.popular li { border-bottom-color: rgba(255,255,255,0.3); }
+        code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 20px;
+            border-radius: 10px;
+            display: block;
+            overflow-x: auto;
+            font-size: 0.9em;
+            margin: 20px 0;
+        }
+        .docs-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✈️ Flight Discovery API</h1>
+            <p class="subtitle">Find cheap flights from 900+ airlines with one API call</p>
+            <a href="#get-started" class="cta-button">Get Free API Key</a>
+        </header>
+
+        <div class="main-content">
+            <h2 style="text-align: center; margin-bottom: 20px;">Why Flight Discovery API?</h2>
+            <p style="text-align: center; color: #718096; margin-bottom: 50px;">
+                Built for developers, travel apps, and deal sites. Real-time data, smart scoring, JSON responses.
+            </p>
+
+            <div class="features">
+                <div class="feature">
+                    <h3>🌍 900+ Airlines</h3>
+                    <p>Access flights from major carriers and budget airlines across 50+ countries</p>
+                </div>
+                <div class="feature">
+                    <h3>🧠 Smart Scoring</h3>
+                    <p>Multi-factor algorithm ranks deals 0-100 based on price, safety, and timing</p>
+                </div>
+                <div class="feature">
+                    <h3>⚡ Fast Responses</h3>
+                    <p>Get 100+ ranked flights in under 2 seconds with intelligent caching</p>
+                </div>
+                <div class="feature">
+                    <h3>🔔 Price Alerts</h3>
+                    <p>Set up email or webhook notifications when deals match your criteria</p>
+                </div>
+            </div>
+
+            <h2 id="get-started" style="text-align: center; margin-top: 80px; margin-bottom: 40px;">Get Started in 60 Seconds</h2>
+            
+            <p><strong>Step 1:</strong> Get your free API key</p>
+            <code>curl -X POST "https://flight-api.railway.app/api/keys/create" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "you@example.com", "tier": "free"}'</code>
+
+            <p><strong>Step 2:</strong> Search for flights</p>
+            <code>curl "https://flight-api.railway.app/api/search?origin=YUL&destination=LHR" \
+  -H "X-API-Key: YOUR_API_KEY"</code>
+
+            <p><strong>Step 3:</strong> Get JSON results</p>
+            <code>{
+  "results": [
+    {
+      "destination": "LHR",
+      "city": "London",
+      "price": 425,
+      "deal_score": 87,
+      "deal_badge": "Great",
+      "airline": "Air Canada",
+      "departure_date": "2024-04-15"
+    }
+  ],
+  "count": 42
+}</code>
+
+            <a href="/docs" class="docs-link">📚 View Full API Documentation →</a>
+
+            <h2 style="text-align: center; margin-top: 80px; margin-bottom: 40px;">Simple, Transparent Pricing</h2>
+            
+            <div class="pricing">
+                <div class="tier">
+                    <h3>Free</h3>
+                    <div class="price">$0<span>/month</span></div>
+                    <ul>
+                        <li>✅ 10 requests/day</li>
+                        <li>✅ Basic search</li>
+                        <li>✅ JSON responses</li>
+                        <li>✅ Email support</li>
+                    </ul>
+                    <a href="#get-started" class="cta-button" style="margin-top: 20px;">Start Free</a>
+                </div>
+
+                <div class="tier popular">
+                    <h3>Starter</h3>
+                    <div class="price">$9<span>/month</span></div>
+                    <ul>
+                        <li>✅ 100 requests/day</li>
+                        <li>✅ Email price alerts</li>
+                        <li>✅ Priority search</li>
+                        <li>✅ 7-day history</li>
+                    </ul>
+                    <a href="#get-started" class="cta-button" style="margin-top: 20px; background: white; color: #667eea;">Get Starter</a>
+                </div>
+
+                <div class="tier">
+                    <h3>Pro</h3>
+                    <div class="price">$29<span>/month</span></div>
+                    <ul>
+                        <li>✅ 1,000 requests/day</li>
+                        <li>✅ Webhook notifications</li>
+                        <li>✅ Custom alerts</li>
+                        <li>✅ 30-day history</li>
+                    </ul>
+                    <a href="#get-started" class="cta-button" style="margin-top: 20px;">Get Pro</a>
+                </div>
+
+                <div class="tier">
+                    <h3>Enterprise</h3>
+                    <div class="price">$99<span>/month</span></div>
+                    <ul>
+                        <li>✅ Unlimited requests</li>
+                        <li>✅ Dedicated support</li>
+                        <li>✅ Custom integrations</li>
+                        <li>✅ SLA guarantee</li>
+                    </ul>
+                    <a href="mailto:support@flightdiscovery.com" class="cta-button" style="margin-top: 20px;">Contact Sales</a>
+                </div>
+            </div>
+
+            <div style="background: #f7fafc; padding: 40px; border-radius: 15px; margin-top: 60px;">
+                <h3 style="text-align: center; margin-bottom: 30px;">Use Cases</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4>✈️ Travel Apps</h4>
+                        <p>Power your mobile or web app with real-time flight data</p>
+                    </div>
+                    <div>
+                        <h4>📧 Deal Newsletters</h4>
+                        <p>Automatically find and send the best deals to subscribers</p>
+                    </div>
+                    <div>
+                        <h4>🤖 Chatbots</h4>
+                        <p>Integrate flight search into Telegram, Discord, or Slack bots</p>
+                    </div>
+                    <div>
+                        <h4>💼 Corporate Tools</h4>
+                        <p>Build internal travel booking and expense tracking systems</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built by Yumo | <a href="https://github.com/yumorepos/flight-discovery" style="color: white;">GitHub</a> | <a href="/docs" style="color: white;">API Docs</a> | <a href="mailto:support@flightdiscovery.com" style="color: white;">Support</a></p>
+            <p style="margin-top: 10px; opacity: 0.8;">© 2024 Flight Discovery. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
