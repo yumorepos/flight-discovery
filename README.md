@@ -4,6 +4,8 @@
 
 🔗 **Live Demo:** [flight-discovery.vercel.app](https://flight-discovery.vercel.app)
 
+![FlightFinder Screenshot](docs/screenshot.png)
+
 ---
 
 ## Why I Built This
