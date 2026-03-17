@@ -1,65 +1,54 @@
-# Contributing to Flight Discovery
+# Contributing to FlightFinder
 
-Thank you for your interest in contributing! This project is primarily a portfolio piece, but contributions are welcome.
+Thank you for your interest in contributing!
 
 ## Development Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yumorepos/flight-discovery.git
-   cd flight-discovery
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/yumorepos/flight-discovery.git
+cd flight-discovery
 
-2. **Backend setup**
-   ```bash
-   cd backend
-   python -m venv .venv
-   source .venv/bin/activate  # Windows: .venv\Scripts\activate
-   pip install -r requirements.txt
-   cp .env.example .env
-   # Add your KIWI_API_KEY to .env
-   uvicorn main:app --reload --port 8000
-   ```
+# Install dependencies
+npm install
 
-3. **Frontend setup**
-   ```bash
-   cd frontend
-   npm install
-   cp .env.local.example .env.local
-   npm run dev
-   ```
+# Run development server
+cd frontend && npm run dev
+```
 
-4. **Access the app**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000/docs
+## Project Structure
 
-## Code Standards
+- `frontend/src/app/` - Next.js app pages
+- `frontend/src/components/` - React components
+- `frontend/src/lib/` - Utilities and data
+- `frontend/tests/` - Playwright tests
 
-- **Python**: Follow PEP 8, use type hints
-- **TypeScript**: Strict mode enabled, use interfaces
-- **Testing**: Add Playwright tests for new features
-- **Commits**: Use conventional commits (`feat:`, `fix:`, `docs:`, etc.)
+## Making Changes
 
-## Pull Request Process
+1. Create a new branch: `git checkout -b feature/your-feature`
+2. Make your changes
+3. Run tests: `npm test`
+4. Commit: `git commit -m "feat: your feature"`
+5. Push: `git push origin feature/your-feature`
+6. Open a Pull Request
 
-1. Fork the repo and create a feature branch
-2. Make your changes with clear commit messages
-3. Add tests if applicable
-4. Update documentation (README, ARCHITECTURE.md)
-5. Submit a PR with a clear description
+## Code Style
+
+- Use TypeScript for type safety
+- Follow existing code formatting
+- Write descriptive commit messages
+- Add tests for new features
 
 ## Testing
 
 ```bash
-# Backend tests
-cd backend
-pytest
-
-# Frontend E2E tests
-cd frontend
+# Run unit tests
 npm test
+
+# Run visual regression tests
+npm run test:visual
 ```
 
 ## Questions?
 
-Open an issue or reach out via [LinkedIn](https://linkedin.com/in/yumo-xu-1589b7326).
+Open an issue or reach out via GitHub discussions.
