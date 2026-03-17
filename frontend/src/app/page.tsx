@@ -86,6 +86,20 @@ function HomeContent() {
       <main id="results" className="-mt-8 pb-16 md:-mt-14">
         <ResultsPage origin={searchState.origin} month={searchState.month} destination={searchState.destination} flexibleDates={searchState.flexibleDates} fareClass={searchState.fareClass} />
       </main>
+
+      <footer className="mt-24 border-t border-slate-200 bg-white py-12">
+        <div className="mx-auto max-w-4xl px-4 text-center">
+          <p className="mb-2 text-sm text-slate-600">
+            <strong className="text-slate-900">FlightFinder</strong> is a portfolio project exploring destination-first travel discovery.
+          </p>
+          <p className="text-sm text-slate-600">
+            Built with Next.js, TypeScript, and Tailwind CSS.
+            <a href="https://github.com/yumorepos/flight-discovery" target="_blank" rel="noopener noreferrer" className="ml-1 text-orange-600 hover:text-orange-700 hover:underline">
+              View source on GitHub →
+            </a>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
