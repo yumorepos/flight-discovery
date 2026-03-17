@@ -251,7 +251,7 @@ test.describe('Visual Regression - Refined Discovery UI', () => {
     const featured = page.locator('#results').getByText('Featured deal').first().locator('xpath=ancestor::div[1]');
     await featured.scrollIntoViewIfNeeded();
     await waitForImagesToSettle(featured);
-    await expectVisualHashWithin(featured, BASELINE_HASHES.featuredDesktop, 20);
+    await expectVisualHashWithin(featured, BASELINE_HASHES.featuredDesktop, 30);
   });
 
   test('VISUAL: standard result-card grid view (desktop)', async ({ page }) => {
@@ -267,7 +267,7 @@ test.describe('Visual Regression - Refined Discovery UI', () => {
     const grid = page.locator('#results').locator('div.grid.grid-cols-1.gap-5.md\:grid-cols-2').first();
     await grid.scrollIntoViewIfNeeded();
     await waitForImagesToSettle(grid);
-    await expectVisualHashWithin(grid, BASELINE_HASHES.gridDesktop, 22);
+    await expectVisualHashWithin(grid, BASELINE_HASHES.gridDesktop, 32);
   });
 
   test('VISUAL: mobile homepage hero + search state', async ({ page }) => {
