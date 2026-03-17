@@ -24,12 +24,12 @@ export default function PriceSparkline({ points }: PriceSparklineProps) {
     <svg viewBox={`0 0 ${width} ${height}`} className="h-12 w-full" role="img" aria-label="Price trend chart" preserveAspectRatio="none">
       <defs>
         <linearGradient id="trend-fill" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="rgb(124 58 237 / 0.25)" />
-          <stop offset="100%" stopColor="rgb(124 58 237 / 0.02)" />
+          <stop offset="0%" stopColor="rgb(249 115 22 / 0.25)" />
+          <stop offset="100%" stopColor="rgb(249 115 22 / 0.02)" />
         </linearGradient>
       </defs>
       <path d={areaPath} fill="url(#trend-fill)" />
-      <path d={linePath} fill="none" stroke="currentColor" strokeWidth="2.5" className="text-violet-600" strokeLinecap="round" />
+      <path d={linePath} fill="none" stroke="currentColor" strokeWidth="2.5" className="text-orange-600" strokeLinecap="round" />
     </svg>
   );
 }
