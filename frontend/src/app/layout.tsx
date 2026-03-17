@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FlightDiscovery – Discover Amazing Flight Deals",
+  title: "FlightFinder – Discover Amazing Flight Deals",
   description:
     "Find flight deals by destination with value ranking, final pricing with taxes, and fare alerts.",
 };

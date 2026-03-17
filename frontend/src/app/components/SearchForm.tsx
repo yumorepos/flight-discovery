@@ -107,7 +107,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
           <div>
             <label className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Departing from</label>
             <input aria-label="Origin airport" list="origin-airports" value={originInput} onChange={(event) => { setOriginInput(event.target.value); setError(""); }} placeholder="Montreal or YUL" className={inputClassName} />
-            <datalist id="origin-airports">{(airportsData as Airport[]).slice(0, 160).map((airport) => (<option key={`origin-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>))}</datalist>
+            <datalist id="origin-airports">{(airportsData as Airport[]).slice(0, 160).map((airport) => (<option key={`origin-${airport.iata}`} value={formatAirport(airport)} />))}</datalist>
           </div>
 
           <div>
@@ -123,7 +123,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
             <input aria-label="Destination airport or flexible region" list="destination-airports" value={destinationInput} onChange={(event) => { setDestinationInput(event.target.value); setError(""); }} placeholder="Anywhere, Europe, Paris, NRT" className={inputClassName} />
             <datalist id="destination-airports">
               {popularSuggestions.map((suggestion) => (<option key={suggestion} value={suggestion} />))}
-              {(airportsData as Airport[]).slice(0, 180).map((airport) => (<option key={`destination-${airport.iata}`} value={formatAirport(airport)}>{airport.country}</option>))}
+              {(airportsData as Airport[]).slice(0, 180).map((airport) => (<option key={`destination-${airport.iata}`} value={formatAirport(airport)} />))}
             </datalist>
           </div>
 

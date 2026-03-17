@@ -1,0 +1,812 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: ✈
+          - generic [ref=e7]:
+            - paragraph [ref=e8]: FlightFinder
+            - paragraph [ref=e9]: Free flight deal finder
+        - generic [ref=e10]:
+          - combobox [ref=e11]:
+            - option "CAD $" [selected]
+            - option "USD $"
+            - option "EUR €"
+            - option "GBP £"
+            - option "JPY ¥"
+            - option "AUD $"
+          - link "Explore fares" [ref=e12] [cursor=pointer]:
+            - /url: "#results"
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - paragraph [ref=e17]: Destination-first fare discovery
+        - heading "Discover bold destinations with premium fare intelligence" [level=1] [ref=e18]
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - generic [ref=e21]:
+            - generic [ref=e22]:
+              - paragraph [ref=e23]: Smart search
+              - paragraph [ref=e24]: Discover the best-value routes with tax-inclusive fares and real-time ranking.
+            - generic [ref=e25]: Trusted pricing intelligence
+          - generic [ref=e27]:
+            - generic [ref=e28]:
+              - generic [ref=e29]: Departing from
+              - combobox "Origin airport" [ref=e30]: Montreal (YUL)
+            - generic [ref=e31]:
+              - generic [ref=e32]: Travel month
+              - combobox "Travel month" [ref=e33]:
+                - option "Any month" [selected]
+                - option "March 2026"
+                - option "April 2026"
+                - option "May 2026"
+                - option "June 2026"
+                - option "July 2026"
+                - option "August 2026"
+                - option "September 2026"
+                - option "October 2026"
+                - option "November 2026"
+                - option "December 2026"
+                - option "January 2027"
+                - option "February 2027"
+                - option "March 2027"
+                - option "April 2027"
+                - option "May 2027"
+                - option "June 2027"
+                - option "July 2027"
+                - option "August 2027"
+            - generic [ref=e34]:
+              - generic [ref=e35]: Destination
+              - combobox "Destination airport or flexible region" [ref=e36]: Anywhere
+            - generic [ref=e37]:
+              - generic [ref=e38]: Fare class
+              - combobox "Fare class" [ref=e39]:
+                - option "Any" [selected]
+                - option "Economy"
+                - option "Premium Economy"
+                - option "Business"
+                - option "First"
+            - button "Search fares" [ref=e40]
+          - generic [ref=e41]:
+            - generic [ref=e42]:
+              - checkbox "Flexible dates (+/- 3 days)" [checked] [ref=e43]
+              - text: Flexible dates (+/- 3 days)
+            - paragraph [ref=e44]: "Tip: use region keywords like Europe, Asia, or Beach for inspiration."
+        - paragraph [ref=e45]: Scans millions of fares daily to highlight the most inspiring routes first.
+      - generic [ref=e46]:
+        - article [ref=e47]:
+          - img "Paris" [ref=e49]
+          - generic [ref=e51]:
+            - paragraph [ref=e52]: Trending now
+            - paragraph [ref=e53]: Paris
+            - paragraph [ref=e54]: Café terraces + iconic boulevards
+            - paragraph [ref=e55]: from 648 CAD
+        - article [ref=e56]:
+          - img "Tokyo" [ref=e58]
+          - generic [ref=e60]:
+            - paragraph [ref=e61]: Trending now
+            - paragraph [ref=e62]: Tokyo
+            - paragraph [ref=e63]: Design districts and late-night ramen
+            - paragraph [ref=e64]: from 1028 CAD
+        - article [ref=e65]:
+          - img "Cancún" [ref=e67]
+          - generic [ref=e69]:
+            - paragraph [ref=e70]: Trending now
+            - paragraph [ref=e71]: Cancún
+            - paragraph [ref=e72]: Warm-water escapes and easy beach downtime
+            - paragraph [ref=e73]: from 452 CAD
+    - main [ref=e74]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - text: Sort
+              - combobox "Sort" [ref=e81]:
+                - option "Best value" [selected]
+                - option "Deal score"
+                - option "Lowest price"
+                - option "Highest price"
+            - generic [ref=e82]:
+              - text: Max CAD $1,064
+              - slider "Max CAD $1,064" [ref=e83]: "1064"
+            - generic [ref=e84]:
+              - text: "Stops: Any"
+              - 'slider "Stops: Any" [ref=e85]': "2"
+            - generic [ref=e86]:
+              - text: "Duration: 30h"
+              - 'slider "Duration: 30h" [ref=e87]': "30"
+          - generic [ref=e88]:
+            - paragraph [ref=e89]: Insights
+            - paragraph [ref=e90]: "Best month: 2026-03 · CAD $207"
+            - paragraph [ref=e91]: Showing 12 of 12 fares
+            - paragraph [ref=e92]: Anywhere mode keeps destination variety high for true discovery. Flexible dates are on for wider fare coverage.
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - paragraph [ref=e95]: Results snapshot
+            - paragraph [ref=e96]: Updated 08:19 PM
+          - generic [ref=e97]:
+            - generic [ref=e98]: Live fares
+            - generic [ref=e99]: 12 fares found
+            - generic [ref=e100]: "Top region: Europe"
+            - generic [ref=e101]: "Best month: 2026-03"
+        - generic [ref=e102]:
+          - button "All regions" [ref=e103]
+          - button "Americas" [ref=e104]
+          - button "Other" [ref=e105]
+          - button "Europe" [ref=e106]
+          - button "Asia" [ref=e107]
+          - button "South America" [ref=e108]
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - paragraph [ref=e112]: Curated discovery
+              - heading "Browse intelligently picked routes before deep filtering" [level=3] [ref=e113]
+            - paragraph [ref=e114]: Sections stay populated even when live inventory is thin.
+          - article [ref=e115]:
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - heading "Best value this month" [level=4] [ref=e118]
+                - paragraph [ref=e119]: High score-to-price routes with strong upside.
+              - generic [ref=e120]: Ranked by value score and deal quality.
+            - generic [ref=e121]:
+              - generic [ref=e122]:
+                - generic [ref=e123]:
+                  - img "Toronto" [ref=e124]
+                  - paragraph [ref=e126]: Americas
+                  - generic [ref=e127]:
+                    - paragraph [ref=e128]: Toronto
+                    - paragraph [ref=e129]: Canada
+                - generic [ref=e130]:
+                  - paragraph [ref=e131]: CAD $90
+                  - paragraph [ref=e132]: Great year-round · Best for long weekends
+                  - paragraph [ref=e133]: Short-haul coastlines, mountain air, and quick premium getaways.
+              - generic [ref=e134]:
+                - generic [ref=e135]:
+                  - img "Paris" [ref=e136]
+                  - paragraph [ref=e138]: Europe
+                  - generic [ref=e139]:
+                    - paragraph [ref=e140]: Paris
+                    - paragraph [ref=e141]: France
+                - generic [ref=e142]:
+                  - paragraph [ref=e143]: CAD $648
+                  - paragraph [ref=e144]: Best in spring · Best for art weekends
+                  - paragraph [ref=e145]: Café terraces, timeless boulevards, and museum-filled afternoons.
+              - generic [ref=e146]:
+                - generic [ref=e147]:
+                  - img "London" [ref=e148]
+                  - paragraph [ref=e150]: Europe
+                  - generic [ref=e151]:
+                    - paragraph [ref=e152]: London
+                    - paragraph [ref=e153]: United Kingdom
+                - generic [ref=e154]:
+                  - paragraph [ref=e155]: CAD $630
+                  - paragraph [ref=e156]: Best in shoulder season · Best for city-hopping
+                  - paragraph [ref=e157]: Royal landmarks, neighborhood markets, and packed cultural calendars.
+          - article [ref=e158]:
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - heading "Weekend escapes" [level=4] [ref=e161]
+                - paragraph [ref=e162]: Shorter itineraries for easy spontaneous trips.
+              - generic [ref=e163]: Friday/Saturday departures with low friction flight times.
+            - generic [ref=e164]:
+              - generic [ref=e165]:
+                - generic [ref=e166]:
+                  - img "YTZ" [ref=e167]
+                  - paragraph [ref=e169]: Other
+                  - generic [ref=e170]:
+                    - paragraph [ref=e171]: YTZ
+                    - paragraph
+                - generic [ref=e172]:
+                  - paragraph [ref=e173]: CAD $186
+                  - paragraph [ref=e174]: Best with flexible dates · Best for flexible travelers
+                  - paragraph [ref=e175]: Strong-value routes with enough variety to spark your next trip.
+              - generic [ref=e176]:
+                - generic [ref=e177]:
+                  - img "FLL" [ref=e178]
+                  - paragraph [ref=e180]: Other
+                  - generic [ref=e181]:
+                    - paragraph [ref=e182]: FLL
+                    - paragraph
+                - generic [ref=e183]:
+                  - paragraph [ref=e184]: CAD $150
+                  - paragraph [ref=e185]: Best with flexible dates · Best for flexible travelers
+                  - paragraph [ref=e186]: Strong-value routes with enough variety to spark your next trip.
+              - generic [ref=e187]:
+                - generic [ref=e188]:
+                  - img "Lima" [ref=e189]
+                  - paragraph [ref=e191]: South America
+                  - generic [ref=e192]:
+                    - paragraph [ref=e193]: Lima
+                    - paragraph [ref=e194]: Peru
+                - generic [ref=e195]:
+                  - paragraph [ref=e196]: CAD $808
+                  - paragraph [ref=e197]: Best in dry season · Best for culinary trips
+                  - paragraph [ref=e198]: Clifftop ocean views anchored by one of the region's top food scenes.
+          - article [ref=e199]:
+            - generic [ref=e200]:
+              - generic [ref=e201]:
+                - heading "Warm-weather picks" [level=4] [ref=e202]
+                - paragraph [ref=e203]: Sun-led routes curated for a climate reset.
+              - generic [ref=e204]: Favoring warmer regions and beach-friendly cities.
+            - generic [ref=e205]:
+              - generic [ref=e206]:
+                - generic [ref=e207]:
+                  - img "Cancún" [ref=e208]
+                  - paragraph [ref=e210]: Americas
+                  - generic [ref=e211]:
+                    - paragraph [ref=e212]: Cancún
+                    - paragraph [ref=e213]: Mexico
+                - generic [ref=e214]:
+                  - paragraph [ref=e215]: CAD $452
+                  - paragraph [ref=e216]: Best in winter · Best for beach downtime
+                  - paragraph [ref=e217]: Turquoise water escapes with cenotes and easy coastal luxury.
+              - generic [ref=e218]:
+                - generic [ref=e219]:
+                  - img "Honolulu" [ref=e220]
+                  - paragraph [ref=e222]: Americas
+                  - generic [ref=e223]:
+                    - paragraph [ref=e224]: Honolulu
+                    - paragraph [ref=e225]: United States
+                - generic [ref=e226]:
+                  - paragraph [ref=e227]: CAD $904
+                  - paragraph [ref=e228]: Best in spring · Best for nature + wellness
+                  - paragraph [ref=e229]: Pacific sunsets, surf-friendly shores, and volcanic scenery.
+          - article [ref=e230]:
+            - generic [ref=e231]:
+              - generic [ref=e232]:
+                - heading "Under CAD $700" [level=4] [ref=e233]
+                - paragraph [ref=e234]: Low-fare options to keep discovery practical.
+              - generic [ref=e235]: Prioritizes routes below the affordability threshold.
+            - generic [ref=e236]:
+              - generic [ref=e237]:
+                - generic [ref=e238]:
+                  - img "PDL" [ref=e239]
+                  - paragraph [ref=e241]: Other
+                  - generic [ref=e242]:
+                    - paragraph [ref=e243]: PDL
+                    - paragraph
+                - generic [ref=e244]:
+                  - paragraph [ref=e245]: CAD $402
+                  - paragraph [ref=e246]: Best with flexible dates · Best for flexible travelers
+                  - paragraph [ref=e247]: Strong-value routes with enough variety to spark your next trip.
+              - generic [ref=e248]:
+                - generic [ref=e249]:
+                  - img "Barcelona" [ref=e250]
+                  - paragraph [ref=e252]: Europe
+                  - generic [ref=e253]:
+                    - paragraph [ref=e254]: Barcelona
+                    - paragraph [ref=e255]: Spain
+                - generic [ref=e256]:
+                  - paragraph [ref=e257]: CAD $652
+                  - paragraph [ref=e258]: Best in early summer · Best for culture + coast
+                  - paragraph [ref=e259]: Beach downtime meets Gaudí architecture in one compact city.
+              - generic [ref=e260]:
+                - generic [ref=e261]:
+                  - img "Rome" [ref=e262]
+                  - paragraph [ref=e264]: Europe
+                  - generic [ref=e265]:
+                    - paragraph [ref=e266]: Rome
+                    - paragraph [ref=e267]: Italy
+                - generic [ref=e268]:
+                  - paragraph [ref=e269]: CAD $688
+                  - paragraph [ref=e270]: Best in spring/fall · Best for slow travel
+                  - paragraph [ref=e271]: Ancient landmarks, long dinners, and golden-hour piazza walks.
+        - generic [ref=e272]:
+          - generic [ref=e273]:
+            - generic: Featured deal
+            - article [ref=e274]:
+              - generic [ref=e275]:
+                - img "Toronto destination" [ref=e276]
+                - generic [ref=e278]:
+                  - generic [ref=e279]: Exceptional Deal
+                  - generic [ref=e280]: 88 score
+                - generic [ref=e281]:
+                  - generic [ref=e282]:
+                    - heading "Toronto" [level=3] [ref=e283]
+                    - paragraph [ref=e284]: Canada
+                  - generic [ref=e285]:
+                    - paragraph [ref=e287]: "98"
+                    - paragraph [ref=e288]: Elite value
+              - generic [ref=e289]:
+                - generic [ref=e290]:
+                  - paragraph [ref=e291]: From
+                  - paragraph [ref=e292]: $90
+                  - generic [ref=e293]:
+                    - generic [ref=e294]: CAD · taxes est. CAD $12
+                    - generic [ref=e295]: Save 17%
+                - generic [ref=e296]:
+                  - paragraph [ref=e297]: Why go now
+                  - paragraph [ref=e298]: Short-haul coastlines, mountain air, and quick premium getaways.
+                  - generic [ref=e299]:
+                    - generic [ref=e300]: Easy getaway
+                    - generic [ref=e301]: Best for Long weekends
+                    - generic [ref=e302]: Great year-round
+                - generic [ref=e304]:
+                  - img "WestJet logo" [ref=e306]
+                  - generic [ref=e307]:
+                    - paragraph [ref=e308]: WestJet
+                    - paragraph [ref=e309]: YUL → YYZ · 1h 34m · Direct
+                    - paragraph [ref=e310]: Mar 12, 2026 · First
+                - generic [ref=e311]:
+                  - generic [ref=e312]:
+                    - paragraph [ref=e313]: Price trend
+                    - paragraph [ref=e314]: Typical CAD $109
+                  - img "Price trend chart" [ref=e315]
+                - link "Book flight →" [ref=e318] [cursor=pointer]:
+                  - /url: https://www.kiwi.com/deep?affilid=yumoxuflightdiscovery&currency=CAD&flightsId=0eae06b350580000626e8217_0&from=YUL&lang=en&passengers=1&to=YYZ&booking_token=HavHsrN5bfuDR0Nc9l7-sMQTt2J7AD7UoxviNFKy4mEr3mehSyWSMekpDDa4vVPBWg8yBCgAowq4zHaguXkTqQKgzH2jzgmegINU4pKKSns-tlkTfaWV1ouH3AMo8976Xr7PMIX9n4MG_B1tR5n40tRlFBK0s5gsPoicCBGXk0MbINgptR2HFA384-nJx_upGMJBR4Bhj_Cm4qG9YD9UkYTmTLomnc3iDrt1wl0jgmNTnXohjvQoYJhF5oq77QjgdEH_LHYFYxHttcgnX_x1FoA1HWAqi_6gSLPZT7JiIYs5M34pAjtfr3WpV-iV55sU9jjfQ7XDd7H5wTpfAei1FLWKDZK8w4uYpKw3Y9LO0yZUjaaFZzcURbXE0D1BhNFuAjZL0L5nN10a4doxo7zz6Do7rXArKKkv91vI8tnFvMAYDLiNAFm63aCzYdVPsUS9r3WJ_oVy4okZEj6u7DDUzmpqvbf-INzpn-iU5ItzVm-ldzvQ0E7x2MqDvimLtqnHqZ2EYOy6ngFMKTIqwz_5miXucwSZRsdPlsnSzLmUfW2ND_ir6Y8-GwKyPDmAHu33ONfz4Bj4TWzUa8lsdnZV05t2bCjqBGqZWETcKJ5RMk4iPJH0a9m_8dbQ49vE0QiiK0lFohalBWbdCTp_n_5-siWNxiWG9djXOLVcO4Lx9nMHnFCZMbO6j8M2Irj1pVMakR4Dqrxne6rvZ4whByERm_kJpfn7ukkHzpHw6unwjO2vtj_-bzEJvDEkoV5qYJ7b2zwppNs3n3emR4ko6PSYI0j1m7ard3CzGzCuX9fyVAYA=&token_module=Mod0.7VhmNCbcE-_TvnGYULFdOv6iEuklW4PF5PrFeYzUDYU-cDrzgwpvGgc0s22qLy51HMLFyKsSzR7eIcC1b86Ni1LUhmLN_Ip8TWCCWw1WbnAVq8FR7ITlH3TrjuzEQDk3GLoYzv4-yxGhLZEqpOu6eq2ulfINXlvBAykdpB8_5nCQAJg2nUWTRxcd2lTiqC6V6b8R1GLqB0fK8Y0mWHP9_p7PHg221peyX8LLwFH_5iL77IZ_PzBmRgTldURKT3A5qQxk-tZi10SX-0U7guveKpPITlbvAci0jkACbh_fsgOkI0tsMpoMbVPQyfUsmvBbde6HFaLLJvXSYMR2O6P1oA==&affilid=flightdiscovery
+                - button "View fare details" [ref=e319]
+                - button "Track Toronto fare alerts" [ref=e320]
+          - generic [ref=e321]:
+            - article [ref=e322]:
+              - generic [ref=e323]:
+                - img "Paris destination" [ref=e324]
+                - generic [ref=e326]:
+                  - generic [ref=e327]: Elite Deal
+                  - generic [ref=e328]: 97 score
+                - generic [ref=e329]:
+                  - generic [ref=e330]:
+                    - heading "Paris" [level=3] [ref=e331]
+                    - paragraph [ref=e332]: France
+                  - generic [ref=e333]:
+                    - paragraph [ref=e335]: "95"
+                    - paragraph [ref=e336]: Elite value
+              - generic [ref=e337]:
+                - generic [ref=e338]:
+                  - paragraph [ref=e339]: From
+                  - paragraph [ref=e340]: $648
+                  - generic [ref=e341]:
+                    - generic [ref=e342]: CAD · taxes est. CAD $91
+                    - generic [ref=e343]: Save 28%
+                - generic [ref=e344]:
+                  - paragraph [ref=e345]: Why go now
+                  - paragraph [ref=e346]: Café terraces, timeless boulevards, and museum-filled afternoons.
+                  - generic [ref=e347]:
+                    - generic [ref=e348]: Romantic classic
+                    - generic [ref=e349]: Best for Art weekends
+                    - generic [ref=e350]: Best in spring
+                - generic [ref=e352]:
+                  - img "Air Canada logo" [ref=e354]
+                  - generic [ref=e355]:
+                    - paragraph [ref=e356]: Air Canada
+                    - paragraph [ref=e357]: YUL → CDG · 7h 15m · Direct
+                    - paragraph [ref=e358]: Apr 3, 2026 · Premium Economy
+                - generic [ref=e359]:
+                  - generic [ref=e360]:
+                    - paragraph [ref=e361]: Price trend
+                    - paragraph [ref=e362]: Typical CAD $902
+                  - img "Price trend chart" [ref=e363]
+                - link "Book flight →" [ref=e366] [cursor=pointer]:
+                  - /url: https://www.google.com/travel/flights?affilid=flightdiscovery
+                - button "View fare details" [ref=e367]
+                - button "Track Paris fare alerts" [ref=e368]
+            - article [ref=e369]:
+              - generic [ref=e370]:
+                - img "London destination" [ref=e371]
+                - generic [ref=e373]:
+                  - generic [ref=e374]: Outstanding
+                  - generic [ref=e375]: 94 score
+                - generic [ref=e376]:
+                  - generic [ref=e377]:
+                    - heading "London" [level=3] [ref=e378]
+                    - paragraph [ref=e379]: United Kingdom
+                  - generic [ref=e380]:
+                    - paragraph [ref=e382]: "91"
+                    - paragraph [ref=e383]: Elite value
+              - generic [ref=e384]:
+                - generic [ref=e385]:
+                  - paragraph [ref=e386]: From
+                  - paragraph [ref=e387]: $630
+                  - generic [ref=e388]:
+                    - generic [ref=e389]: CAD · taxes est. CAD $88
+                    - generic [ref=e390]: Save 28%
+                - generic [ref=e391]:
+                  - paragraph [ref=e392]: Why go now
+                  - paragraph [ref=e393]: Royal landmarks, neighborhood markets, and packed cultural calendars.
+                  - generic [ref=e394]:
+                    - generic [ref=e395]: Cosmopolitan
+                    - generic [ref=e396]: Best for City-hopping
+                    - generic [ref=e397]: Best in shoulder season
+                - generic [ref=e399]:
+                  - img "British Airways logo" [ref=e401]
+                  - generic [ref=e402]:
+                    - paragraph [ref=e403]: British Airways
+                    - paragraph [ref=e404]: YUL → LHR · 6h 50m · Direct
+                    - paragraph [ref=e405]: Apr 6, 2026 · Basic Economy
+                - generic [ref=e406]:
+                  - generic [ref=e407]:
+                    - paragraph [ref=e408]: Price trend
+                    - paragraph [ref=e409]: Typical CAD $878
+                  - img "Price trend chart" [ref=e410]
+                - link "Book flight →" [ref=e413] [cursor=pointer]:
+                  - /url: https://www.google.com/travel/flights?affilid=flightdiscovery
+                - button "View fare details" [ref=e414]
+                - button "Track London fare alerts" [ref=e415]
+            - article [ref=e416]:
+              - generic [ref=e417]:
+                - img "Tokyo destination" [ref=e418]
+                - generic [ref=e420]:
+                  - generic [ref=e421]: Outstanding
+                  - generic [ref=e422]: 91 score
+                - generic [ref=e423]:
+                  - generic [ref=e424]:
+                    - heading "Tokyo" [level=3] [ref=e425]
+                    - paragraph [ref=e426]: Japan
+                  - generic [ref=e427]:
+                    - paragraph [ref=e429]: "87"
+                    - paragraph [ref=e430]: Great value
+              - generic [ref=e431]:
+                - generic [ref=e432]:
+                  - paragraph [ref=e433]: From
+                  - paragraph [ref=e434]: $1,064
+                  - generic [ref=e435]:
+                    - generic [ref=e436]: CAD · taxes est. CAD $149
+                    - generic [ref=e437]: Save 30%
+                - generic [ref=e438]:
+                  - paragraph [ref=e439]: Why go now
+                  - paragraph [ref=e440]: Temple mornings, neon nights, and endlessly good food districts.
+                  - generic [ref=e441]:
+                    - generic [ref=e442]: High-energy
+                    - generic [ref=e443]: Best for Food + design
+                    - generic [ref=e444]: Great year-round
+                - generic [ref=e446]:
+                  - img "Japan Airlines logo" [ref=e448]
+                  - generic [ref=e449]:
+                    - paragraph [ref=e450]: Japan Airlines
+                    - paragraph [ref=e451]: YUL → NRT · 13h 25m · Direct
+                    - paragraph [ref=e452]: Apr 9, 2026 · Premium Economy
+                - generic [ref=e453]:
+                  - generic [ref=e454]:
+                    - paragraph [ref=e455]: Price trend
+                    - paragraph [ref=e456]: Typical CAD $1,526
+                  - img "Price trend chart" [ref=e457]
+                - link "Book flight →" [ref=e460] [cursor=pointer]:
+                  - /url: https://www.google.com/travel/flights?affilid=flightdiscovery
+                - button "View fare details" [ref=e461]
+                - button "Track Tokyo fare alerts" [ref=e462]
+            - article [ref=e463]:
+              - generic [ref=e464]:
+                - img "YTZ destination" [ref=e465]
+                - generic [ref=e467]:
+                  - generic [ref=e468]: Great Deal
+                  - generic [ref=e469]: 85 score
+                - generic [ref=e470]:
+                  - generic [ref=e471]:
+                    - heading "YTZ" [level=3] [ref=e472]
+                    - paragraph
+                  - generic [ref=e473]:
+                    - paragraph [ref=e475]: "86"
+                    - paragraph [ref=e476]: Great value
+              - generic [ref=e477]:
+                - generic [ref=e478]:
+                  - paragraph [ref=e479]: From
+                  - paragraph [ref=e480]: $186
+                  - generic [ref=e481]:
+                    - generic [ref=e482]: CAD · taxes est. CAD $24
+                    - generic [ref=e483]: Save 18%
+                - generic [ref=e484]:
+                  - paragraph [ref=e485]: Why go now
+                  - paragraph [ref=e486]: Strong-value routes with enough variety to spark your next trip.
+                  - generic [ref=e487]:
+                    - generic [ref=e488]: Discovery mode
+                    - generic [ref=e489]: Best for Flexible travelers
+                    - generic [ref=e490]: Best with flexible dates
+                - generic [ref=e492]:
+                  - img "Porter Airlines logo" [ref=e494]
+                  - generic [ref=e495]:
+                    - paragraph [ref=e496]: Porter Airlines
+                    - paragraph [ref=e497]: YUL → YTZ · 1h 25m · Direct
+                    - paragraph [ref=e498]: Mar 12, 2026 · Basic Economy
+                - generic [ref=e499]:
+                  - generic [ref=e500]:
+                    - paragraph [ref=e501]: Price trend
+                    - paragraph [ref=e502]: Typical CAD $227
+                  - img "Price trend chart" [ref=e503]
+                - link "Book flight →" [ref=e506] [cursor=pointer]:
+                  - /url: https://www.kiwi.com/deep?affilid=yumoxuflightdiscovery&currency=CAD&flightsId=0eae228a504f00006f5071a8_0&from=YUL&lang=en&passengers=1&to=YTZ&booking_token=H0XlQPDpDt8509W-Ls4KA1cZ6Z0I5e-G2DJHoiW0MA5Ym_c00-dl_kv3odTrJCNKIMyT3UVcZuUaDepqFV5Mtl1R-QZDYTU3_gtOMceWdwHes15uCf1JTyTs0c_XGXa5_QXwK_91I-D8S-8AdmXbwTSEsbShhbjZv9d6W3qEMde1uXPLQXxSHMBLKxX68xofbqn2crCBBjRCkPIYVEB_xJ0tBhOx7R59WJbBKh6DLZV5YfQG4ChTUauMTKI2boX9PTJjLvxMJ6DtsBSY6BWytw__0qxLAsRFScoyNOicDfKklvW-3Qs110CFSIm79OSrkozWxzn6xCWJEc2EUaz7KLykmOQybh1uztvDBPuJZiwXq3x3Rvh-yy3DQ8xVUAnEXeipBEoTP2UFvBdP157z_TXL4jeUjTnow_LH0jenP3ueEmNJHQP2aLPqlq1cjx_sTub0905Ix8soEgfbwQzYW55AlWiUKQfRjtR6wEaNJs-jm0mKnQx_iP-VN86IXeD6c985mdxH2mDf8kt-eqvmHiM_4MFhRkbilWah19fLOS_2hu0fxiW-7StYSlYYkTcTubbpXG1ZX5kVBvizcDWHbBLetuF2ewj6t6vJPVu5H69slY6PkoFLfak71FFMeoFTB93JqL5fmQqwQJ21dGVbO2EwNIqEB_X8aACBM3K0W5yHuttB7u-gzudpZ9ukbhrbjBpKohEc6q5ZCnVBP7YSHM9p3fUFVdmLFy82LpnlLqXeV2G6oxe8Eggnuc5iVqJMHCfvkg4tb-Hz06CvtZ_np3wcbeOrZWUW3CIdSYQ2qN-g=&token_module=Mod0.SXOdB5y1drQBN4c-tFqXuD9MWR9atmGig5LTkFzl71GDyOsWc483_BGHjm9ko_KwMSzEb6VIAvktV2toIoB2LAqgcEk0C7JV5tLfY9dQEk6vcTa5q45JpFdBasFdxEy-pVB0qYx8acFGb1-OsqHjZ5d3qYRWq9SdkLg_tE0BHa7cE0nqfhjtopEcRDzRzPfbLzGGpQgLxCaWEOimXY9gKDAasYXo-b9hGOPCQaVfjqWoMma38AZAs_pzal6XOzOavDPlkAxBaHsvYDQDSRtSbfA7BkXRQFiTR6OalvueqYl1CjV1fpEvAS2DEYp1A7uO&affilid=flightdiscovery
+                - button "View fare details" [ref=e507]
+                - button "Track YTZ fare alerts" [ref=e508]
+            - article [ref=e509]:
+              - generic [ref=e510]:
+                - img "FLL destination" [ref=e511]
+                - generic [ref=e513]:
+                  - generic [ref=e514]: Great Deal
+                  - generic [ref=e515]: 84 score
+                - generic [ref=e516]:
+                  - generic [ref=e517]:
+                    - heading "FLL" [level=3] [ref=e518]
+                    - paragraph
+                  - generic [ref=e519]:
+                    - paragraph [ref=e521]: "84"
+                    - paragraph [ref=e522]: Great value
+              - generic [ref=e523]:
+                - generic [ref=e524]:
+                  - paragraph [ref=e525]: From
+                  - paragraph [ref=e526]: $150
+                  - generic [ref=e527]:
+                    - generic [ref=e528]: CAD · taxes est. CAD $20
+                    - generic [ref=e529]: Save 18%
+                - generic [ref=e530]:
+                  - paragraph [ref=e531]: Why go now
+                  - paragraph [ref=e532]: Strong-value routes with enough variety to spark your next trip.
+                  - generic [ref=e533]:
+                    - generic [ref=e534]: Discovery mode
+                    - generic [ref=e535]: Best for Flexible travelers
+                    - generic [ref=e536]: Best with flexible dates
+                - generic [ref=e538]:
+                  - img "Porter Airlines logo" [ref=e540]
+                  - generic [ref=e541]:
+                    - paragraph [ref=e542]: Porter Airlines
+                    - paragraph [ref=e543]: YUL → FLL · 3h 45m · Direct
+                    - paragraph [ref=e544]: Mar 12, 2026 · Standard Economy
+                - generic [ref=e545]:
+                  - generic [ref=e546]:
+                    - paragraph [ref=e547]: Price trend
+                    - paragraph [ref=e548]: Typical CAD $182
+                  - img "Price trend chart" [ref=e549]
+                - link "Book flight →" [ref=e552] [cursor=pointer]:
+                  - /url: https://www.kiwi.com/deep?affilid=yumoxuflightdiscovery&currency=CAD&flightsId=0eae04cd50370000a09a242a_0&from=YUL&lang=en&passengers=1&to=FLL&booking_token=HKzgPg969p2-vcLR9H05gRHmnjIlx3NE5BOwl7SSMoMgkAp-jkKAw60wr3-n_6eoESQU9F85kTcmnfNAX_YdIewp_MA6Tdq71i7q8RtsXr33AQPQHbBEaN-UURPlhmPd1ypJ4r8ayfVl7eAcTOrB0G2zQKYG7tMAxG6LxOShnS6gQWfME-QTIZch3WGKa2K5bf4AWazGy2Sa-Af8zwlUmfiYOU4LnK7g5bXyY7lDCUAXubmXqr_qKxHz4UGX51kHRrhKgBiH73JJfeckxBA0aDNUP3QsLVgV0aYrCIfC2um0xfaQVPAyeU1DVGjAhjlRBQgkiNTjbeNOqB1B-ag1DKUaZFPPHAAcKLjs9ayIaUx4izc8IHpLfMBxTKQ4GtniGIl2kU4Bhsm4I3mgkkOjgSs-8_uYT2-bBJvo7wMoPfnjpCiizTSEmsjHglORJN8Chl6oRY1xcHxffVQMI6AuD6qKvB0tGCgvsGTeWo3ApypaH6B56zRkRV0FwPWzp_vzpOOvIDFtWBAhByRnry40QywZFGP_mJPlWhIUhpKD43G07IZ5uV27X1zdpDz6ZIQUDngYMc3g8bdc0ggw_TbHsk5ZR8os5Eql7DI7Chjvesu2kRDlQkgldhsFkELEP4IQcdDgP4qpl3vVfQUe38URHELJQklpoeetRmjVl98QQSkD9ZrMKYuHfvKUbXG2w9oCQA6aKWYtnQQMC6owFaNvIIXWUeHsUmX2UnT5ZnHOXRzPq2CNaAYnB2Gv2I2RZvJyx2UjIA07ZeKjcMPr7Pd9eOou0eXQdhmpPa46Hm92-eTHGTLtF6OTmsrQ8EA2vRdoF&token_module=Mod0.Xq9dHn5EutFnAFmfxnFfd2ePFcUvfsNWBwq8S2h7UjCUFg_MPBgfMPyl8mse7KtYYyLXE7Gk-nwgYMlQ2RRVJyCaGip0SDZsLmxqD2cyJgJbj6_w2WByvZqVlVWbu7fPS4TydTVEjSDYRzYW7kfxVfEUF_qt8c-UrOaMzCLY0XRJI_G0bSpKduj4jtKEDtkSAph3okln625aOeW0Jk1y4Wzi0LXK0729XBkSvFGFFW5uyRS97w_orWzFBnGa1s-4HrLTWU_8u0fXtaBB0dsApPqqBfd_Z1RFpHFubmlnILudDPQE1VIKnX31O7VFWl1E&affilid=flightdiscovery
+                - button "View fare details" [ref=e553]
+                - button "Track FLL fare alerts" [ref=e554]
+            - article [ref=e555]:
+              - generic [ref=e556]:
+                - img "Rome destination" [ref=e557]
+                - generic [ref=e559]:
+                  - generic [ref=e560]: Outstanding
+                  - generic [ref=e561]: 88 score
+                - generic [ref=e562]:
+                  - generic [ref=e563]:
+                    - heading "Rome" [level=3] [ref=e564]
+                    - paragraph [ref=e565]: Italy
+                  - generic [ref=e566]:
+                    - paragraph [ref=e568]: "83"
+                    - paragraph [ref=e569]: Great value
+              - generic [ref=e570]:
+                - generic [ref=e571]:
+                  - paragraph [ref=e572]: From
+                  - paragraph [ref=e573]: $688
+                  - generic [ref=e574]:
+                    - generic [ref=e575]: CAD · taxes est. CAD $96
+                    - generic [ref=e576]: Save 28%
+                - generic [ref=e577]:
+                  - paragraph [ref=e578]: Why go now
+                  - paragraph [ref=e579]: Ancient landmarks, long dinners, and golden-hour piazza walks.
+                  - generic [ref=e580]:
+                    - generic [ref=e581]: Historic glow
+                    - generic [ref=e582]: Best for Slow travel
+                    - generic [ref=e583]: Best in spring/fall
+                - generic [ref=e585]:
+                  - img "ITA Airways logo" [ref=e587]
+                  - generic [ref=e588]:
+                    - paragraph [ref=e589]: ITA Airways
+                    - paragraph [ref=e590]: YUL → FCO · 8h 25m · 1 stop
+                    - paragraph [ref=e591]: Apr 12, 2026 · Basic Economy
+                - generic [ref=e592]:
+                  - generic [ref=e593]:
+                    - paragraph [ref=e594]: Price trend
+                    - paragraph [ref=e595]: Typical CAD $960
+                  - img "Price trend chart" [ref=e596]
+                - link "Book flight →" [ref=e599] [cursor=pointer]:
+                  - /url: https://www.google.com/travel/flights?affilid=flightdiscovery
+                - button "View fare details" [ref=e600]
+                - button "Track Rome fare alerts" [ref=e601]
+            - article [ref=e602]:
+              - generic [ref=e603]:
+                - img "Barcelona destination" [ref=e604]
+                - generic [ref=e606]:
+                  - generic [ref=e607]: Great Value
+                  - generic [ref=e608]: 85 score
+                - generic [ref=e609]:
+                  - generic [ref=e610]:
+                    - heading "Barcelona" [level=3] [ref=e611]
+                    - paragraph [ref=e612]: Spain
+                  - generic [ref=e613]:
+                    - paragraph [ref=e615]: "79"
+                    - paragraph [ref=e616]: Great value
+              - generic [ref=e617]:
+                - generic [ref=e618]:
+                  - paragraph [ref=e619]: From
+                  - paragraph [ref=e620]: $652
+                  - generic [ref=e621]:
+                    - generic [ref=e622]: CAD · taxes est. CAD $91
+                    - generic [ref=e623]: Save 30%
+                - generic [ref=e624]:
+                  - paragraph [ref=e625]: Why go now
+                  - paragraph [ref=e626]: Beach downtime meets Gaudí architecture in one compact city.
+                  - generic [ref=e627]:
+                    - generic [ref=e628]: Sunny creative
+                    - generic [ref=e629]: Best for Culture + coast
+                    - generic [ref=e630]: Best in early summer
+                - generic [ref=e632]:
+                  - img "Air Transat logo" [ref=e634]
+                  - generic [ref=e635]:
+                    - paragraph [ref=e636]: Air Transat
+                    - paragraph [ref=e637]: YUL → BCN · 8h 10m · Direct
+                    - paragraph [ref=e638]: Apr 15, 2026 · Flex
+                - generic [ref=e639]:
+                  - generic [ref=e640]:
+                    - paragraph [ref=e641]: Price trend
+                    - paragraph [ref=e642]: Typical CAD $936
+                  - img "Price trend chart" [ref=e643]
+                - link "Book flight →" [ref=e646] [cursor=pointer]:
+                  - /url: https://www.google.com/travel/flights?affilid=flightdiscovery
+                - button "View fare details" [ref=e647]
+                - button "Track Barcelona fare alerts" [ref=e648]
+            - article [ref=e649]:
+              - generic [ref=e650]:
+                - img "Lima destination" [ref=e651]
+                - generic [ref=e653]:
+                  - generic [ref=e654]: Great Value
+                  - generic [ref=e655]: 82 score
+                - generic [ref=e656]:
+                  - generic [ref=e657]:
+                    - heading "Lima" [level=3] [ref=e658]
+                    - paragraph [ref=e659]: Peru
+                  - generic [ref=e660]:
+                    - paragraph [ref=e662]: "75"
+                    - paragraph [ref=e663]: Great value
+              - generic [ref=e664]:
+                - generic [ref=e665]:
+                  - paragraph [ref=e666]: From
+                  - paragraph [ref=e667]: $808
+                  - generic [ref=e668]:
+                    - generic [ref=e669]: CAD · taxes est. CAD $113
+                    - generic [ref=e670]: Save 25%
+                - generic [ref=e671]:
+                  - paragraph [ref=e672]: Why go now
+                  - paragraph [ref=e673]: Clifftop ocean views anchored by one of the region's top food scenes.
+                  - generic [ref=e674]:
+                    - generic [ref=e675]: Urban coastal
+                    - generic [ref=e676]: Best for Culinary trips
+                    - generic [ref=e677]: Best in dry season
+                - generic [ref=e679]:
+                  - img "LATAM Airlines logo" [ref=e681]
+                  - generic [ref=e682]:
+                    - paragraph [ref=e683]: LATAM Airlines
+                    - paragraph [ref=e684]: YUL → LIM · 10h 45m · 1 stop
+                    - paragraph [ref=e685]: Apr 18, 2026 · Flex
+                - generic [ref=e686]:
+                  - generic [ref=e687]:
+                    - paragraph [ref=e688]: Price trend
+                    - paragraph [ref=e689]: Typical CAD $1,078
+                  - img "Price trend chart" [ref=e690]
+                - link "Book flight →" [ref=e693] [cursor=pointer]:
+                  - /url: https://www.google.com/travel/flights?affilid=flightdiscovery
+                - button "View fare details" [ref=e694]
+                - button "Track Lima fare alerts" [ref=e695]
+            - article [ref=e696]:
+              - generic [ref=e697]:
+                - img "Cancún destination" [ref=e698]
+                - generic [ref=e700]:
+                  - generic [ref=e701]: Good Deal
+                  - generic [ref=e702]: 79 score
+                - generic [ref=e703]:
+                  - generic [ref=e704]:
+                    - heading "Cancún" [level=3] [ref=e705]
+                    - paragraph [ref=e706]: Mexico
+                  - generic [ref=e707]:
+                    - paragraph [ref=e709]: "71"
+                    - paragraph [ref=e710]: Good value
+              - generic [ref=e711]:
+                - generic [ref=e712]:
+                  - paragraph [ref=e713]: From
+                  - paragraph [ref=e714]: $452
+                  - generic [ref=e715]:
+                    - generic [ref=e716]: CAD · taxes est. CAD $63
+                    - generic [ref=e717]: Save 27%
+                - generic [ref=e718]:
+                  - paragraph [ref=e719]: Why go now
+                  - paragraph [ref=e720]: Turquoise water escapes with cenotes and easy coastal luxury.
+                  - generic [ref=e721]:
+                    - generic [ref=e722]: Tropical reset
+                    - generic [ref=e723]: Best for Beach downtime
+                    - generic [ref=e724]: Best in winter
+                - generic [ref=e726]:
+                  - img "Air Canada Rouge logo" [ref=e728]
+                  - generic [ref=e729]:
+                    - paragraph [ref=e730]: Air Canada Rouge
+                    - paragraph [ref=e731]: YUL → CUN · 4h 35m · Direct
+                    - paragraph [ref=e732]: Apr 21, 2026 · Standard Economy
+                - generic [ref=e733]:
+                  - generic [ref=e734]:
+                    - paragraph [ref=e735]: Price trend
+                    - paragraph [ref=e736]: Typical CAD $618
+                  - img "Price trend chart" [ref=e737]
+                - link "Book flight →" [ref=e740] [cursor=pointer]:
+                  - /url: https://www.google.com/travel/flights?affilid=flightdiscovery
+                - button "View fare details" [ref=e741]
+                - button "Track Cancún fare alerts" [ref=e742]
+            - article [ref=e743]:
+              - generic [ref=e744]:
+                - img "Honolulu destination" [ref=e745]
+                - generic [ref=e747]:
+                  - generic [ref=e748]: Good Deal
+                  - generic [ref=e749]: 76 score
+                - generic [ref=e750]:
+                  - generic [ref=e751]:
+                    - heading "Honolulu" [level=3] [ref=e752]
+                    - paragraph [ref=e753]: United States
+                  - generic [ref=e754]:
+                    - paragraph [ref=e756]: "67"
+                    - paragraph [ref=e757]: Good value
+              - generic [ref=e758]:
+                - generic [ref=e759]:
+                  - paragraph [ref=e760]: From
+                  - paragraph [ref=e761]: $904
+                  - generic [ref=e762]:
+                    - generic [ref=e763]: CAD · taxes est. CAD $127
+                    - generic [ref=e764]: Save 24%
+                - generic [ref=e765]:
+                  - paragraph [ref=e766]: Why go now
+                  - paragraph [ref=e767]: Pacific sunsets, surf-friendly shores, and volcanic scenery.
+                  - generic [ref=e768]:
+                    - generic [ref=e769]: Island luxury
+                    - generic [ref=e770]: Best for Nature + wellness
+                    - generic [ref=e771]: Best in spring
+                - generic [ref=e773]:
+                  - img "United Airlines logo" [ref=e775]
+                  - generic [ref=e776]:
+                    - paragraph [ref=e777]: United Airlines
+                    - paragraph [ref=e778]: YUL → HNL · 12h 40m · 1 stop
+                    - paragraph [ref=e779]: Apr 24, 2026 · Business
+                - generic [ref=e780]:
+                  - generic [ref=e781]:
+                    - paragraph [ref=e782]: Price trend
+                    - paragraph [ref=e783]: Typical CAD $1,183
+                  - img "Price trend chart" [ref=e784]
+                - link "Book flight →" [ref=e787] [cursor=pointer]:
+                  - /url: https://www.google.com/travel/flights?affilid=flightdiscovery
+                - button "View fare details" [ref=e788]
+                - button "Track Honolulu fare alerts" [ref=e789]
+            - article [ref=e790]:
+              - generic [ref=e791]:
+                - img "PDL destination" [ref=e792]
+                - generic [ref=e794]:
+                  - generic [ref=e795]: Fair Price
+                  - generic [ref=e796]: 57 score
+                - generic [ref=e797]:
+                  - generic [ref=e798]:
+                    - heading "PDL" [level=3] [ref=e799]
+                    - paragraph
+                  - generic [ref=e800]:
+                    - paragraph [ref=e802]: "19"
+                    - paragraph [ref=e803]: Fair value
+              - generic [ref=e804]:
+                - generic [ref=e805]:
+                  - paragraph [ref=e806]: From
+                  - paragraph [ref=e807]: $402
+                  - generic [ref=e808]:
+                    - generic [ref=e809]: CAD · taxes est. CAD $52
+                    - generic [ref=e810]: Save 18%
+                - generic [ref=e811]:
+                  - paragraph [ref=e812]: Why go now
+                  - paragraph [ref=e813]: Strong-value routes with enough variety to spark your next trip.
+                  - generic [ref=e814]:
+                    - generic [ref=e815]: Discovery mode
+                    - generic [ref=e816]: Best for Flexible travelers
+                    - generic [ref=e817]: Best with flexible dates
+                - generic [ref=e819]:
+                  - img "TP logo" [ref=e821]
+                  - generic [ref=e822]:
+                    - paragraph [ref=e823]: TP
+                    - paragraph [ref=e824]: YUL → PDL · 12h · 1 stop
+                    - paragraph [ref=e825]: Mar 12, 2026 · Basic Economy
+                - generic [ref=e826]:
+                  - generic [ref=e827]:
+                    - paragraph [ref=e828]: Price trend
+                    - paragraph [ref=e829]: Typical CAD $490
+                  - img "Price trend chart" [ref=e830]
+                - link "Book flight →" [ref=e833] [cursor=pointer]:
+                  - /url: https://www.kiwi.com/deep?affilid=yumoxuflightdiscovery&currency=CAD&flightsId=0eae01645076000079a442f0_0%7C0eae01645076000079a442f0_1&from=YUL&lang=en&passengers=1&to=PDL&booking_token=HMmMluGGbPn6vKgZJEKiAPS_yx-PUNu8iKJdM9qS1ODklkHglyw8L-KQ0FbqdEYcbk2prXlZmw3yHoTIRxoCVQqkjooxtfcjpVWUjur2K7y1tqmlHmJdNcorBs8Dz_rdBNi4YiShupymoo0LU8IST8Zn9HjqHUiaT7scqKQNNQJ5r820ataTsG-Z3c2rd9dauSsfwLHfbTZFq3_q6jqMsGx3Lac1qGRVas6X-XQfnOfxjRzKzsO3M-ArxOLapYqn6c49IQmHxaUUPRIYR9mqEnhqjA775A0kRl6gIh3AjuARbdjZdPDxNmtfqe0ymxnvr3bVMyKgsXKSu6Lum3kyBp9Xf3AalB14n5UpM_SKGUjgTzFWVDYuHN8NFHK1Ey7HBB2DGqVWTig0rdHdDYPNiZje8QMeBdjZaLdCnU2d1OgCiUmih02NbAbjD-K_kKOD9PdjHwktAJjCbz-DWkyj43deVfYE-qTjYwW-KBafE_ES7uNsVEid8QxyMunmMyDYgNSriNMJ6T2IK0Ye2SM_IGIb9qrJy_Phcaso2nUDHl3gzwWgFZzii3YUoSSw3DIaX_JMa8n9v7IiVqYIKmsUL4mfNCDmwD581xukjUBfh9Z1XCFefsCV61hvckC34aJiYeHJdLEZCqZ0qGePVaftcRiym26PTvY3QANButFXmh1WnBD7Rbr3fgveDLrXEF76yKfK37enPOWfyHpB0_NWT6q77xCwl8f9kezlrA8FSdDX72xgAb68hhuwDRG62OpwDnS__x0YKFb_xsAG8wOQ2BvQHASAaH1o3pfjDhUKVrH-6MIeyO84kjzW4PcFZ3weq_owK_fINrddYLkZWP3w4dQ==&token_module=Mod0.-8Q_mg45itjojLQpGMShxOOGdQwfLdRXjrgvA1IBIl0UzNbgWObGEHuPPZ3Lta9u4kxw5MzqJ5ApUbU16jILjKuwCly9ftq45v2Y2XgcpfK860LxQsmES7sRM9aoq4sA2F80_8edI5IFGwybBRAT21EkD1X5QtJ2sz1jupVj2oyYyneBqOyxLCxOc1zPVjLNvVHMR9aWIs65uiMRGdAlCfrdTuoWccpd8NCmxl2pYxqwhxZYvXyeDwiKux5NLgZYshPVU7aNV-NJxr8ZHJLFxZfK8Z2gPelxYdnJrtM7n6c_nglwIUgevFUwMDeARkfaIJx5Xqy3N7nPbo405J1YB2EtoJEKmYNwiaePbyKzztc=&affilid=flightdiscovery
+                - button "View fare details" [ref=e834]
+                - button "Track PDL fare alerts" [ref=e835]
+  - button "Open Next.js Dev Tools" [ref=e841] [cursor=pointer]:
+    - generic [ref=e844]:
+      - text: Compiling
+      - generic [ref=e845]:
+        - generic [ref=e846]: .
+        - generic [ref=e847]: .
+        - generic [ref=e848]: .
+  - alert [ref=e849]
+```

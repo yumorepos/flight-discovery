@@ -1,0 +1,115 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: ✈
+          - generic [ref=e7]:
+            - paragraph [ref=e8]: FlightFinder
+            - paragraph [ref=e9]: Free flight deal finder
+        - generic [ref=e10]:
+          - combobox [ref=e11]:
+            - option "CAD $" [selected]
+            - option "USD $"
+            - option "EUR €"
+            - option "GBP £"
+            - option "JPY ¥"
+            - option "AUD $"
+          - link "Explore fares" [ref=e12] [cursor=pointer]:
+            - /url: "#results"
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - paragraph [ref=e17]: Destination-first fare discovery
+        - heading "Discover bold destinations with premium fare intelligence" [level=1] [ref=e18]
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - generic [ref=e21]:
+            - generic [ref=e22]:
+              - paragraph [ref=e23]: Smart search
+              - paragraph [ref=e24]: Discover the best-value routes with tax-inclusive fares and real-time ranking.
+            - generic [ref=e25]: Trusted pricing intelligence
+          - generic [ref=e27]:
+            - generic [ref=e28]:
+              - generic [ref=e29]: Departing from
+              - combobox "Origin airport" [ref=e30]: Montreal (YUL)
+            - generic [ref=e31]:
+              - generic [ref=e32]: Travel month
+              - combobox "Travel month" [ref=e33]:
+                - option "Any month" [selected]
+                - option "March 2026"
+                - option "April 2026"
+                - option "May 2026"
+                - option "June 2026"
+                - option "July 2026"
+                - option "August 2026"
+                - option "September 2026"
+                - option "October 2026"
+                - option "November 2026"
+                - option "December 2026"
+                - option "January 2027"
+                - option "February 2027"
+                - option "March 2027"
+                - option "April 2027"
+                - option "May 2027"
+                - option "June 2027"
+                - option "July 2027"
+                - option "August 2027"
+            - generic [ref=e34]:
+              - generic [ref=e35]: Destination
+              - combobox "Destination airport or flexible region" [ref=e36]: Anywhere
+            - generic [ref=e37]:
+              - generic [ref=e38]: Fare class
+              - combobox "Fare class" [ref=e39]:
+                - option "Any" [selected]
+                - option "Economy"
+                - option "Premium Economy"
+                - option "Business"
+                - option "First"
+            - button "Search fares" [ref=e40]
+          - generic [ref=e41]:
+            - generic [ref=e42]:
+              - checkbox "Flexible dates (+/- 3 days)" [checked] [ref=e43]
+              - text: Flexible dates (+/- 3 days)
+            - paragraph [ref=e44]: "Tip: use region keywords like Europe, Asia, or Beach for inspiration."
+        - paragraph [ref=e45]: Scans millions of fares daily to highlight the most inspiring routes first.
+      - generic [ref=e46]:
+        - article [ref=e47]:
+          - img "Paris" [ref=e49]
+          - generic [ref=e51]:
+            - paragraph [ref=e52]: Trending now
+            - paragraph [ref=e53]: Paris
+            - paragraph [ref=e54]: Café terraces + iconic boulevards
+            - paragraph [ref=e55]: from 648 CAD
+        - article [ref=e56]:
+          - img "Tokyo" [ref=e58]
+          - generic [ref=e60]:
+            - paragraph [ref=e61]: Trending now
+            - paragraph [ref=e62]: Tokyo
+            - paragraph [ref=e63]: Design districts and late-night ramen
+            - paragraph [ref=e64]: from 1028 CAD
+        - article [ref=e65]:
+          - img "Cancún" [ref=e67]
+          - generic [ref=e69]:
+            - paragraph [ref=e70]: Trending now
+            - paragraph [ref=e71]: Cancún
+            - paragraph [ref=e72]: Warm-water escapes and easy beach downtime
+            - paragraph [ref=e73]: from 452 CAD
+    - main [ref=e74]:
+      - generic [ref=e77]:
+        - paragraph [ref=e78]: Connection issue
+        - heading "Unable to load fares right now." [level=2] [ref=e79]
+        - paragraph [ref=e80]: Please try again in a moment. You can also broaden filters once results are back to reveal more destination deals.
+        - paragraph [ref=e81]: "Technical detail: Failed to fetch"
+        - button "Retry search" [ref=e82]
+  - button "Open Next.js Dev Tools" [ref=e88] [cursor=pointer]:
+    - generic [ref=e91]:
+      - text: Compiling
+      - generic [ref=e92]:
+        - generic [ref=e93]: .
+        - generic [ref=e94]: .
+        - generic [ref=e95]: .
+  - alert [ref=e96]
+```
