@@ -1,8 +1,12 @@
 # FlightFinder
 
+[![CI](https://github.com/yumorepos/flight-discovery/actions/workflows/ci.yml/badge.svg)](https://github.com/yumorepos/flight-discovery/actions/workflows/ci.yml)
+
 **A destination-first flight discovery platform built with Next.js, TypeScript, and Tailwind CSS.**
 
 🔗 **Live Demo:** [flight-discovery.vercel.app](https://flight-discovery.vercel.app)
+
+![FlightFinder Screenshot](docs/screenshot.png)
 
 ![FlightFinder Screenshot](docs/screenshot.png)
 
